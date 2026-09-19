@@ -40,7 +40,10 @@ export const metadata: Metadata = {
     "TaxBuddy alternative",
     "Tax & Compliance Suite",
     "GSTR-2A Reconciliation"
-  ]
+  ],
+  verification: {
+    google: "hOYQSCdhyz53Bs5FZfHUZ-3zX8S0F8TpKEJJTOmXhaM"
+  }
 };
 
 export default function RootLayout({
@@ -50,6 +53,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
+      <head>
+        <meta name="google-site-verification" content="hOYQSCdhyz53Bs5FZfHUZ-3zX8S0F8TpKEJJTOmXhaM" />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white">
         <ConfigProvider>
           <AuthProvider>
