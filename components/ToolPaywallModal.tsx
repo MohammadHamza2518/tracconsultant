@@ -170,7 +170,7 @@ export default function ToolPaywallModal({
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-xs font-bold text-slate-500 uppercase">Single Tool</span>
                     {selectedPlan === 'single' && (
-                      <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">
+                      <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">
                         ✓
                       </span>
                     )}
@@ -187,13 +187,13 @@ export default function ToolPaywallModal({
                       : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
                   }`}
                 >
-                  <div className="absolute -top-2.5 right-3 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  <div className="absolute -top-2.5 right-3 bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                     Best Value
                   </div>
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-xs font-bold text-indigo-700 uppercase">All 5 Paid Tools</span>
                     {selectedPlan === 'all' && (
-                      <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">
+                      <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
                         ✓
                       </span>
                     )}
@@ -243,16 +243,16 @@ export default function ToolPaywallModal({
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleUnlockPayment('instant_demo')}
-                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#008f4c] active:bg-emerald-800 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2"
                 >
                   <Zap className="w-4 h-4 fill-white" />
                   <span>{isProcessing ? 'Verifying...' : `Unlock Now (Instant 1-Click Verification)`}</span>
                 </button>
 
-                <p className="text-center text-[10px] text-slate-400 leading-normal">
+                <p className="text-center text-xs text-slate-400 leading-normal">
                   🔒 Bank-grade 256-bit encryption. By proceeding, you agree to our{' '}
-                  <a href="/terms-of-service" target="_blank" className="text-emerald-400 underline">Terms</a> &{' '}
-                  <a href="/refund-policy" target="_blank" className="text-emerald-400 underline">Refund Policy</a>. Digital tools unlocked instantly.
+                  <a href="/terms-of-service" target="_blank" className="text-emerald-500 underline">Terms</a> &{' '}
+                  <a href="/refund-policy" target="_blank" className="text-emerald-500 underline">Refund Policy</a>. Digital tools unlocked instantly.
                 </p>
               </div>
             </>
