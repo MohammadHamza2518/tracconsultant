@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useConfig } from '@/context/ConfigContext';
-import { X, CheckCircle2, ShieldCheck, Zap, Sparkles, QrCode, ArrowRight, Lock, Check } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Zap, Sparkles, ArrowRight, Lock, Check } from 'lucide-react';
 import { loadRazorpayScript } from '@/lib/loadRazorpay';
 
 interface ToolPaywallModalProps {
@@ -46,10 +46,6 @@ export default function ToolPaywallModal({
   const effectivePrice = price ?? getToolPrice(toolId, 199);
   const bundlePrice = toolPrices?.allAccessPass || 999;
   const finalAmount = selectedPlan === 'single' ? effectivePrice : bundlePrice;
-  const upiId = 'tracconsultant@upi';
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-    `upi://pay?pa=${upiId}&pn=Tracconsultant%20Advisory&am=${finalAmount}&cu=INR&tn=${encodeURIComponent(toolName)}`
-  )}`;
 
   const handleRazorpayToolPayment = async () => {
     const finalName = (user?.name || customerName).trim();
@@ -159,13 +155,25 @@ export default function ToolPaywallModal({
           email: finalEmail,
           contact: finalPhone
         },
+        // Explicitly enable all Indian payment methods including UPI
+        method: {
+          upi: true,
+          card: true,
+          netbanking: true,
+          wallet: true,
+          emi: true,
+          paylater: true
+        },
         theme: {
-          color: '#00a859'
+          color: '#00a859',
+          hide_topbar: false
         },
         modal: {
           ondismiss: function () {
             setIsProcessing(false);
-          }
+          },
+          confirm_close: false,
+          animation: true
         }
       };
 
@@ -337,22 +345,26 @@ export default function ToolPaywallModal({
                 </div>
               )}
 
-              {/* UPI QR & Instant Payment Box */}
-              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-4 flex flex-col sm:flex-row items-center gap-4">
-                <div className="p-2 bg-white rounded-xl shadow-xs border border-slate-200 shrink-0">
-                  <img src={qrUrl} alt="UPI QR Code" className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg" />
+              {/* Payment Methods Info */}
+              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-4">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 text-center">
+                  All Payment Methods Accepted
                 </div>
-                <div className="space-y-1.5 text-center sm:text-left flex-1 text-xs">
-                  <div className="text-slate-500 font-semibold uppercase tracking-wider text-[11px]">Instant UPI Gateway</div>
-                  <div className="font-mono text-xs bg-white px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700 inline-block font-bold">
-                    {upiId}
-                  </div>
-                  <div className="text-slate-500 text-[11px]">
-                    Supports Google Pay, PhonePe, Paytm, BHIM, Cred, Cards & NetBanking.
-                  </div>
-                  <div className="text-sm font-extrabold text-emerald-700 pt-0.5">
-                    Amount: ₹{finalAmount}
-                  </div>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {[
+                    { label: '🏦 UPI', sub: 'GPay · PhonePe · Paytm' },
+                    { label: '💳 Cards', sub: 'Visa · Mastercard · RuPay' },
+                    { label: '🌐 Net Banking', sub: 'All Major Banks' },
+                    { label: '👛 Wallets', sub: 'Freecharge · Mobikwik' },
+                  ].map((m) => (
+                    <div key={m.label} className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center shadow-xs">
+                      <div className="text-xs font-bold text-slate-800">{m.label}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{m.sub}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center text-[11px] text-emerald-700 font-bold mt-3">
+                  Amount: ₹{finalAmount} — Secure Razorpay Checkout
                 </div>
               </div>
 
