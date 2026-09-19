@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyRazorpaySignature } from '@/lib/razorpay';
-import { updatePaymentStatus, findPaymentByOrderId, recordToolPurchase, findUserByEmail, createUser } from '@/lib/db';
+import { updatePaymentStatus, findPaymentByOrderId, recordToolPurchase, findUserByEmail, findUserById, createUser, syncUserPurchasedTools } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
       verifiedAt: new Date().toISOString()
     });
 
+    let confirmedUser: any = null;
+
     // 3. If this payment is for unlocking a SaaS tool, record the tool purchase
     if (notes?.type === 'tool' || notes?.toolId) {
       const toolId = notes.toolId;
@@ -55,31 +57,40 @@ export async function POST(req: NextRequest) {
       const userPhone = customer?.phone || '';
       let targetUserId = notes.userId;
 
-      if (!targetUserId && userEmail) {
-        let user = findUserByEmail(userEmail);
+      // Robust user resolution: check by id or by email
+      let user = null;
+      if (targetUserId && targetUserId !== 'usr-client') {
+        user = findUserById(targetUserId);
+      }
+      if (!user && userEmail) {
+        user = findUserByEmail(userEmail);
         if (!user) {
           user = createUser({
             name: userName,
             email: userEmail,
             phone: userPhone,
-            role: 'client'
+            role: 'client',
+            password: 'default123'
           });
         }
-        targetUserId = user.id;
       }
 
-      if (targetUserId) {
+      if (user) {
         recordToolPurchase({
-          userId: targetUserId,
-          userName,
-          userEmail,
-          userPhone,
+          userId: user.id,
+          userName: user.name || userName,
+          userEmail: user.email || userEmail,
+          userPhone: user.phone || userPhone,
           toolId,
           toolName,
           amount: Number(amount) || 0,
           paymentMode: 'Card', // Razorpay online
           paymentId: razorpay_payment_id
         });
+
+        const synced = syncUserPurchasedTools(user);
+        const { password: _, ...userSafe } = synced as any;
+        confirmedUser = userSafe;
       }
     }
 
@@ -88,6 +99,7 @@ export async function POST(req: NextRequest) {
       verified: true,
       receiptId: updated?.id || receiptId || `TRAC-PAY-${new Date().getFullYear()}`,
       paymentId: razorpay_payment_id,
+      user: confirmedUser,
       message: 'Payment verified and officially confirmed.'
     });
   } catch (error: any) {

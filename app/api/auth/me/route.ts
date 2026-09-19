@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUserById, findUserByEmail } from '@/lib/db';
+import { findUserById, findUserByEmail, syncUserPurchasedTools } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  const { password: _, ...userSafe } = user as any;
+  const synced = syncUserPurchasedTools(user);
+  const { password: _, ...userSafe } = synced as any;
   return NextResponse.json({ user: userSafe });
 }

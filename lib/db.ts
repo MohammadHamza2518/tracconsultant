@@ -319,22 +319,47 @@ export function saveUsers(users: User[]): void {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
 }
 
+export const ALL_PRO_TOOLS = [
+  'pdf-redactor', 
+  'tb-to-balancesheet', 
+  'gstr2a-reconciliation', 
+  'json-to-computation', 
+  'gstr2a-cleaner'
+];
+
+export const FREE_TOOLS = [
+  'hra-calculator', 
+  'advance-tax-calculator', 
+  'tax-calculator'
+];
+
 export function findUserByEmail(email: string): User | undefined {
   const users = getUsers();
-  return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (found) {
+    return syncUserPurchasedTools(found);
+  }
+  return undefined;
 }
 
 export function findUserById(id: string): User | undefined {
   const users = getUsers();
-  return users.find(u => u.id === id);
+  const found = users.find(u => u.id === id);
+  if (found) {
+    return syncUserPurchasedTools(found);
+  }
+  return undefined;
 }
 
 export function createUser(userData: Partial<User> & { email: string; name: string }): User {
   const users = getUsers();
   const existing = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
   if (existing) {
-    return existing;
+    return syncUserPurchasedTools(existing);
   }
+
+  const initialTools = new Set<string>(userData.unlockedTools || FREE_TOOLS);
+  FREE_TOOLS.forEach(t => initialTools.add(t));
 
   const newUser: User = {
     id: `usr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -344,14 +369,14 @@ export function createUser(userData: Partial<User> & { email: string; name: stri
     role: userData.role || 'client',
     authProvider: userData.authProvider || 'email',
     avatar: userData.avatar,
-    unlockedTools: userData.unlockedTools || ['hra-calculator', 'advance-tax-calculator', 'tax-calculator'],
+    unlockedTools: Array.from(initialTools),
     createdAt: new Date().toISOString(),
     password: userData.password
   };
 
   users.push(newUser);
   saveUsers(users);
-  return newUser;
+  return syncUserPurchasedTools(newUser);
 }
 
 export function updateUser(id: string, updates: Partial<User>): User | null {
@@ -369,11 +394,20 @@ export function toggleUserToolAccess(userId: string, toolId: string, grant: bool
   const idx = users.findIndex(u => u.id === userId);
   if (idx === -1) return false;
 
-  const current = new Set(users[idx].unlockedTools || []);
+  const current = new Set(users[idx].unlockedTools || FREE_TOOLS);
+  FREE_TOOLS.forEach(t => current.add(t));
+
   if (grant) {
     current.add(toolId);
+    if (toolId === 'all-access-pass' || toolId === 'all-access') {
+      ALL_PRO_TOOLS.forEach(t => current.add(t));
+    }
   } else {
     current.delete(toolId);
+    if (toolId === 'all-access-pass' || toolId === 'all-access') {
+      current.delete('all-access-pass');
+      current.delete('all-access');
+    }
   }
 
   users[idx].unlockedTools = Array.from(current);
@@ -545,5 +579,77 @@ export function updatePaymentStatus(idOrOrderId: string, update: Partial<Payment
 
   savePayments(payments);
   return payments[idx];
+}
+
+// ----------------------------------------------------
+// Tool Purchases & User Entitlement Reconciler
+// ----------------------------------------------------
+export function syncUserPurchasedTools(user: User): User {
+  if (!user) return user;
+
+  const currentTools = new Set<string>(user.unlockedTools || FREE_TOOLS);
+  FREE_TOOLS.forEach(t => currentTools.add(t));
+
+  // If user is admin, grant all
+  if (user.role === 'admin') {
+    ALL_PRO_TOOLS.forEach(t => currentTools.add(t));
+    currentTools.add('all-access-pass');
+  }
+
+  // 1. Check all active tool purchases in tool_purchases.json
+  const purchases = getToolPurchases();
+  const userPurchases = purchases.filter(p => 
+    p.status === 'active' && (
+      (p.userId && p.userId === user.id) ||
+      (p.userEmail && user.email && p.userEmail.toLowerCase() === user.email.toLowerCase()) ||
+      (p.userPhone && user.phone && p.userPhone.trim() !== '' && p.userPhone === user.phone)
+    )
+  );
+
+  userPurchases.forEach(p => {
+    if (p.toolId === 'all-access-pass' || p.toolId === 'all-access') {
+      currentTools.add('all-access-pass');
+      ALL_PRO_TOOLS.forEach(t => currentTools.add(t));
+    } else if (p.toolId) {
+      currentTools.add(p.toolId);
+    }
+  });
+
+  // 2. Check verified payments in payments.json
+  const payments = getPayments();
+  const userPayments = payments.filter(p =>
+    p.status === 'paid' && (
+      (p.notes?.userId && p.notes.userId === user.id) ||
+      (p.payerEmail && user.email && p.payerEmail.toLowerCase() === user.email.toLowerCase()) ||
+      (p.payerPhone && user.phone && p.payerPhone.trim() !== '' && p.payerPhone === user.phone)
+    )
+  );
+
+  userPayments.forEach(p => {
+    const tid = p.notes?.toolId;
+    if (tid === 'all-access-pass' || tid === 'all-access') {
+      currentTools.add('all-access-pass');
+      ALL_PRO_TOOLS.forEach(t => currentTools.add(t));
+    } else if (tid) {
+      currentTools.add(tid);
+    }
+  });
+
+  const updatedTools = Array.from(currentTools);
+  const originalTools = user.unlockedTools || [];
+  const isChanged = updatedTools.length !== originalTools.length || 
+    updatedTools.some(t => !originalTools.includes(t));
+
+  if (isChanged) {
+    user.unlockedTools = updatedTools;
+    const users = getUsers();
+    const idx = users.findIndex(u => u.id === user.id);
+    if (idx !== -1) {
+      users[idx].unlockedTools = updatedTools;
+      saveUsers(users);
+    }
+  }
+
+  return user;
 }
 

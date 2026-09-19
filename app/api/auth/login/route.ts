@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUserByEmail } from '@/lib/db';
+import { findUserByEmail, syncUserPurchasedTools } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Incorrect password. Please check and try again.' }, { status: 401 });
     }
 
-    const { password: _, ...userSafe } = user as any;
+    const synced = syncUserPurchasedTools(user);
+    const { password: _, ...userSafe } = synced as any;
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUserByEmail, createUser } from '@/lib/db';
+import { findUserByEmail, createUser, updateUser, syncUserPurchasedTools } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +12,22 @@ export async function POST(req: NextRequest) {
 
     const existing = findUserByEmail(email);
     if (existing) {
+      // If user was created during guest payment (or has default password), upgrade account seamlessly
+      if (!existing.password || existing.password === 'default123') {
+        const updated = updateUser(existing.id, {
+          name: name || existing.name,
+          phone: phone || existing.phone,
+          password: password || 'default123'
+        });
+        const synced = syncUserPurchasedTools(updated || existing);
+        const { password: _, ...userSafe } = synced as any;
+        return NextResponse.json({
+          success: true,
+          message: 'Account activated and synced with your verified purchases!',
+          user: userSafe
+        }, { status: 200 });
+      }
+
       return NextResponse.json({ error: 'An account with this email already exists. Please login.' }, { status: 409 });
     }
 
@@ -24,8 +40,9 @@ export async function POST(req: NextRequest) {
       role: 'client'
     });
 
+    const synced = syncUserPurchasedTools(newUser);
     // Remove password before sending to client
-    const { password: _, ...userSafe } = newUser as any;
+    const { password: _, ...userSafe } = synced as any;
 
     return NextResponse.json({
       success: true,

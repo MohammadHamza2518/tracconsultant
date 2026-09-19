@@ -53,9 +53,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = async () => {
-    if (!user?.id) return;
+    let currentId = user?.id;
+    let currentEmail = user?.email;
+    if (!currentId && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('trac_user_session');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          currentId = parsed.id;
+          currentEmail = parsed.email;
+        } catch {}
+      }
+    }
+    if (!currentId && !currentEmail) return;
+
     try {
-      const res = await fetch(`/api/auth/me?id=${encodeURIComponent(user.id)}`);
+      const queryParam = currentId ? `id=${encodeURIComponent(currentId)}` : `email=${encodeURIComponent(currentEmail!)}`;
+      const res = await fetch(`/api/auth/me?${queryParam}`);
       const data = await res.json();
       if (data.user) {
         setUser(data.user);
@@ -152,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasToolAccess = (toolId: string) => {
-    // Free tools are accessible to everyone
+    // Free calculators are accessible to everyone
     if (['hra-calculator', 'advance-tax-calculator', 'tax-calculator'].includes(toolId)) {
       return true;
     }
@@ -160,33 +174,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user?.role === 'admin') {
       return true;
     }
-    // All-access pass unlocks all tools
-    if (user?.unlockedTools?.includes('all-access-pass')) {
+    // All-access pass unlocks all pro tools
+    if (user?.unlockedTools?.includes('all-access-pass') || user?.unlockedTools?.includes('all-access')) {
       return true;
     }
-    // Check if user has unlocked the tool
+    // Check if user has unlocked the specific tool
     if (user?.unlockedTools?.includes(toolId)) {
       return true;
     }
-    // Check localStorage fallback for quick test unlocks
+    // Check saved session during SSR / initial hydration
     if (typeof window !== 'undefined') {
-      if (localStorage.getItem('trac_test_all_access') === 'true') {
-        return true;
-      }
       const saved = localStorage.getItem('trac_user_session');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed.unlockedTools?.includes('all-access-pass') || parsed.unlockedTools?.includes(toolId) || parsed.role === 'admin') {
-            return true;
-          }
-        } catch {}
-      }
-      const direct = localStorage.getItem('trac_unlocked_tools');
-      if (direct) {
-        try {
-          const parsed = JSON.parse(direct);
-          if (Array.isArray(parsed) && (parsed.includes(toolId) || parsed.includes('all-access-pass'))) {
+          if (
+            parsed.role === 'admin' ||
+            parsed.unlockedTools?.includes('all-access-pass') ||
+            parsed.unlockedTools?.includes('all-access') ||
+            parsed.unlockedTools?.includes(toolId)
+          ) {
             return true;
           }
         } catch {}

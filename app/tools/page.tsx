@@ -31,45 +31,6 @@ export default function ToolsHubPage() {
   const [filter, setFilter] = useState<'all' | 'free' | 'paid'>('all');
   const [search, setSearch] = useState('');
   const [paywallTool, setPaywallTool] = useState<ToolConfig | null>(null);
-  const [isAllTestingUnlocked, setIsAllTestingUnlocked] = useState<boolean>(false);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsAllTestingUnlocked(localStorage.getItem('trac_test_all_access') === 'true');
-    }
-  }, []);
-
-  const handleUnlockAllForTesting = () => {
-    localStorage.setItem('trac_test_all_access', 'true');
-    const allTools = ['pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'all-access-pass'];
-    localStorage.setItem('trac_unlocked_tools', JSON.stringify(allTools));
-    // Also add to active user profile if logged in
-    const session = localStorage.getItem('trac_user_session');
-    if (session) {
-      try {
-        const u = JSON.parse(session);
-        u.unlockedTools = allTools;
-        localStorage.setItem('trac_user_session', JSON.stringify(u));
-      } catch {}
-    }
-    setIsAllTestingUnlocked(true);
-    refreshUser();
-  };
-
-  const handleResetTesting = () => {
-    localStorage.removeItem('trac_test_all_access');
-    localStorage.removeItem('trac_unlocked_tools');
-    const session = localStorage.getItem('trac_user_session');
-    if (session) {
-      try {
-        const u = JSON.parse(session);
-        u.unlockedTools = [];
-        localStorage.setItem('trac_user_session', JSON.stringify(u));
-      } catch {}
-    }
-    setIsAllTestingUnlocked(false);
-    refreshUser();
-  };
 
   const filteredTools = TOOLS_LIST.filter(tool => {
     const matchesFilter = filter === 'all' || tool.category === filter;
@@ -125,85 +86,31 @@ export default function ToolsHubPage() {
               <span>Explore All 8 Tools</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
-            {!isAllTestingUnlocked ? (
-              <button
-                type="button"
-                onClick={handleUnlockAllForTesting}
-                className="px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-xl text-xs border border-white/20 transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Zap className="w-3.5 h-3.5 text-amber-300" />
-                <span>1-Click Unlock All (Test Mode)</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleResetTesting}
-                className="px-4 py-2.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>All Tools Unlocked (Click to Reset)</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setPaywallTool({
+                id: 'all-access-pass',
+                name: 'All-Access Compliance Suite Pass (All 5 Paid Modules)',
+                slug: 'all-access',
+                category: 'paid',
+                price: bundlePrice,
+                shortDesc: 'Unlock all 5 paid CA processing tools in one bundle.',
+                description: 'Unlimited file processing pass for all 5 professional tools.',
+                icon: 'Sparkles',
+                tags: ['Bundle', 'Full Suite'],
+                features: ['All 5 Paid Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
+              })}
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Get All-Access Pass (₹{bundlePrice})</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-8 relative z-10">
-        {/* Full Access Testing Notice (Light, low-noise card) */}
-        <div className={`rounded-2xl p-4 mb-6 border transition-all flex flex-col sm:flex-row items-center justify-between gap-3 text-xs ${
-          isAllTestingUnlocked 
-            ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900' 
-            : 'bg-slate-100/90 border-slate-200 text-slate-700'
-        }`}>
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-              isAllTestingUnlocked 
-                ? 'bg-emerald-100 border-emerald-200 text-emerald-700' 
-                : 'bg-white border-slate-200 text-slate-700'
-            }`}>
-              <Zap className="w-4 h-4 fill-current" />
-            </div>
-            <div>
-              <div className="font-bold flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span className="text-slate-900">Evaluation & Client Test Mode</span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
-                  isAllTestingUnlocked 
-                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                    : 'bg-white text-slate-600 border-slate-200'
-                }`}>
-                  {isAllTestingUnlocked ? '● All 8 Tools Unlocked' : 'Paywall Demo Mode'}
-                </span>
-              </div>
-              <p className="text-slate-500 mt-0.5 text-xs">
-                {isAllTestingUnlocked 
-                  ? 'All 5 Pro tools are unlocked! Click "Open Workspace" on any tool to test full calculation & report downloads.'
-                  : 'Click "1-Click Unlock" above to test all 5 Pro tools without payment, or click "Unlock" on any card to preview checkout.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {!isAllTestingUnlocked ? (
-              <button
-                type="button"
-                onClick={handleUnlockAllForTesting}
-                className="px-3.5 py-1.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Zap className="w-3.5 h-3.5 fill-white" />
-                <span>1-Click Unlock</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleResetTesting}
-                className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-lg text-xs border border-slate-300 shadow-xs transition-colors cursor-pointer"
-              >
-                Reset Paywall
-              </button>
-            )}
-          </div>
-        </div>
+      <div id="tools-grid" className="max-w-6xl mx-auto px-4 sm:px-8 pt-8 relative z-10">
 
         {/* Controls: Filter Tabs & Search Box - Explicit h-11 Alignment */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">

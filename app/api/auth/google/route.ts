@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUserByEmail, createUser } from '@/lib/db';
+import { findUserByEmail, createUser, syncUserPurchasedTools } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const { password: _, ...userSafe } = user as any;
+    const synced = syncUserPurchasedTools(user);
+    const { password: _, ...userSafe } = synced as any;
 
     return NextResponse.json({
       success: true,
