@@ -62,7 +62,7 @@ export default function HowItWorks() {
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-3xl font-black text-emerald-400/30 font-mono">{s.step}</span>
-                    <span className="text-[10px] font-bold px-2.5 py-1 bg-emerald-500/10 text-emerald-300 rounded-full border border-emerald-500/20">
+                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-500/10 text-emerald-300 rounded-full border border-emerald-500/20">
                       {s.badge}
                     </span>
                   </div>
@@ -75,7 +75,7 @@ export default function HowItWorks() {
                   <p className="text-xs text-slate-300 leading-relaxed">{s.desc}</p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-700/60 text-[11px] text-emerald-400 font-medium">
+                <div className="mt-6 pt-4 border-t border-slate-700/60 text-xs text-emerald-400 font-medium">
                   {idx === 0 && '⚡ Zero physical visit required'}
                   {idx === 1 && '🛡️ Cross-checked with Income Tax API'}
                   {idx === 2 && '💬 Instant WhatsApp communication'}
@@ -89,7 +89,7 @@ export default function HowItWorks() {
         <div className="mt-12 text-center">
           <Link
             href="#file-now"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#00a859] to-[#059669] hover:from-[#008f4c] hover:to-[#047857] text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-500/30 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm shadow-xl shadow-emerald-500/30 transition-all cursor-pointer"
           >
             <span>Start Your Filing Now</span>
             <ArrowRight className="w-4 h-4" />

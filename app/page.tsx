@@ -80,15 +80,17 @@ export default function HomePage() {
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="#file-now"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#00a859] to-[#059669] hover:from-[#008f4c] hover:to-[#047857] text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-500/25 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm shadow-xl shadow-emerald-500/25 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              Start Filing in 30 Seconds &rarr;
+              <span>Start Filing with CA Now</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <a
               href="tel:+917275922162"
-              className="w-full sm:w-auto px-6 py-4 bg-white/10 hover:bg-white/15 text-white border border-white/20 rounded-2xl font-semibold text-sm transition-all"
+              className="w-full sm:w-auto px-6 py-4 bg-white/10 hover:bg-white/15 text-white border border-white/20 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2"
             >
-              Direct CA Call: +91 7275922162
+              <Phone className="w-4 h-4 text-emerald-400" />
+              <span>Direct CA Call: +91 7275922162</span>
             </a>
           </div>
         </div>

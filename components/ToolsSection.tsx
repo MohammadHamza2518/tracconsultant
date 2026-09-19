@@ -57,7 +57,7 @@ export default function ToolsSection() {
             href="/tools"
             className="px-5 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md shrink-0"
           >
-            <span>Explore Complete Suite (8)</span>
+            <span>View All Tools Directory</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -76,11 +76,11 @@ export default function ToolsSection() {
                     {getToolIcon(tool.icon)}
                   </div>
                   {tool.category === 'free' ? (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       FREE
                     </span>
                   ) : (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                       ₹{getToolPrice(tool.id, tool.price)}
                     </span>
                   )}
@@ -89,16 +89,24 @@ export default function ToolsSection() {
                 <h3 className="font-bold text-sm text-white group-hover:text-emerald-400 transition-colors leading-snug">
                   {tool.name}
                 </h3>
-                <p className="text-[11px] text-slate-400 mt-1.5 line-clamp-2">
+                <p className="text-xs text-slate-400 mt-1.5 line-clamp-2">
                   {tool.shortDesc}
                 </p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-[11px]">
-                <span className="text-slate-500">{tool.category === 'free' ? 'No Paywall' : 'One-time unlock'}</span>
-                <span className="text-emerald-400 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                  Launch →
+              <div className="mt-5 pt-3.5 border-t border-slate-700/60 flex items-center justify-between">
+                <span className="text-xs text-slate-400">
+                  {tool.category === 'free' ? 'No Paywall' : 'One-time unlock'}
                 </span>
+                {tool.category === 'free' ? (
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 group-hover:bg-emerald-500 text-white shadow-sm flex items-center gap-1 transition-all">
+                    Launch Free Tool →
+                  </span>
+                ) : (
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 group-hover:bg-indigo-500 text-white shadow-sm flex items-center gap-1 transition-all">
+                    Unlock Tool →
+                  </span>
+                )}
               </div>
             </Link>
           ))}

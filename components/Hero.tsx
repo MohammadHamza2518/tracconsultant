@@ -190,8 +190,8 @@ export default function Hero() {
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/90 cursor-pointer" title="Live Desk Active" />
                 </div>
                 
-                <div className="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-emerald-400" />
+                <div className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-emerald-400" />
                   <span>tracconsultant.com • Secure CA Console</span>
                 </div>
 
@@ -199,7 +199,7 @@ export default function Hero() {
                   href="https://wa.me/917275922162?text=Hello%20Tracconsultant!%20I%20want%20to%20connect%20with%20the%20live%20desk."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-semibold transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors cursor-pointer"
                   title="Click to chat with live CA desk"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -291,12 +291,12 @@ export default function Hero() {
                         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-700">Tax Refund Optimization</span>
-                              <span className="text-[10px] text-slate-400 font-medium">AY 25-26</span>
+                              <span className="text-xs font-bold text-slate-700">Tax Refund Optimization</span>
+                              <span className="text-xs text-slate-400 font-medium">AY 25-26</span>
                             </div>
                             <div className="mt-1 flex items-baseline gap-1.5">
                               <span className="text-xl font-black text-emerald-600">+₹34,800</span>
-                              <span className="text-[10px] font-semibold text-slate-500">saved</span>
+                              <span className="text-xs font-semibold text-slate-500">saved</span>
                             </div>
                           </div>
 
@@ -322,7 +322,7 @@ export default function Hero() {
                               />
                               <circle cx="160" cy="4" r="3.5" fill="#059669" />
                             </svg>
-                            <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+                            <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
                               <span>Jan</span>
                               <span>Mar</span>
                               <span>May</span>
@@ -344,9 +344,9 @@ export default function Hero() {
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-slate-700">Form 16 / AIS</span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
-                              {uploadedFileName ? 'Attached' : 'Click to Upload'}
+                            <span className="text-xs font-bold text-slate-700">Form 16 / AIS</span>
+                            <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                              {uploadedFileName ? 'Attached' : 'Upload'}
                             </span>
                           </div>
 
@@ -354,20 +354,20 @@ export default function Hero() {
                             {uploadedFileName ? (
                               <div className="space-y-1">
                                 <FileCheck className="w-5 h-5 mx-auto text-emerald-600 animate-bounce" />
-                                <span className="block text-[11px] font-bold text-slate-800 truncate max-w-[140px] mx-auto">
+                                <span className="block text-xs font-bold text-slate-800 truncate max-w-[140px] mx-auto">
                                   {uploadedFileName}
                                 </span>
-                                <span className="block text-[9px] text-emerald-600 font-semibold">
+                                <span className="block text-xs text-emerald-600 font-semibold">
                                   {isUploading ? `Uploading ${uploadProgress}%...` : 'Ready for CA Filing ✓'}
                                 </span>
                               </div>
                             ) : (
                               <>
                                 <UploadCloud className="w-5 h-5 mx-auto text-emerald-600 group-hover:scale-110 transition-transform" />
-                                <span className="block text-[11px] font-semibold text-slate-700 mt-1">
+                                <span className="block text-xs font-semibold text-slate-700 mt-1">
                                   Drag &amp; Drop Form 16
                                 </span>
-                                <span className="block text-[9px] text-slate-400">PDF, Excel or JSON</span>
+                                <span className="block text-xs text-slate-400">PDF, Excel or JSON</span>
                               </>
                             )}
                           </div>
@@ -401,11 +401,11 @@ export default function Hero() {
                             />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[11px] font-bold text-slate-900 flex items-center gap-1">
+                            <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
                               <span>Verified ICAI</span>
                               <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                             </div>
-                            <div className="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">
+                            <div className="text-xs text-slate-500 font-medium leading-tight mt-0.5">
                               Certified &amp; Notice-Proof Standards
                             </div>
                           </div>
@@ -427,10 +427,10 @@ export default function Hero() {
                               <Star className="w-3 h-3 fill-amber-400" />
                             </div>
                           </div>
-                          <div className="text-[10px] font-bold text-emerald-700 mt-0.5">
+                          <div className="text-xs font-bold text-emerald-700 mt-0.5">
                             15,000+ Happy Clients
                           </div>
-                          <div className="text-[9px] text-slate-400">
+                          <div className="text-[10px] text-slate-400">
                             Click to view reviews &rarr;
                           </div>
                         </div>
@@ -446,9 +446,9 @@ export default function Hero() {
                       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                         <div>
                           <h4 className="text-xs font-bold text-[#0B2545]">Senior CA Advisory Panel</h4>
-                          <p className="text-[10px] text-slate-500">Qualified Chartered Accountants Active Now</p>
+                          <p className="text-xs text-slate-500">Qualified Chartered Accountants Active Now</p>
                         </div>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
                           Online Desk
                         </span>
                       </div>
@@ -461,10 +461,10 @@ export default function Hero() {
                             </div>
                             <div>
                               <div className="font-bold text-slate-900">Senior Tax Partner</div>
-                              <div className="text-[10px] text-slate-500">12+ Yrs • Scrutiny & Appeals</div>
+                              <div className="text-xs text-slate-500">12+ Yrs • Scrutiny & Appeals</div>
                             </div>
                           </div>
-                          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                          <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Available
                           </span>
@@ -477,10 +477,10 @@ export default function Hero() {
                             </div>
                             <div>
                               <div className="font-bold text-slate-900">Capital Gains & Crypto Desk</div>
-                              <div className="text-[10px] text-slate-500">Zerodha / Groww / Foreign Stocks</div>
+                              <div className="text-xs text-slate-500">Zerodha / Groww / Foreign Stocks</div>
                             </div>
                           </div>
-                          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                          <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Available
                           </span>
@@ -504,7 +504,7 @@ export default function Hero() {
                     <div className="space-y-2.5 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h4 className="text-xs font-bold text-[#0B2545]">Select Service to Fast-Track</h4>
-                        <span className="text-[10px] text-slate-400">Click to Start</span>
+                        <span className="text-xs text-slate-400">Click to Start</span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-xs">
@@ -514,7 +514,7 @@ export default function Hero() {
                           className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 text-left transition-all"
                         >
                           <div className="font-bold text-slate-900">Salaried ITR-1</div>
-                          <div className="text-[10px] text-slate-500">Form 16 + ₹75k standard deduction</div>
+                          <div className="text-xs text-slate-500">Form 16 + ₹75k standard deduction</div>
                           <div className="text-emerald-700 font-extrabold mt-1">₹499</div>
                         </button>
 
@@ -524,7 +524,7 @@ export default function Hero() {
                           className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 text-left transition-all"
                         >
                           <div className="font-bold text-slate-900">Capital Gains / F&amp;O</div>
-                          <div className="text-[10px] text-slate-500">Stocks, Crypto &amp; Intraday</div>
+                          <div className="text-xs text-slate-500">Stocks, Crypto &amp; Intraday</div>
                           <div className="text-emerald-700 font-extrabold mt-1">₹1,999</div>
                         </button>
 
@@ -534,7 +534,7 @@ export default function Hero() {
                           className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 text-left transition-all"
                         >
                           <div className="font-bold text-slate-900">Notice 143(1) Scrutiny</div>
-                          <div className="text-[10px] text-slate-500">Official CA reply &amp; rectification</div>
+                          <div className="text-xs text-slate-500">Official CA reply &amp; rectification</div>
                           <div className="text-emerald-700 font-extrabold mt-1">₹999</div>
                         </button>
 
@@ -544,7 +544,7 @@ export default function Hero() {
                           className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 text-left transition-all"
                         >
                           <div className="font-bold text-slate-900">GST Monthly Returns</div>
-                          <div className="text-[10px] text-slate-500">GSTR-1 &amp; 3B filing + ITC match</div>
+                          <div className="text-xs text-slate-500">GSTR-1 &amp; 3B filing + ITC match</div>
                           <div className="text-emerald-700 font-extrabold mt-1">₹799/mo</div>
                         </button>
                       </div>
@@ -564,7 +564,7 @@ export default function Hero() {
                     <div className="space-y-3 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h4 className="text-xs font-bold text-[#0B2545]">100% Notice Protection Guarantee</h4>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
                           ICAI Standard
                         </span>
                       </div>
@@ -574,7 +574,7 @@ export default function Hero() {
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                           <div>
                             <div className="font-bold text-slate-900">Double-Verification by Practicing CAs</div>
-                            <div className="text-[11px] text-slate-600">Every computation is reconciled across Form 16, AIS, and TIS before e-filing.</div>
+                            <div className="text-xs text-slate-600">Every computation is reconciled across Form 16, AIS, and TIS before e-filing.</div>
                           </div>
                         </div>
 
@@ -582,7 +582,7 @@ export default function Hero() {
                           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                           <div>
                             <div className="font-bold text-slate-900">Free Scrutiny Defense Coverage</div>
-                            <div className="text-[11px] text-slate-600">If the Income Tax Department issues any query on our filed return, our senior CAs defend it at zero extra charge.</div>
+                            <div className="text-xs text-slate-600">If the Income Tax Department issues any query on our filed return, our senior CAs defend it at zero extra charge.</div>
                           </div>
                         </div>
 
@@ -590,7 +590,7 @@ export default function Hero() {
                           <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
                           <div>
                             <div className="font-bold text-slate-900">256-Bit Bank-Grade Data Vault</div>
-                            <div className="text-[11px] text-slate-600">Your PAN, Form 16, and bank data are strictly encrypted and never shared.</div>
+                            <div className="text-xs text-slate-600">Your PAN, Form 16, and bank data are strictly encrypted and never shared.</div>
                           </div>
                         </div>
                       </div>
@@ -613,7 +613,7 @@ export default function Hero() {
               <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs">
                 <div 
                   onClick={() => setActiveTab('security')}
-                  className="flex items-center gap-1.5 text-slate-600 text-[11px] cursor-pointer hover:text-emerald-700 transition-colors"
+                  className="flex items-center gap-1.5 text-slate-600 text-xs cursor-pointer hover:text-emerald-700 transition-colors"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>256-Bit SSL Encrypted Vault</span>
@@ -621,9 +621,9 @@ export default function Hero() {
                 
                 <a
                   href="tel:+917275922162"
-                  className="text-emerald-700 font-bold hover:underline text-[11px] flex items-center gap-1"
+                  className="text-emerald-700 font-bold hover:underline text-xs flex items-center gap-1"
                 >
-                  <Phone className="w-3 h-3 text-emerald-600" />
+                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Senior CA Direct: +91 7275922162</span>
                 </a>
               </div>

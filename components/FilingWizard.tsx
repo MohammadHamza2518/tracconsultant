@@ -199,8 +199,8 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
       <div className="bg-[#0B2545] px-6 py-4 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">CA-Assisted Tax & Compliance Filing</span>
-            <h3 className="text-lg sm:text-xl font-bold">Fast-Track Filing Form</h3>
+            <span className="text-xs font-semibold tracking-wider text-emerald-400">CA-Assisted Tax & Compliance Filing</span>
+            <h2 className="text-lg sm:text-xl font-bold">Fast-Track Filing Form</h2>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-semibold bg-white/10 px-3 py-1.5 rounded-full">
             <span>Step {step} of 3</span>
@@ -228,7 +228,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <h4 className="text-base font-bold text-slate-900">1. Select Required Service Category</h4>
+              <h3 className="text-base font-bold text-slate-900">1. Select Required Service Category</h3>
               <p className="text-xs text-slate-500 mt-0.5">Pick the service you want our Chartered Accountants to handle</p>
             </div>
 
@@ -264,31 +264,35 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
 
             {/* Plan selection within service */}
             <div className="pt-2">
-              <label className="block text-sm font-semibold text-slate-800 mb-2">
-                Select Your Filing Category / Plan:
-              </label>
+              <div className="mb-3">
+                <h3 className="text-base font-bold text-slate-900">2. Select Your Specific Filing Plan</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Choose the plan that accurately matches your filing requirement or business volume</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {currentServiceObj.plans.map(plan => {
+                {currentServiceObj.plans.map((plan, index) => {
                   const isPlanSelected = selectedPlan === plan.id;
+                  const isLastOdd = index === currentServiceObj.plans.length - 1 && currentServiceObj.plans.length % 2 !== 0;
                   return (
                     <button
                       key={plan.id}
                       type="button"
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`p-3.5 rounded-xl border text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${
+                        isLastOdd ? 'sm:col-span-2' : ''
+                      } ${
                         isPlanSelected
-                          ? 'border-[#0B2545] bg-slate-900 text-white shadow-md'
+                          ? 'border-emerald-500 bg-emerald-50/70 text-slate-900 shadow-sm ring-2 ring-emerald-500/20'
                           : 'border-slate-200 hover:border-slate-300 bg-white text-slate-800'
                       }`}
                     >
                       <div>
                         <div className="font-semibold text-xs sm:text-sm">{plan.name}</div>
-                        <div className={`text-[11px] mt-0.5 ${isPlanSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                        <div className="text-xs text-slate-500 mt-0.5">
                           Turnaround: {plan.turnaround}
                         </div>
                       </div>
                       <div className={`text-xs font-bold px-2.5 py-1 rounded-md ${
-                        isPlanSelected ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700'
+                        isPlanSelected ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-700'
                       }`}>
                         {plan.price}
                       </div>
@@ -302,9 +306,9 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="flex items-center gap-2 px-6 py-3 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-semibold text-sm shadow-md transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer"
               >
-                <span>Continue to Your Details</span>
+                <span>Continue to Personal Details</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -315,7 +319,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
         {step === 2 && (
           <div className="space-y-6">
             <div>
-              <h4 className="text-base font-bold text-slate-900">2. Personal & Contact Information</h4>
+              <h3 className="text-base font-bold text-slate-900">Personal & Contact Information</h3>
               <p className="text-xs text-slate-500 mt-0.5">Your personal CA will connect with you via WhatsApp & Call using this number</p>
             </div>
 
@@ -426,9 +430,9 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
                   setErrorMsg('');
                   setStep(3);
                 }}
-                className="flex items-center gap-2 px-6 py-3 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-semibold text-sm shadow-md transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer"
               >
-                <span>Upload Documents (Optional)</span>
+                <span>Continue to Upload Documents</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -439,7 +443,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <h4 className="text-base font-bold text-slate-900">3. Attach Documents & Confirm Filing</h4>
+              <h3 className="text-base font-bold text-slate-900">Attach Documents & Confirm Filing</h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Attach Form 16, Bank Statement, Notice PDF, or PAN. You can also share documents later directly with your CA on WhatsApp.
               </p>
@@ -471,7 +475,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
                       <div className="flex items-center gap-2 truncate">
                         <FileCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                         <span className="truncate font-medium text-slate-800">{f.name}</span>
-                        <span className="text-slate-400 text-[10px]">({f.size})</span>
+                        <span className="text-slate-400 text-xs">({f.size})</span>
                       </div>
                       <button 
                         type="button" 
@@ -494,7 +498,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
               </div>
               <div className="text-slate-600">Selected Plan: <strong className="text-slate-800">{selectedPlan}</strong></div>
               <div className="text-slate-600">Filer: <strong className="text-slate-800">{fullName}</strong> (+91 {mobile})</div>
-              <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+              <div className="text-xs text-slate-500 pt-1 border-t border-slate-200">
                 🔒 Protected by Tracconsultant 100% Notice Guarantee & Bank-Grade 256-bit Encryption.
               </div>
             </div>

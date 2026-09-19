@@ -231,27 +231,13 @@ export default function TaxCalculator() {
       {/* TAB CONTENT: 1. INCOME TAX */}
       {activeTab === 'income_tax' && (
         <div className="p-6 sm:p-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-6">
-            <div>
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">
-                {taxRates.financialYear || 'FY 2024-25'} & {taxRates.assessmentYear || 'AY 2025-26'} Budget Slabs
-              </span>
-              <h3 className="text-xl font-bold text-slate-900">
-                Income Tax Comparison Calculator
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={isSalariedId}
-                checked={isSalaried}
-                onChange={(e) => setIsSalaried(e.target.checked)}
-                className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
-              />
-              <label htmlFor={isSalariedId} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                Salaried Employee (₹{standardDeductionAmount.toLocaleString('en-IN')} New Std Deduction)
-              </label>
-            </div>
+          <div className="mb-6">
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">
+              {taxRates.financialYear || 'FY 2024-25'} & {taxRates.assessmentYear || 'AY 2025-26'} Budget Slabs
+            </span>
+            <h3 className="text-xl font-bold text-slate-900 mt-0.5">
+              Income Tax Comparison Calculator
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -271,11 +257,25 @@ export default function TaxCalculator() {
                   onChange={(e) => setGrossIncome(Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                 />
-                <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                <div className="flex justify-between text-xs text-slate-400 mt-1">
                   <span>₹3 Lakh</span>
                   <span>₹25 Lakh</span>
                   <span>₹50 Lakh</span>
                 </div>
+              </div>
+
+              {/* Salaried Employee Checkbox in logical flow */}
+              <div className="flex items-center gap-2.5 p-3 bg-emerald-50/50 border border-emerald-200/60 rounded-xl">
+                <input
+                  type="checkbox"
+                  id={isSalariedId}
+                  checked={isSalaried}
+                  onChange={(e) => setIsSalaried(e.target.checked)}
+                  className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                />
+                <label htmlFor={isSalariedId} className="text-xs font-semibold text-slate-800 cursor-pointer select-none">
+                  Salaried Employee (Includes ₹{standardDeductionAmount.toLocaleString('en-IN')} Standard Deduction)
+                </label>
               </div>
 
               {/* Deductions for Old Regime */}
@@ -341,8 +341,8 @@ export default function TaxCalculator() {
                 <div>
                   <div className="text-xs font-medium uppercase tracking-wider text-emerald-100">Best Regime for You</div>
                   <div className="text-lg font-extrabold">{taxResult.recommendedRegime}</div>
-                  <div className="text-xs text-emerald-50 mt-0.5">
-                    You save <strong className="underline decoration-white">₹{taxResult.savings.toLocaleString('en-IN')}</strong> extra tax!
+                  <div className="text-xs text-emerald-50 mt-1">
+                    You save <strong className="font-bold text-white bg-white/20 px-2 py-0.5 rounded">₹{taxResult.savings.toLocaleString('en-IN')}</strong> extra tax!
                   </div>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -361,13 +361,13 @@ export default function TaxCalculator() {
                   <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
                     <span>NEW REGIME</span>
                     {taxResult.totalNewTax <= taxResult.totalOldTax && (
-                      <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full">Recommended</span>
+                      <span className="text-xs font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">Recommended</span>
                     )}
                   </div>
                   <div className="text-2xl font-black text-slate-900">
                     ₹{taxResult.totalNewTax.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-2 space-y-1">
+                  <div className="text-xs text-slate-500 mt-2 space-y-1">
                     <div>Std Deduction: ₹{taxResult.newStdDeduction.toLocaleString('en-IN')}</div>
                     <div>Taxable: ₹{taxResult.newTaxableIncome.toLocaleString('en-IN')}</div>
                     <div className="text-emerald-700 font-medium">Rebate up to ₹7.75L: Applied</div>
@@ -383,13 +383,13 @@ export default function TaxCalculator() {
                   <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
                     <span>OLD REGIME</span>
                     {taxResult.totalOldTax < taxResult.totalNewTax && (
-                      <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full">Recommended</span>
+                      <span className="text-xs font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">Recommended</span>
                     )}
                   </div>
                   <div className="text-2xl font-black text-slate-900">
                     ₹{taxResult.totalOldTax.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-2 space-y-1">
+                  <div className="text-xs text-slate-500 mt-2 space-y-1">
                     <div>Total Deductions: ₹{taxResult.totalOldDeductions.toLocaleString('en-IN')}</div>
                     <div>Taxable: ₹{taxResult.oldTaxableIncome.toLocaleString('en-IN')}</div>
                     <div>80C + 80D claimed</div>
@@ -397,23 +397,23 @@ export default function TaxCalculator() {
                 </div>
               </div>
 
-              {/* Actions: Download Summary & CA Consultation */}
-              <div className="space-y-2">
+              {/* Actions: Primary CA Filing CTA & Secondary Download */}
+              <div className="space-y-2.5 pt-2">
+                <Link
+                  href="/#file-now"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl text-sm font-bold shadow-md transition-all cursor-pointer"
+                >
+                  <span>File with CA & Claim Max Refund</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
                 <button
                   type="button"
                   onClick={downloadTaxSummary}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-4 h-4 text-slate-500" />
                   <span>Download Computation Summary (.txt)</span>
                 </button>
-                <Link
-                  href="/#file-now"
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-[#0B2545] hover:bg-[#133b6b] text-white rounded-xl text-xs font-semibold shadow-md transition-colors"
-                >
-                  <span>File with CA & Claim Max Refund</span>
-                  <ArrowRight className="w-4 h-4 text-emerald-400" />
-                </Link>
               </div>
             </div>
           </div>
@@ -605,7 +605,7 @@ export default function TaxCalculator() {
 
                 <div className="p-4 bg-slate-900 text-white rounded-xl flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">Total Payable / Invoice</div>
+                    <div className="text-xs uppercase tracking-wider text-emerald-400 font-bold">Total Payable / Invoice</div>
                     <div className="text-2xl font-black">₹{Math.round(gstResult.total).toLocaleString('en-IN')}</div>
                   </div>
                   <div className="text-right text-xs text-slate-400">

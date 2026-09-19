@@ -58,7 +58,7 @@ export const TOOLS_LIST: ToolConfig[] = [
   },
   {
     id: 'tax-calculator',
-    name: 'Income Tax Calculator (Budget FY 24-25 / 25-26)',
+    name: 'Income Tax Calculator (Budget FY 2024–25)',
     slug: 'tax-calculator',
     category: 'free',
     price: 0,

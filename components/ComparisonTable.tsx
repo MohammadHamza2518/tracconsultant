@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X, ShieldCheck, Zap, Award } from 'lucide-react';
+import { Check, X, ShieldCheck, Zap, Award, PhoneCall } from 'lucide-react';
 import Link from 'next/link';
 
 const COMPARISON_ROWS = [
@@ -80,14 +80,16 @@ export default function ComparisonTable() {
                 <th className="py-5 px-6 text-sm font-bold text-slate-900 w-2/5">
                   Key Deliverables
                 </th>
-                <th className="py-5 px-6 text-sm font-black text-white bg-[#0B2545] w-1/4 rounded-t-2xl relative shadow-lg">
+                <th className="py-4 px-6 text-sm font-black text-white bg-[#0B2545] w-1/4 rounded-t-2xl shadow-lg align-top">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                     <span>Tracconsultant</span>
                   </div>
-                  <span className="absolute -bottom-2 left-6 text-[10px] text-emerald-400 font-semibold tracking-wider uppercase">
-                    Our Promise
-                  </span>
+                  <div className="mt-1.5">
+                    <span className="inline-block text-xs text-emerald-300 font-bold tracking-wider uppercase bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                      Our Promise
+                    </span>
+                  </div>
                 </th>
                 <th className="py-5 px-6 text-xs sm:text-sm font-semibold text-slate-600 w-1/5">
                   TaxBuddy / Cleartax
@@ -99,20 +101,20 @@ export default function ComparisonTable() {
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
               {COMPARISON_ROWS.map((row, idx) => (
-                <tr key={idx} className={row.highlight ? 'bg-emerald-50/20' : 'hover:bg-slate-50/50'}>
-                  <td className="py-4 px-6 font-semibold text-slate-800">
+                <tr key={idx} className={`min-h-[56px] ${row.highlight ? 'bg-emerald-50/20' : 'hover:bg-slate-50/50'}`}>
+                  <td className="py-4 px-6 font-semibold text-slate-800 align-middle">
                     {row.feature}
                   </td>
-                  <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40 border-l border-r border-emerald-100">
+                  <td className="py-4 px-6 font-bold text-emerald-800 bg-emerald-50/50 border-l border-r border-emerald-100 align-middle">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                       <span>{row.trac}</span>
                     </div>
                   </td>
-                  <td className="py-4 px-6 text-slate-500">
+                  <td className="py-4 px-6 text-slate-600 align-middle">
                     {row.taxbuddy}
                   </td>
-                  <td className="py-4 px-6 text-slate-500">
+                  <td className="py-4 px-6 text-slate-600 align-middle">
                     {row.localCA}
                   </td>
                 </tr>
@@ -125,15 +127,16 @@ export default function ComparisonTable() {
         <div className="mt-10 text-center flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="#file-now"
-            className="px-8 py-3.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/20 transition-all"
+            className="w-full sm:w-auto px-8 py-3.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
           >
             Experience the Tracconsultant Advantage &rarr;
           </Link>
           <a
             href="tel:+917275922162"
-            className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm rounded-2xl border border-slate-200 transition-all"
+            className="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm rounded-xl border-2 border-slate-300 hover:border-slate-400 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
           >
-            Speak with Lead CA: +91 7275922162
+            <PhoneCall className="w-4 h-4 text-emerald-600" />
+            <span>Speak with Lead CA: +91 7275922162</span>
           </a>
         </div>
 
