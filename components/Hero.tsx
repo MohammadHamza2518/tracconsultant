@@ -227,7 +227,7 @@ export default function Hero() {
               {/* Card Header with Verified CA Avatar */}
               <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 rounded-2xl bg-[#07172B] border-2 border-emerald-400 p-1 flex items-center justify-center">
+                  <div className="relative w-12 h-12 rounded-2xl bg-[#07172B] border-2 border-emerald-400 p-1 flex items-center justify-center shadow-inner">
                     <Image 
                       src="/logo.png" 
                       alt="Tracconsultant CA" 
@@ -235,18 +235,19 @@ export default function Hero() {
                       height={42} 
                       className="object-contain" 
                     />
-                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full animate-pulse"></span>
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
-                      <span>CA Anjan Agarwal</span>
+                      <span>Dedicated Senior CA Panel</span>
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
                     </h3>
-                    <p className="text-[11px] text-emerald-400 font-medium">Fellow Chartered Accountant (ICAI)</p>
+                    <p className="text-[11px] text-emerald-400 font-medium">ICAI Certified • 100% Notice Protection</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">
-                  Online Now
+                <span className="text-[10px] font-bold px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Available Now</span>
                 </span>
               </div>
 
@@ -288,13 +289,13 @@ export default function Hero() {
               {/* Action Buttons inside Card */}
               <div className="space-y-2 pt-1">
                 <a
-                  href="https://wa.me/917275922162?text=Hello%20CA%20Anjan!%20I%20need%20help%20with%20my%20Income%20Tax%20Return."
+                  href="https://wa.me/917275922162?text=Hello%20Tracconsultant%20CA%20Desk!%20I%20need%20expert%20help%20with%20my%20Income%20Tax%20Return."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 py-3 bg-[#00a859] hover:bg-[#008f4c] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Connect with CA on WhatsApp (7275922162)</span>
+                  <span>Connect with Senior CA on WhatsApp (7275922162)</span>
                 </a>
 
                 <div className="flex items-center justify-between text-xs text-slate-400 px-1 pt-1">

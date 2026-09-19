@@ -34,7 +34,7 @@ export function getSystemConfig(): SystemConfig {
   }
 }
 
-export function saveSystemConfig(newConfig: Partial<SystemConfig>, updatedBy = 'CA Anjan Agarwal'): SystemConfig {
+export function saveSystemConfig(newConfig: Partial<SystemConfig>, updatedBy = 'Senior CA Partner'): SystemConfig {
   ensureConfigFile();
   const current = getSystemConfig();
   const updated: SystemConfig = {

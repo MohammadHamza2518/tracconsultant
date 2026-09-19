@@ -111,7 +111,7 @@ export default function AdminPage() {
   const [newFilingPlan, setNewFilingPlan] = useState('Salaried Basic (ITR-1)');
   const [newFilingYear, setNewFilingYear] = useState('AY 2025-26');
   const [newFilingStatus, setNewFilingStatus] = useState<FilingStatus>('new');
-  const [newFilingCAName, setNewFilingCAName] = useState('CA Anjan Agarwal');
+  const [newFilingCAName, setNewFilingCAName] = useState('Senior Tax Expert (CA)');
   const [newFilingRefund, setNewFilingRefund] = useState<number | ''>('');
   const [newFilingNotes, setNewFilingNotes] = useState('');
   const [isCreatingFiling, setIsCreatingFiling] = useState(false);
@@ -193,7 +193,7 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config, updatedBy: 'CA Anjan Agarwal' })
+        body: JSON.stringify({ config, updatedBy: 'Lead CA Partner' })
       });
       const data = await res.json();
       if (res.ok) {
@@ -335,7 +335,7 @@ export default function AdminPage() {
           status: newFilingStatus,
           estimatedRefund: newFilingRefund !== '' ? Number(newFilingRefund) : undefined,
           assignedCA: {
-            name: newFilingCAName || 'CA Anjan Agarwal',
+            name: newFilingCAName || 'Senior Tax Expert (CA)',
             phone: '7275922162',
             email: 'contact@tracconsultant.com'
           },
@@ -423,7 +423,7 @@ export default function AdminPage() {
   const openLeadDrawer = (filing: FilingItem) => {
     setSelectedFiling(filing);
     setEditStatus(filing.status);
-    setEditCAName(filing.assignedCA?.name || 'CA Anjan Agarwal');
+    setEditCAName(filing.assignedCA?.name || 'Senior Tax Expert (CA)');
     setEditCAPhone(filing.assignedCA?.phone || '7275922162');
     setEditEstimatedRefund(filing.estimatedRefund !== undefined ? filing.estimatedRefund : '');
     setNewNote('');
@@ -439,7 +439,7 @@ export default function AdminPage() {
         status: editStatus,
         estimatedRefund: editEstimatedRefund !== '' ? Number(editEstimatedRefund) : undefined,
         assignedCA: {
-          name: editCAName || 'CA Anjan Agarwal',
+          name: editCAName || 'Senior Tax Expert (CA)',
           phone: editCAPhone || '7275922162',
           email: 'contact@tracconsultant.com'
         }
@@ -530,7 +530,7 @@ export default function AdminPage() {
               />
             </div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Executive Admin Portal</h2>
-            <p className="text-xs text-slate-500">Supervised by <strong>CA Anjan Agarwal</strong> • 20 Services & Compliance Suite Control</p>
+            <p className="text-xs text-slate-500">Supervised by <strong>Chartered Accountants (ICAI Panel)</strong> • 20 Services & Compliance Suite Control</p>
           </div>
 
           {authError && (
@@ -628,9 +628,9 @@ export default function AdminPage() {
             {/* Lead CA Profile Badge */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-xl text-slate-300">
               <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
-                A
+                CA
               </div>
-              <span className="text-[11px] font-semibold">CA Anjan Agarwal (Admin)</span>
+              <span className="text-[11px] font-semibold">CA Operations Desk (Admin)</span>
             </div>
 
             <button
@@ -1183,7 +1183,7 @@ export default function AdminPage() {
                       <td className="p-3 text-center space-x-1.5 whitespace-nowrap">
                         <a
                           href={`https://wa.me/91${lead.mobile.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(
-                            `Hello ${lead.fullName}, thank you for inquiring about ${lead.serviceInterest} with Tracconsultant. I am CA Anjan Agarwal, how may I assist you?`
+                            `Hello ${lead.fullName}, thank you for inquiring about ${lead.serviceInterest} with Tracconsultant. I am your Senior CA Consultant, how may I assist you?`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -1730,7 +1730,7 @@ export default function AdminPage() {
                 </a>
 
                 <a
-                  href={`https://wa.me/91${selectedFiling.mobile}?text=${encodeURIComponent(`Hello ${selectedFiling.fullName}, this is CA Anjan Agarwal from Tracconsultant regarding your ${selectedFiling.service} (Ref: ${selectedFiling.id}).`)}`}
+                  href={`https://wa.me/91${selectedFiling.mobile}?text=${encodeURIComponent(`Hello ${selectedFiling.fullName}, this is Tracconsultant Senior CA Desk regarding your ${selectedFiling.service} (Ref: ${selectedFiling.id}).`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
@@ -1834,7 +1834,7 @@ export default function AdminPage() {
                 <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center space-y-1">
                   <p className="text-xs text-slate-500">No client documents attached with this submission yet.</p>
                   <a
-                    href={`https://wa.me/91${selectedFiling.mobile}?text=${encodeURIComponent(`Hello ${selectedFiling.fullName}, CA Anjan Agarwal here. Kindly share your Form 16 / Bank Statement on WhatsApp to expedite your ${selectedFiling.service}.`)}`}
+                    href={`https://wa.me/91${selectedFiling.mobile}?text=${encodeURIComponent(`Hello ${selectedFiling.fullName}, Tracconsultant CA Desk here. Kindly share your Form 16 / Bank Statement on WhatsApp to expedite your ${selectedFiling.service}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:underline"
@@ -1877,7 +1877,7 @@ export default function AdminPage() {
                     value={editCAName}
                     onChange={(e) => setEditCAName(e.target.value)}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium"
-                    placeholder="e.g. CA Anjan Agarwal"
+                    placeholder="e.g. Senior Tax Expert (CA)"
                   />
                 </div>
               </div>
@@ -2166,7 +2166,7 @@ export default function AdminPage() {
                     type="text"
                     value={newFilingCAName}
                     onChange={(e) => setNewFilingCAName(e.target.value)}
-                    placeholder="CA Anjan Agarwal"
+                    placeholder="Senior Tax Expert (CA)"
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium"
                   />
                 </div>
@@ -2226,7 +2226,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
-              <strong>Tracconsultant Operations & Control Center</strong> • Lead Partner: <strong>CA Anjan Agarwal</strong>
+              <strong>Tracconsultant Operations & Control Center</strong> • Lead: <strong>Senior Chartered Accountant Panel</strong>
             </span>
           </div>
           <div className="flex items-center gap-4 text-slate-400 text-[11px]">

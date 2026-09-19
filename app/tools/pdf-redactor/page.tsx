@@ -60,7 +60,7 @@ const PRESET_TEMPLATES: Record<string, DocProfile> = {
   },
   itrv: {
     docType: 'INDIAN INCOME TAX RETURN VERIFICATION (ITR-V)',
-    taxpayerName: 'PRIYA AGARWAL',
+    taxpayerName: 'PRIYA SHARMA',
     panNumber: 'APZPA8712E',
     aadhaarNumber: '9921 4410 7712',
     bankAccount: '110098234123',

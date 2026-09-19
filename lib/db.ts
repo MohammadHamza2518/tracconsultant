@@ -32,7 +32,7 @@ const DEFAULT_FILINGS: FilingItem[] = [
     status: 'draft_ready',
     estimatedRefund: 24850,
     assignedCA: {
-      name: 'CA Anjan Agarwal',
+      name: 'Senior Tax Expert (CA)',
       phone: '7275922162',
       email: 'contact@tracconsultant.com',
       membershipNumber: 'ICAI-512948'
@@ -42,7 +42,7 @@ const DEFAULT_FILINGS: FilingItem[] = [
       {
         id: 'n-1',
         date: '2025-05-12T10:30:00Z',
-        author: 'CA Anjan Agarwal',
+        author: 'Senior CA Desk',
         message: 'Both Form 16s reconciled with AIS/TIS. Claimed Section 80C (1.5L) and 80D (25k). Net refund computed at Rs 24,850.'
       }
     ],
@@ -64,7 +64,7 @@ const DEFAULT_FILINGS: FilingItem[] = [
     ],
     timeline: [
       { step: '1', title: 'Application Received', description: 'Application submitted online with documents.', date: '10 May 2025, 02:25 PM', completed: true, current: false },
-      { step: '2', title: 'CA Assigned', description: 'CA Anjan Agarwal assigned for tax computation.', date: '11 May 2025, 10:00 AM', completed: true, current: false },
+      { step: '2', title: 'CA Assigned', description: 'Senior Chartered Accountant assigned for tax computation.', date: '11 May 2025, 10:00 AM', completed: true, current: false },
       { step: '3', title: 'Data Reconciliation', description: 'Form 16 verified with AIS, TIS & Form 26AS.', date: '12 May 2025, 11:30 AM', completed: true, current: false },
       { step: '4', title: 'Draft Computation Ready', description: 'Draft tax sheet ready with estimated refund ₹24,850.', date: '12 May 2025, 04:15 PM', completed: true, current: true },
       { step: '5', title: 'Client E-Verification & Filing', description: 'Filing with Govt Income Tax Portal and ITR-V generation.', date: null, completed: false, current: false }
@@ -195,7 +195,7 @@ const DEFAULT_FILINGS: FilingItem[] = [
     status: 'completed',
     estimatedRefund: 18200,
     assignedCA: {
-      name: 'CA Anjan Agarwal',
+      name: 'Senior Tax Expert (CA)',
       phone: '7275922162',
       email: 'contact@tracconsultant.com'
     },
@@ -204,7 +204,7 @@ const DEFAULT_FILINGS: FilingItem[] = [
       {
         id: 'n-4',
         date: '2025-05-08T16:00:00Z',
-        author: 'CA Anjan Agarwal',
+        author: 'Senior CA Desk',
         message: 'Successfully e-filed on Govt portal. Acknowledgement number #9218491823. Sent ITR-V to client on WhatsApp.'
       }
     ],
@@ -497,7 +497,7 @@ export function saveWhatsAppSettings(settings: WhatsAppSettings): void {
 const DEFAULT_USERS: User[] = [
   {
     id: 'usr-admin-1',
-    name: 'CA Anjan Agarwal',
+    name: 'Senior CA Partner',
     email: 'admin@tracconsultant.com',
     phone: '+91 7275922162',
     role: 'admin',

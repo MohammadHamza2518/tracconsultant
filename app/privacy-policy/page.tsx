@@ -114,11 +114,11 @@ export default function PrivacyPolicyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <span className="text-slate-500 block">Name of Grievance Officer:</span>
-                  <strong className="text-slate-900 text-sm">CA Anjan Agarwal</strong>
+                  <strong className="text-slate-900 text-sm">Tracconsultant Compliance Officer</strong>
                 </div>
                 <div>
                   <span className="text-slate-500 block">Designation:</span>
-                  <strong className="text-slate-900">Principal Compliance Head & Grievance Officer</strong>
+                  <strong className="text-slate-900">Principal Compliance Head & Legal Grievance Officer</strong>
                 </div>
               </div>
               <div className="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -81,5 +81,5 @@ export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
     { id: 'loans-syndication', title: 'Commercial Business Loans', category: 'Advisory & Wealth', startingPrice: 'Success Fee', tat: '7-14 Days', isActive: true }
   ],
   lastUpdated: new Date().toISOString(),
-  updatedBy: 'CA Anjan Agarwal (System Partner)'
+  updatedBy: 'Senior CA Partner (System Panel)'
 };

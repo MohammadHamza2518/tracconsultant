@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const updated = saveSystemConfig(body.config, body.updatedBy || 'CA Anjan Agarwal');
+    const updated = saveSystemConfig(body.config, body.updatedBy || 'Lead CA Partner');
     return NextResponse.json({
       success: true,
       message: 'Rates & pricing successfully updated and applied across the platform!',

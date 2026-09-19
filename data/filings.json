@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "TRAC-2026-3156",
     "service": "ITR Filing",
@@ -138,7 +138,7 @@
     "createdAt": "2026-09-19T09:09:29.146Z",
     "updatedAt": "2026-09-19T10:42:38.032Z",
     "assignedCA": {
-      "name": "CA Anjan Agarwal",
+      "name": "Senior Tax Expert (CA)",
       "phone": "7275922162",
       "email": "contact@tracconsultant.com"
     }
@@ -156,7 +156,7 @@
     "status": "draft_ready",
     "estimatedRefund": 24850,
     "assignedCA": {
-      "name": "CA Anjan Agarwal",
+      "name": "Senior Tax Expert (CA)",
       "phone": "7275922162",
       "email": "contact@tracconsultant.com"
     },
@@ -165,13 +165,13 @@
       {
         "id": "n-1",
         "date": "2025-05-12T10:30:00Z",
-        "author": "CA Anjan Agarwal",
+        "author": "Senior Tax Expert (CA)",
         "message": "Both Form 16s reconciled with AIS/TIS. Claimed Section 80C (1.5L) and 80D (25k). Net refund computed at Rs 24,850."
       },
       {
         "id": "n-1789814550669",
         "date": "2026-09-19T10:42:30.669Z",
-        "author": "CA Anjan Agarwal",
+        "author": "Senior Tax Expert (CA)",
         "message": "demo testing"
       }
     ],
@@ -203,7 +203,7 @@
       {
         "step": "2",
         "title": "CA Assigned",
-        "description": "CA Anjan Agarwal assigned for tax computation.",
+        "description": "Senior Tax Expert (CA) assigned for tax computation.",
         "date": "11 May 2025, 10:00 AM",
         "completed": true,
         "current": false
@@ -219,7 +219,7 @@
       {
         "step": "4",
         "title": "Draft Computation Ready",
-        "description": "Draft tax sheet ready with estimated refund ₹24,850.",
+        "description": "Draft tax sheet ready with estimated refund â‚¹24,850.",
         "date": "12 May 2025, 04:15 PM",
         "completed": true,
         "current": true
@@ -429,7 +429,7 @@
     "status": "completed",
     "estimatedRefund": 18200,
     "assignedCA": {
-      "name": "CA Anjan Agarwal",
+      "name": "Senior Tax Expert (CA)",
       "phone": "7275922162",
       "email": "contact@tracconsultant.com"
     },
@@ -438,7 +438,7 @@
       {
         "id": "n-4",
         "date": "2025-05-08T16:00:00Z",
-        "author": "CA Anjan Agarwal",
+        "author": "Senior Tax Expert (CA)",
         "message": "Successfully e-filed on Govt portal. Acknowledgement number #9218491823. Sent ITR-V to client on WhatsApp."
       }
     ],
