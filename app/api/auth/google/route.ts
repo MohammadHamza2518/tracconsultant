@@ -4,7 +4,24 @@ import { findUserByEmail, createUser } from '@/lib/db';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, name, avatar } = body;
+    let email = body.email;
+    let name = body.name;
+    let avatar = body.avatar;
+
+    // Support real Google Identity Services JWT credential
+    if (body.credential) {
+      try {
+        const parts = body.credential.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
+          if (payload.email) email = payload.email;
+          if (payload.name) name = payload.name;
+          if (payload.picture) avatar = payload.picture;
+        }
+      } catch (e) {
+        console.error('Failed to decode Google credential JWT:', e);
+      }
+    }
 
     if (!email) {
       return NextResponse.json({ error: 'Google email is required.' }, { status: 400 });
@@ -13,10 +30,10 @@ export async function POST(req: NextRequest) {
     let user = findUserByEmail(email);
 
     if (!user) {
-      // Auto register via Google
+      // Auto register new client via Google
       user = createUser({
         name: name || email.split('@')[0],
-        email,
+        email: email.toLowerCase().trim(),
         authProvider: 'google',
         avatar: avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || email)}`,
         role: 'client'

@@ -106,20 +106,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginWithGoogle = async (customEmail?: string, customName?: string) => {
+  const loginWithGoogle = async (customEmailOrCredential?: string, customName?: string) => {
     try {
-      const email = customEmail || 'taxpayer@gmail.com';
-      const rawName = customName || (email.includes('@') ? email.split('@')[0].replace('.', ' ') : 'Taxpayer');
-      const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+      let body: any = {};
+      
+      // If it looks like a Google JWT credential
+      if (customEmailOrCredential && customEmailOrCredential.split('.').length === 3) {
+        body = { credential: customEmailOrCredential };
+      } else if (customEmailOrCredential) {
+        const email = customEmailOrCredential.trim().toLowerCase();
+        const rawName = customName || (email.includes('@') ? email.split('@')[0].replace('.', ' ') : 'Google User');
+        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        body = {
+          email,
+          name,
+          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`
+        };
+      } else {
+        return { success: false, error: 'Please enter your email or choose a Google account to continue.' };
+      }
 
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          name,
-          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`
-        })
+        body: JSON.stringify(body)
       });
 
       const data = await res.json();
