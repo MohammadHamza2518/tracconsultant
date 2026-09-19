@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SERVICES_LIST } from '@/lib/data';
@@ -18,6 +19,42 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const service = SERVICES_LIST.find((s) => s.slug === slug);
+  if (!service) {
+    return {
+      title: 'Service Not Found',
+    };
+  }
+
+  const url = `https://tracconsultant.com/services/${slug}`;
+
+  return {
+    title: `${service.title} - CA Assisted Consultation & Filing`,
+    description: `${service.shortDesc} Expert Chartered Accountant consultation with 100% notice protection, maximum tax savings, and guaranteed ${service.tat} turnaround time.`,
+    keywords: [
+      service.title,
+      service.categoryLabel,
+      'CA consultation online India',
+      'Chartered Accountant filing',
+      'Tracconsultant services',
+      ...(service.subServices || []),
+    ],
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: `${service.title} | Tracconsultant Senior CA Panel`,
+      description: service.shortDesc,
+      url: url,
+      siteName: 'Tracconsultant',
+      type: 'website',
+      images: [{ url: '/logo.png', width: 512, height: 512, alt: service.title }],
+    },
+  };
+}
+
 export async function generateStaticParams() {
   return SERVICES_LIST.map((service) => ({
     slug: service.slug,
@@ -32,8 +69,33 @@ export default async function ServiceDetailPage({ params }: Props) {
     notFound();
   }
 
+  const serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.title,
+    serviceType: service.categoryLabel,
+    description: service.longDesc,
+    provider: {
+      '@type': 'AccountingService',
+      name: 'Tracconsultant',
+      url: 'https://tracconsultant.com',
+      telephone: '+91-7275922162',
+    },
+    areaServed: 'IN',
+    offers: {
+      '@type': 'Offer',
+      price: service.startingPrice.replace(/[^0-9]/g, '') || '499',
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/60 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
       {/* Top Banner */}
       <div className="bg-slate-900 text-white py-16 px-4 sm:px-8 border-b border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
