@@ -231,30 +231,32 @@ export default function Hero() {
             <div className="relative mx-auto max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6">
               
               {/* Header: Verified Institutional Advisory Panel */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 rounded-2xl bg-slate-950 border border-emerald-500/40 p-1.5 flex items-center justify-center shadow-inner">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative w-11 h-11 rounded-xl bg-slate-950 border border-emerald-500/30 p-1 flex items-center justify-center shrink-0 shadow-inner">
                     <Image 
                       src="/logo.png" 
-                      alt="Tracconsultant Official Emblem" 
-                      width={40} 
-                      height={40} 
+                      alt="Tracconsultant CA Emblem" 
+                      width={36} 
+                      height={36} 
                       className="object-contain" 
                     />
                     <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
-                      <span>Senior Chartered Accountant Panel</span>
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-sm text-white flex items-center gap-1.5 truncate">
+                      <span>Senior CA Panel</span>
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                     </h3>
-                    <p className="text-[11px] text-slate-400 font-medium">ICAI Standards • 100% Notice Protection</p>
+                    <p className="text-[11px] text-slate-400 font-medium truncate">
+                      ICAI Standards • Notice Proof
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Active Desk</span>
+                <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px] font-semibold whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span>Live Desk</span>
                 </div>
               </div>
 
