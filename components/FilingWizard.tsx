@@ -194,7 +194,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
   };
 
   return (
-    <div id="file-now" className="w-full bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+    <div id="filing-wizard-container" className="w-full bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
       {/* Wizard Step Indicator */}
       <div className="bg-[#0B2545] px-6 py-4 text-white">
         <div className="flex items-center justify-between">
