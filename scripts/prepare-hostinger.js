@@ -36,17 +36,26 @@ if (fs.existsSync(dataSrc)) {
 }
 
 // 4. Create an env file template for production
-const envContent = `NODE_ENV=production
+const rootEnvPath = path.join(rootDir, '.env');
+const envDest = path.join(standaloneDir, '.env');
+
+let envContent = `NODE_ENV=production
 PORT=3000
 HOSTNAME=0.0.0.0
-NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+NEXT_PUBLIC_SITE_URL=https://tracconsultant.com
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_Tdyj5KRoPhN4Ao
+RAZORPAY_KEY_ID=rzp_test_Tdyj5KRoPhN4Ao
+RAZORPAY_KEY_SECRET=pSGKjdOMdizDHuy99nj9q3b7
 `;
 
-const envDest = path.join(standaloneDir, '.env');
-if (!fs.existsSync(envDest)) {
-  fs.writeFileSync(envDest, envContent, 'utf-8');
-  console.log('⚙️ Created default .env for standalone server.');
+if (fs.existsSync(rootEnvPath)) {
+  try {
+    envContent = fs.readFileSync(rootEnvPath, 'utf-8');
+  } catch {}
 }
+
+fs.writeFileSync(envDest, envContent, 'utf-8');
+console.log('⚙️ Synchronized production .env for standalone server.');
 
 console.log('\n✅ Standalone deployment folder is 100% READY at:');
 console.log('👉 ' + standaloneDir);

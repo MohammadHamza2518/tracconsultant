@@ -16,7 +16,8 @@ import {
   Search,
   ShieldAlert,
   HelpCircle,
-  FileCheck
+  FileCheck,
+  CreditCard
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -582,6 +583,14 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
                 <MessageCircle className="w-4 h-4" />
                 <span>Connect with CA on WhatsApp Now</span>
               </button>
+
+              <Link
+                href={`/pay?plan=${encodeURIComponent(submittedFiling.service)}`}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-sm font-bold transition-colors"
+              >
+                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <span>Pay Fee via Razorpay Online</span>
+              </Link>
 
               <Link
                 href={`/track?q=${submittedFiling.id}`}

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { FilingItem, WhatsAppTemplate, WhatsAppSettings, FilingStatus, TimelineStep, User, ToolPurchase, LeadItem } from './types';
+import { FilingItem, WhatsAppTemplate, WhatsAppSettings, FilingStatus, TimelineStep, User, ToolPurchase, LeadItem, PaymentTransaction } from './types';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const FILINGS_FILE = path.join(DATA_DIR, 'filings.json');
@@ -9,6 +9,7 @@ const SETTINGS_FILE = path.join(DATA_DIR, 'whatsapp_settings.json');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const TOOL_PURCHASES_FILE = path.join(DATA_DIR, 'tool_purchases.json');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
+const PAYMENTS_FILE = path.join(DATA_DIR, 'payments.json');
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -485,3 +486,64 @@ export function deleteLead(leadId: string): boolean {
   saveLeads(filtered);
   return true;
 }
+
+// ----------------------------------------------------
+// Payment Gateway Transactions DB
+// ----------------------------------------------------
+const DEFAULT_PAYMENTS: PaymentTransaction[] = [];
+
+export function getPayments(): PaymentTransaction[] {
+  ensureDataDir();
+  if (!fs.existsSync(PAYMENTS_FILE)) {
+    fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(DEFAULT_PAYMENTS, null, 2), 'utf-8');
+    return DEFAULT_PAYMENTS;
+  }
+  return safeReadJSON<PaymentTransaction[]>(PAYMENTS_FILE, DEFAULT_PAYMENTS);
+}
+
+export function savePayments(payments: PaymentTransaction[]): void {
+  ensureDataDir();
+  fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(payments, null, 2), 'utf-8');
+}
+
+export function recordPayment(paymentData: Omit<PaymentTransaction, 'id' | 'createdAt'> & { id?: string }): PaymentTransaction {
+  const payments = getPayments();
+  const year = new Date().getFullYear();
+  const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+  const id = paymentData.id || `TRAC-PAY-${year}-${randomSuffix}`;
+
+  const newPayment: PaymentTransaction = {
+    ...paymentData,
+    id,
+    createdAt: new Date().toISOString()
+  };
+
+  payments.unshift(newPayment);
+  savePayments(payments);
+  return newPayment;
+}
+
+export function findPaymentById(id: string): PaymentTransaction | null {
+  const payments = getPayments();
+  return payments.find(p => p.id === id) || null;
+}
+
+export function findPaymentByOrderId(orderId: string): PaymentTransaction | null {
+  const payments = getPayments();
+  return payments.find(p => p.razorpayOrderId === orderId) || null;
+}
+
+export function updatePaymentStatus(idOrOrderId: string, update: Partial<PaymentTransaction>): PaymentTransaction | null {
+  const payments = getPayments();
+  const idx = payments.findIndex(p => p.id === idOrOrderId || p.razorpayOrderId === idOrOrderId);
+  if (idx === -1) return null;
+
+  payments[idx] = {
+    ...payments[idx],
+    ...update
+  };
+
+  savePayments(payments);
+  return payments[idx];
+}
+

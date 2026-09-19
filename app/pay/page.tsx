@@ -19,8 +19,10 @@ import {
   Lock, 
   Copy, 
   FileText,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from 'lucide-react';
+import { loadRazorpayScript } from '@/lib/loadRazorpay';
 
 const POPULAR_PLANS = [
   { name: 'Salaried Basic (ITR-1)', price: 499, service: 'ITR Filing' },
@@ -49,12 +51,13 @@ function PaymentCheckoutContent() {
   const [email, setEmail] = useState<string>('');
   const [panNumber, setPanNumber] = useState<string>('');
 
-  // Payment method
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'bank'>('upi');
+  // Payment method: 'razorpay' (default), 'manual_upi', 'bank'
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'manual_upi' | 'bank'>('razorpay');
   const [utrNumber, setUtrNumber] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
   const [receiptId, setReceiptId] = useState<string>('');
+  const [razorpayPaymentId, setRazorpayPaymentId] = useState<string>('');
   const [copiedUpi, setCopiedUpi] = useState<boolean>(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
@@ -90,25 +93,137 @@ function PaymentCheckoutContent() {
     setTimeout(() => setCopiedUpi(false), 2000);
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !mobile.trim()) {
-      alert('Please fill your full name and 10-digit mobile number.');
+    if (!fullName.trim() || fullName.trim().length < 2) {
+      alert('Please enter your full legal name.');
+      return;
+    }
+    if (!mobile.trim() || mobile.trim().length !== 10) {
+      alert('Please enter your 10-digit mobile number for WhatsApp transaction confirmation.');
       return;
     }
 
-    setIsProcessing(true);
+    // 1. If Razorpay Gateway chosen
+    if (paymentMethod === 'razorpay') {
+      setIsProcessing(true);
+      try {
+        const loaded = await loadRazorpayScript();
+        if (!loaded) {
+          throw new Error('Razorpay Checkout failed to initialize. Please check your connection.');
+        }
 
+        // Create Order on Server
+        const orderRes = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            planName: selectedPlanName,
+            service: POPULAR_PLANS.find(p => p.name === selectedPlanName)?.service || 'Tax & Corporate Advisory',
+            customer: {
+              name: fullName.trim(),
+              phone: mobile.trim(),
+              email: email.trim(),
+              panNumber: panNumber.trim()
+            }
+          })
+        });
+
+        const orderData = await orderRes.json();
+        if (!orderRes.ok || !orderData.success) {
+          throw new Error(orderData.error || 'Failed to initialize payment gateway.');
+        }
+
+        // Initialize Razorpay Modal
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency || 'INR',
+          name: 'Tracconsultant Advisory',
+          description: selectedPlanName,
+          image: '/logo.png',
+          order_id: orderData.orderId,
+          handler: async function (response: any) {
+            try {
+              setIsProcessing(true);
+              const verifyRes = await fetch('/api/payment/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  receiptId: orderData.receiptId,
+                  planName: selectedPlanName,
+                  amount,
+                  customer: {
+                    name: fullName.trim(),
+                    phone: mobile.trim(),
+                    email: email.trim(),
+                    panNumber: panNumber.trim()
+                  }
+                })
+              });
+
+              const verifyData = await verifyRes.json();
+              if (verifyRes.ok && verifyData.success) {
+                setReceiptId(verifyData.receiptId || orderData.receiptId);
+                setRazorpayPaymentId(response.razorpay_payment_id);
+                setPaymentSuccess(true);
+              } else {
+                alert(verifyData.error || 'Payment verification failed. Please contact support with Payment ID: ' + response.razorpay_payment_id);
+              }
+            } catch (err: any) {
+              alert('Verification error: ' + err.message);
+            } finally {
+              setIsProcessing(false);
+            }
+          },
+          prefill: {
+            name: fullName.trim(),
+            contact: mobile.trim(),
+            email: email.trim() || 'taxpayer@tracconsultant.com'
+          },
+          notes: {
+            planName: selectedPlanName,
+            customerPAN: panNumber.trim()
+          },
+          theme: {
+            color: '#00a859'
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessing(false);
+            }
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (resp: any) {
+          setIsProcessing(false);
+          alert('Payment Failed: ' + (resp.error?.description || 'Transaction declined.'));
+        });
+        rzp.open();
+      } catch (err: any) {
+        setIsProcessing(false);
+        alert(err.message || 'Payment initialization failed.');
+      }
+      return;
+    }
+
+    // 2. Fallback Manual UPI or Bank Transfer
+    setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
       const recId = `TRAC-PAY-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
       setReceiptId(recId);
       setPaymentSuccess(true);
-    }, 1500);
+    }, 1200);
   };
 
   const openWhatsAppConfirmation = () => {
-    const text = `Hello Tracconsultant! I have completed payment of ₹${amount} for *${selectedPlanName}*. Receipt No: *${receiptId}*. Name: ${fullName}, Phone: ${mobile}. ${utrNumber ? 'UTR: ' + utrNumber : ''}`;
+    const text = `Hello Tracconsultant! I have completed payment of ₹${amount} for *${selectedPlanName}*. Receipt No: *${receiptId}*. ${razorpayPaymentId ? 'Razorpay Payment ID: *' + razorpayPaymentId + '*. ' : ''}Name: ${fullName}, Phone: ${mobile}. ${utrNumber ? 'UTR: ' + utrNumber : ''}`;
     window.open(`https://wa.me/917275922162?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -148,6 +263,15 @@ function PaymentCheckoutContent() {
                 <span className="text-slate-500">Receipt Reference:</span>
                 <span className="font-mono font-bold text-slate-900">{receiptId}</span>
               </div>
+              {razorpayPaymentId && (
+                <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+                  <span className="text-slate-500">Razorpay Payment ID:</span>
+                  <span className="font-mono font-bold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    {razorpayPaymentId}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center pb-3 border-b border-slate-200">
                 <span className="text-slate-500">Service Plan:</span>
                 <span className="font-bold text-slate-900">{selectedPlanName}</span>
@@ -264,51 +388,105 @@ function PaymentCheckoutContent() {
 
               {/* Payment Methods */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                <h3 className="text-base font-bold text-slate-900">2. Choose Payment Mode</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-slate-900">2. Choose Payment Mode</h3>
+                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Razorpay Verified
+                  </span>
+                </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('upi')}
-                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
-                      paymentMethod === 'upi'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-bold shadow-xs'
+                    onClick={() => setPaymentMethod('razorpay')}
+                    className={`py-3 px-3 rounded-2xl border text-center transition-all cursor-pointer relative ${
+                      paymentMethod === 'razorpay'
+                        ? 'border-emerald-500 bg-emerald-50/80 text-emerald-900 font-bold shadow-xs ring-2 ring-emerald-500/20'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <QrCode className="w-5 h-5 mx-auto mb-1" />
-                    <span className="text-xs">Instant UPI / QR</span>
+                    <div className="flex items-center justify-center gap-1 text-xs text-emerald-700 font-bold mb-1">
+                      <Zap className="w-3.5 h-3.5 fill-emerald-600 text-emerald-600" />
+                      <span>Instant Online</span>
+                    </div>
+                    <div className="text-xs font-black text-slate-900">Razorpay Gateway</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">UPI, Cards &amp; NetBanking</div>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
-                      paymentMethod === 'card'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-bold shadow-xs'
+                    onClick={() => setPaymentMethod('manual_upi')}
+                    className={`py-3 px-3 rounded-2xl border text-center transition-all cursor-pointer ${
+                      paymentMethod === 'manual_upi'
+                        ? 'border-emerald-500 bg-emerald-50/80 text-emerald-900 font-bold shadow-xs ring-2 ring-emerald-500/20'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <CreditCard className="w-5 h-5 mx-auto mb-1" />
-                    <span className="text-xs">Debit / Card</span>
+                    <QrCode className="w-4 h-4 mx-auto mb-1 text-slate-700" />
+                    <div className="text-xs font-bold text-slate-900">Scan UPI QR</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">GPay, PhonePe, Paytm</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('bank')}
-                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
+                    className={`py-3 px-3 rounded-2xl border text-center transition-all cursor-pointer ${
                       paymentMethod === 'bank'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-bold shadow-xs'
+                        ? 'border-emerald-500 bg-emerald-50/80 text-emerald-900 font-bold shadow-xs ring-2 ring-emerald-500/20'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <Building className="w-5 h-5 mx-auto mb-1" />
-                    <span className="text-xs">NEFT / NetBanking</span>
+                    <Building className="w-4 h-4 mx-auto mb-1 text-slate-700" />
+                    <div className="text-xs font-bold text-slate-900">Direct Bank / NEFT</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">Current A/C Transfer</div>
                   </button>
                 </div>
 
-                {/* UPI Content */}
-                {paymentMethod === 'upi' && (
+                {/* Razorpay Gateway Mode */}
+                {paymentMethod === 'razorpay' && (
+                  <div className="p-4 sm:p-5 bg-gradient-to-b from-emerald-50/50 to-slate-50 rounded-2xl border border-emerald-200/80 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#0B2545] flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                        Razorpay Automated Smart Checkout
+                      </span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
+                        Zero Extra Convenience Fee
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Click <strong>&quot;Confirm &amp; Pay ₹{amount.toLocaleString('en-IN')}&quot;</strong> below to launch the official Razorpay payment portal. Supports all payment options with instantaneous CA confirmation:
+                    </p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-center">
+                      <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-800">Instant UPI</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">GPay, PhonePe, Paytm, Cred</div>
+                      </div>
+                      <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-800">Credit / Debit</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">Visa, Mastercard, RuPay</div>
+                      </div>
+                      <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-800">Net Banking</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">50+ Indian Banks</div>
+                      </div>
+                      <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-800">Wallets &amp; EMI</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">Paytm, Mobikwik, etc.</div>
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-emerald-700 flex items-center gap-1.5 pt-1 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Instant digital receipt generated &amp; WhatsApp status update triggered automatically.</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual UPI Content */}
+                {paymentMethod === 'manual_upi' && (
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 text-center">
                     <div className="text-xs text-slate-600 font-medium">
                       Scan QR Code using Google Pay, PhonePe, Paytm, or BHIM:
@@ -390,39 +568,6 @@ function PaymentCheckoutContent() {
                   </div>
                 )}
 
-                {/* Card Content */}
-                {paymentMethod === 'card' && (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Card Number</label>
-                      <input
-                        type="text"
-                        placeholder="4242 •••• •••• 4242"
-                        className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">Expiry Date</label>
-                        <input
-                          type="text"
-                          placeholder="MM / YY"
-                          className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">CVV</label>
-                        <input
-                          type="password"
-                          maxLength={4}
-                          placeholder="123"
-                          className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* Bank Transfer Content */}
                 {paymentMethod === 'bank' && (
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
@@ -480,9 +625,19 @@ function PaymentCheckoutContent() {
                   type="button"
                   onClick={handlePaymentSubmit}
                   disabled={isProcessing}
-                  className="w-full py-4 bg-[#00a859] hover:bg-[#008f4c] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full py-4 bg-[#00a859] hover:bg-[#008f4c] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isProcessing ? 'Verifying Transaction...' : `Confirm & Pay ₹${amount.toLocaleString('en-IN')}`}
+                  {isProcessing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Processing Gateway Checkout...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      <span>Confirm &amp; Pay ₹{amount.toLocaleString('en-IN')}</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Razorpay Compliance Terms Agreement */}

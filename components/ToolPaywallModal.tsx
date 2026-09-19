@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useConfig } from '@/context/ConfigContext';
 import { X, CheckCircle2, ShieldCheck, Zap, Sparkles, QrCode, ArrowRight, Lock, Check } from 'lucide-react';
+import { loadRazorpayScript } from '@/lib/loadRazorpay';
 
 interface ToolPaywallModalProps {
   isOpen: boolean;
@@ -38,6 +39,157 @@ export default function ToolPaywallModal({
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
     `upi://pay?pa=${upiId}&pn=Tracconsultant%20Advisory&am=${finalAmount}&cu=INR&tn=${encodeURIComponent(toolName)}`
   )}`;
+
+  const handleRazorpayToolPayment = async () => {
+    setIsProcessing(true);
+    try {
+      const loaded = await loadRazorpayScript();
+      if (!loaded) {
+        throw new Error('Razorpay SDK failed to load. Please check your connection.');
+      }
+
+      let activeUser = user;
+      if (!activeUser) {
+        await loginWithGoogle('taxpayer@tracconsultant.com', 'Verified Taxpayer');
+        const saved = typeof window !== 'undefined' ? localStorage.getItem('trac_user_session') : null;
+        if (saved) {
+          try { activeUser = JSON.parse(saved); } catch {}
+        }
+      }
+
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalAmount,
+          planName: selectedPlan === 'all' ? 'All-Access CA Toolkit Pass' : toolName,
+          service: 'Compliance Suite Tool',
+          customer: {
+            name: activeUser?.name || 'Verified Taxpayer',
+            email: activeUser?.email || 'taxpayer@tracconsultant.com',
+            phone: activeUser?.phone || '7275922162'
+          },
+          notes: {
+            type: 'tool',
+            toolId: selectedPlan === 'all' ? 'all-access-pass' : toolId,
+            toolName: selectedPlan === 'all' ? 'All-Access CA Toolkit Pass' : toolName,
+            userId: activeUser?.id || 'usr-client'
+          }
+        })
+      });
+
+      const orderData = await res.json();
+      if (!res.ok || !orderData.success) {
+        throw new Error(orderData.error || 'Failed to create payment order');
+      }
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
+        name: 'Tracconsultant Advisory',
+        description: selectedPlan === 'all' ? 'All-Access CA Toolkit Pass' : toolName,
+        image: '/logo.png',
+        order_id: orderData.orderId,
+        handler: async function (response: any) {
+          try {
+            setIsProcessing(true);
+            const verifyRes = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                receiptId: orderData.receiptId,
+                planName: selectedPlan === 'all' ? 'All-Access CA Toolkit Pass' : toolName,
+                amount: finalAmount,
+                customer: {
+                  name: activeUser?.name || 'Verified Taxpayer',
+                  email: activeUser?.email || 'taxpayer@tracconsultant.com',
+                  phone: activeUser?.phone || '7275922162'
+                },
+                notes: {
+                  type: 'tool',
+                  toolId: selectedPlan === 'all' ? 'all-access-pass' : toolId,
+                  toolName: selectedPlan === 'all' ? 'All-Access CA Toolkit Pass' : toolName,
+                  userId: activeUser?.id
+                }
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success) {
+              // Save to localStorage
+              if (typeof window !== 'undefined') {
+                try {
+                  const savedSession = localStorage.getItem('trac_user_session');
+                  if (savedSession) {
+                    const u = JSON.parse(savedSession);
+                    const tools = new Set(u.unlockedTools || []);
+                    if (selectedPlan === 'all') {
+                      ['pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'all-access-pass'].forEach(t => tools.add(t));
+                      localStorage.setItem('trac_test_all_access', 'true');
+                    } else {
+                      tools.add(toolId);
+                    }
+                    u.unlockedTools = Array.from(tools);
+                    localStorage.setItem('trac_user_session', JSON.stringify(u));
+                  }
+
+                  const direct = localStorage.getItem('trac_unlocked_tools');
+                  const toolSet = new Set(direct ? JSON.parse(direct) : []);
+                  if (selectedPlan === 'all') {
+                    ['pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'all-access-pass'].forEach(t => toolSet.add(t));
+                    localStorage.setItem('trac_test_all_access', 'true');
+                  } else {
+                    toolSet.add(toolId);
+                  }
+                  localStorage.setItem('trac_unlocked_tools', JSON.stringify(Array.from(toolSet)));
+                } catch {}
+              }
+
+              setSuccessMessage(`Payment Verified! ${selectedPlan === 'all' ? 'All Tools' : toolName} unlocked successfully.`);
+              await refreshUser();
+              setTimeout(() => {
+                onUnlockSuccess();
+                onClose();
+              }, 1200);
+            } else {
+              alert(verifyData.error || 'Payment verification failed.');
+            }
+          } catch (err: any) {
+            alert('Verification error: ' + err.message);
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: activeUser?.name || 'Verified Taxpayer',
+          email: activeUser?.email || 'taxpayer@tracconsultant.com',
+          contact: activeUser?.phone || '7275922162'
+        },
+        theme: {
+          color: '#00a859'
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (resp: any) {
+        setIsProcessing(false);
+        alert('Payment Failed: ' + (resp.error?.description || 'Declined'));
+      });
+      rzp.open();
+    } catch (err: any) {
+      setIsProcessing(false);
+      alert(err.message || 'Payment initialization error');
+    }
+  };
 
   const handleUnlockPayment = async (mode: 'instant_demo' | 'upi_submit') => {
     setIsProcessing(true);
@@ -242,11 +394,29 @@ export default function ToolPaywallModal({
                 <button
                   type="button"
                   disabled={isProcessing}
-                  onClick={() => handleUnlockPayment('instant_demo')}
-                  className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#008f4c] active:bg-emerald-800 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2"
+                  onClick={handleRazorpayToolPayment}
+                  className="w-full py-3.5 px-4 bg-[#00a859] hover:bg-[#008f4c] active:bg-emerald-800 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <Zap className="w-4 h-4 fill-white" />
-                  <span>{isProcessing ? 'Verifying...' : `Unlock Now (Instant 1-Click Verification)`}</span>
+                  {isProcessing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Processing Gateway Checkout...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      <span>Pay ₹{finalAmount} via Razorpay (Instant Unlock)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isProcessing}
+                  onClick={() => handleUnlockPayment('instant_demo')}
+                  className="w-full py-1 text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                >
+                  Or test with Instant Demo Simulation
                 </button>
 
                 <p className="text-center text-xs text-slate-400 leading-normal">

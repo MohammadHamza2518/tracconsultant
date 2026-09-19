@@ -164,3 +164,24 @@ export interface WhatsAppSettings {
   phoneNumberId?: string;
   autoSendOnSubmission: boolean;
 }
+
+export interface PaymentTransaction {
+  id: string; // e.g. TRAC-PAY-2025-12345
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  amount: number; // in rupees
+  currency: string;
+  planName: string;
+  service?: string;
+  payerName: string;
+  payerEmail?: string;
+  payerPhone: string;
+  panNumber?: string;
+  status: 'created' | 'paid' | 'failed';
+  method?: string; // upi, card, netbanking, wallet
+  createdAt: string;
+  verifiedAt?: string;
+  notes?: Record<string, any>;
+}
+
