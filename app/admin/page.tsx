@@ -403,7 +403,7 @@ export default function AdminPage() {
 
   // KPI Calculations
   const totalFilings = filings.length;
-  const totalRegisteredUsers = users.length;
+  const totalRegisteredUsers = users.filter(u => u.role !== 'admin').length;
   const totalToolPurchasesCount = toolPurchases.length;
   const totalToolRevenue = toolPurchases.reduce((acc, p) => acc + (p.status === 'active' ? p.amount : 0), 0);
   const pendingReviews = filings.filter(f => f.status === 'new' || f.status === 'under_review').length;
@@ -764,7 +764,7 @@ export default function AdminPage() {
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Client Accounts ({users.length})</span>
+            <span>Client Accounts ({totalRegisteredUsers})</span>
           </button>
 
           <button

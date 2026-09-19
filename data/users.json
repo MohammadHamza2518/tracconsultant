@@ -1,7 +1,7 @@
 [
   {
     "id": "usr-admin-1",
-    "name": "Senior Tax Expert (CA)",
+    "name": "Senior CA Partner",
     "email": "admin@tracconsultant.com",
     "phone": "+91 7275922162",
     "role": "admin",
@@ -17,66 +17,5 @@
       "gstr2a-cleaner"
     ],
     "createdAt": "2025-01-15T09:00:00Z"
-  },
-  {
-    "id": "usr-client-1",
-    "name": "Amitabh Sharma",
-    "email": "amitabh.sharma@example.com",
-    "phone": "9876543210",
-    "role": "client",
-    "authProvider": "google",
-    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-    "unlockedTools": [
-      "tax-calculator",
-      "hra-calculator",
-      "pdf-redactor"
-    ],
-    "createdAt": "2025-05-10T14:20:00Z"
-  },
-  {
-    "id": "usr-client-2",
-    "name": "Pooja Verma",
-    "email": "pooja.verma@apexretail.in",
-    "phone": "9812345678",
-    "role": "client",
-    "authProvider": "email",
-    "unlockedTools": [
-      "gstr2a-reconciliation",
-      "gstr2a-cleaner"
-    ],
-    "createdAt": "2025-05-11T11:30:00Z"
-  },
-  {
-    "id": "usr-client-3",
-    "name": "Vikram Singhania",
-    "email": "vikram.singhania@gmail.com",
-    "phone": "9765432109",
-    "role": "client",
-    "authProvider": "google",
-    "unlockedTools": [
-      "advance-tax-calculator",
-      "tax-calculator"
-    ],
-    "createdAt": "2025-05-12T09:10:00Z"
-  },
-  {
-    "id": "usr-1789818271406-401",
-    "name": "Verified Taxpayer",
-    "email": "taxpayer@tracconsultant.com",
-    "phone": "",
-    "role": "client",
-    "authProvider": "google",
-    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Verified%20Taxpayer",
-    "unlockedTools": [
-      "hra-calculator",
-      "advance-tax-calculator",
-      "tax-calculator",
-      "json-to-computation",
-      "gstr2a-cleaner",
-      "tb-to-balancesheet",
-      "gstr2a-reconciliation",
-      "pdf-redactor"
-    ],
-    "createdAt": "2026-09-19T11:44:31.406Z"
   }
 ]
