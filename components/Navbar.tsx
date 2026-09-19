@@ -469,29 +469,30 @@ export default function Navbar() {
               <div className="text-lg sm:text-xl xl:text-2xl font-black tracking-tight text-[#0B2545] leading-none flex items-center whitespace-nowrap">
                 TR<span className="text-[#C9933B]">A</span>C<span className="text-[#C9933B] ml-1 text-base sm:text-lg xl:text-xl font-bold tracking-wider">CONSULTANT</span>
               </div>
-              <div className="hidden xl:block text-[9px] font-semibold text-slate-500 tracking-wider uppercase mt-1 whitespace-nowrap">
+              <div className="hidden xl:block text-xs font-semibold text-slate-500 tracking-wider uppercase mt-1 whitespace-nowrap">
                 Tax • Regulatory • Advisory • Compliance
               </div>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
-            {/* Services Mega Dropdown */}
-            <div className="relative" ref={servicesRef}>
-              <button
-                onClick={() => { setServicesOpen(!servicesOpen); setToolsOpen(false); }}
-                className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors ${
-                  servicesOpen ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:text-emerald-600 hover:bg-slate-50'
-                }`}
-              >
-                <Briefcase className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="whitespace-nowrap">All Services</span>
-                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shrink-0">
-                  20
-                </span>
-                <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${servicesOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} />
-              </button>
+          {/* Desktop Navigation Links & Action Group */}
+          <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
+            <div className="flex items-center gap-1 xl:gap-1.5">
+              {/* Services Mega Dropdown */}
+              <div className="relative" ref={servicesRef}>
+                <button
+                  onClick={() => { setServicesOpen(!servicesOpen); setToolsOpen(false); }}
+                  className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors ${
+                    servicesOpen ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:text-emerald-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <Briefcase className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="whitespace-nowrap">All Services</span>
+                  <span className="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-2 py-0.5 rounded-full shrink-0">
+                    20
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${servicesOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} />
+                </button>
 
               {/* HIGH-IMPACT DESKTOP MEGA MENU */}
               {servicesOpen && (
@@ -604,14 +605,14 @@ export default function Navbar() {
                                       <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 truncate">
                                         <span className="text-emerald-600 font-mono mr-1">#{item.num}</span> {item.title}
                                       </div>
-                                      <div className="text-[10px] text-slate-500 truncate">{item.sub}</div>
+                                      <div className="text-xs text-slate-500 truncate">{item.sub}</div>
                                     </div>
                                   </div>
                                   <div className="text-right shrink-0 pl-2">
-                                    <span className="text-[11px] font-extrabold text-slate-900 block leading-none">
+                                    <span className="text-xs font-extrabold text-slate-900 block leading-none">
                                       {getService(item.slug)?.startingPrice || item.price}
                                     </span>
-                                    <span className="text-[9px] text-emerald-700 font-semibold">
+                                    <span className="text-xs text-emerald-700 font-semibold">
                                       {getService(item.slug)?.tat || item.tat}
                                     </span>
                                   </div>
@@ -628,7 +629,7 @@ export default function Navbar() {
                           <div key={grp.id} className="space-y-2.5">
                             {/* Column Category Header */}
                             <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
-                              <span className={`text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${grp.badgeClass}`}>
+                              <span className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${grp.badgeClass}`}>
                                 {grp.emoji} {grp.shortTitle} ({grp.items.length})
                               </span>
                             </div>
@@ -650,19 +651,19 @@ export default function Navbar() {
                                       </div>
                                       <div className="min-w-0">
                                         <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 truncate leading-tight">
-                                          <span className="text-slate-400 font-mono text-[10px] mr-1">#{item.num}</span>
+                                          <span className="text-slate-400 font-mono text-xs mr-1">#{item.num}</span>
                                           {item.title}
                                         </div>
-                                        <div className="text-[10px] text-slate-400 truncate leading-none mt-0.5">
+                                        <div className="text-xs text-slate-400 truncate leading-none mt-0.5">
                                           {item.sub}
                                         </div>
                                       </div>
                                     </div>
                                     <div className="text-right shrink-0 pl-1.5 opacity-80 group-hover:opacity-100">
-                                      <span className="text-[10px] font-bold text-slate-700 block leading-none">
+                                      <span className="text-xs font-bold text-slate-700 block leading-none">
                                         {getService(item.slug)?.startingPrice || item.price}
                                       </span>
-                                      <span className="text-[8px] text-slate-400">
+                                      <span className="text-xs text-slate-400">
                                         {getService(item.slug)?.tat || item.tat}
                                       </span>
                                     </div>
@@ -678,17 +679,17 @@ export default function Navbar() {
                     {/* Right Spotlight: CA Advisory Card */}
                     <div className="w-64 shrink-0 bg-gradient-to-br from-[#0B2545] via-[#133E68] to-[#0B2545] text-white p-4 rounded-2xl flex flex-col justify-between shadow-lg">
                       <div>
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-bold uppercase tracking-wider mb-2 border border-emerald-500/30">
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2 border border-emerald-500/30">
                           <Sparkles className="w-3 h-3" /> Senior CA Hotline
                         </div>
                         <h4 className="text-sm font-black text-white leading-snug">
                           Need Help Picking the Right Service?
                         </h4>
-                        <p className="text-[11px] text-slate-300 mt-1.5 leading-relaxed">
+                        <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
                           Consult directly with a Senior Chartered Accountant for customized advice on notices, incorporation or filings.
                         </p>
                         
-                        <div className="mt-3 space-y-1.5 text-[10px] text-slate-200">
+                        <div className="mt-3 space-y-1.5 text-xs text-slate-200">
                           <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
                             <CheckCircle2 className="w-3 h-3 shrink-0" />
                             <span>100% Notice Protection</span>
@@ -716,7 +717,7 @@ export default function Navbar() {
                         </a>
                         <a
                           href="tel:+917275922162"
-                          className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
                         >
                           <PhoneCall className="w-3 h-3 text-emerald-400" />
                           <span>+91 7275922162</span>
@@ -756,7 +757,7 @@ export default function Navbar() {
               >
                 <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span className="whitespace-nowrap">Compliance Suite</span>
-                <span className="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shrink-0">
+                <span className="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2 py-0.5 rounded-full shrink-0">
                   8
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${toolsOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} />
@@ -774,12 +775,12 @@ export default function Navbar() {
                         <h3 className="text-sm font-black text-slate-900 leading-tight">
                           Tax & Compliance Software Suite
                         </h3>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-xs text-slate-500 mt-0.5">
                           High-accuracy Union Budget tax calculators & automated audit SaaS engines
                         </p>
                       </div>
                     </div>
-                    <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                       <ShieldCheck className="w-3.5 h-3.5" />
                       <span>Instant Browser Processing • 100% Confidential</span>
                     </div>
@@ -790,10 +791,10 @@ export default function Navbar() {
                     {/* Column 1: Free Public Calculators */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
                           <Calculator className="w-3 h-3" /> Free Tax Calculators (3)
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-600">Zero Paywall</span>
+                        <span className="text-xs font-bold text-emerald-600">Zero Paywall</span>
                       </div>
 
                       <div className="space-y-2">
@@ -819,11 +820,11 @@ export default function Navbar() {
                                   <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 truncate">
                                     {t.name}
                                   </span>
-                                  <span className="text-[9px] font-extrabold bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded shrink-0">
+                                  <span className="text-xs font-extrabold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded shrink-0">
                                     FREE
                                   </span>
                                 </div>
-                                <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                                <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
                                   {t.shortDesc}
                                 </p>
                               </div>
@@ -832,7 +833,7 @@ export default function Navbar() {
                         })}
                       </div>
 
-                      <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 flex items-center gap-2">
+                      <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs text-emerald-800 flex items-center gap-2">
                         <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                         <span>All 3 calculators are updated to Union Budget FY 2024-25 / 2025-26 rules.</span>
                       </div>
@@ -841,10 +842,10 @@ export default function Navbar() {
                     {/* Column 2: Pro Audit & Compliance Utilities */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
+                        <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
                           <Sparkles className="w-3 h-3" /> Pro Audit & SaaS Utilities (5)
                         </span>
-                        <span className="text-[10px] font-bold text-indigo-600">₹199 - ₹299</span>
+                        <span className="text-xs font-bold text-indigo-600">₹199 - ₹299</span>
                       </div>
 
                       <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
@@ -872,14 +873,14 @@ export default function Navbar() {
                                   <div className="text-xs font-bold text-slate-800 group-hover:text-indigo-700 truncate leading-tight">
                                     {t.name}
                                   </div>
-                                  <div className="text-[10px] text-slate-400 truncate leading-none mt-0.5">
+                                  <div className="text-xs text-slate-400 truncate leading-none mt-0.5">
                                     {t.shortDesc}
                                   </div>
                                 </div>
                               </div>
                               <div className="text-right shrink-0 pl-2">
-                                <span className="text-[11px] font-extrabold text-indigo-700 block leading-none">₹{getToolPrice(t.id, t.price)}</span>
-                                <span className="text-[8px] text-slate-400 uppercase font-semibold">Instant Access</span>
+                                <span className="text-xs font-extrabold text-indigo-700 block leading-none">₹{getToolPrice(t.id, t.price)}</span>
+                                <span className="text-xs text-slate-400 uppercase font-semibold">Instant Access</span>
                               </div>
                             </Link>
                           );
@@ -926,8 +927,11 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Clean Visual Divider */}
+          <div className="h-6 w-px bg-slate-200 shrink-0" />
+
           {/* User Auth Action (Right) */}
-          <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
+          <div className="flex items-center gap-2 xl:gap-2.5 shrink-0">
             {isLoading ? (
               <div className="h-9 w-28 bg-slate-100/80 rounded-full animate-pulse shrink-0 border border-slate-200/50" />
             ) : user ? (
@@ -945,7 +949,7 @@ export default function Navbar() {
                   )}
                   <div className="text-left shrink-0">
                     <div className="text-xs font-bold text-slate-800 leading-tight max-w-[130px] truncate">{user.name}</div>
-                    <div className="text-[10px] font-semibold leading-none mt-0.5">
+                    <div className="text-xs font-semibold leading-none mt-0.5">
                       {user.role === 'admin' ? (
                         <span className="text-indigo-600 uppercase font-bold">Admin</span>
                       ) : (
@@ -959,7 +963,7 @@ export default function Navbar() {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
                     <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Signed in as</p>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Signed in as</p>
                       <p className="text-xs font-bold text-slate-800 truncate mt-0.5">{user.email}</p>
                     </div>
 
@@ -1007,24 +1011,25 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => openAuthModal('login')}
-                className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 rounded-xl transition-all border border-emerald-200/80 flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl transition-all border border-slate-300 shadow-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <UserIcon className="w-4 h-4 shrink-0" />
                 <span className="whitespace-nowrap">Sign In</span>
               </button>
             )}
 
-            {/* Direct WhatsApp / Consultation Callout */}
+            {/* Direct WhatsApp / Consultation Callout - Unified Primary Emerald */}
             <a
               href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 rounded-xl shadow-md shadow-emerald-700/20 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
+              className="px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-bold text-white bg-[#00a859] hover:bg-[#008f4c] rounded-xl shadow-md shadow-emerald-900/10 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
             >
               <span className="whitespace-nowrap">Consult a CA</span>
               <Sparkles className="w-3.5 h-3.5 shrink-0" />
             </a>
           </div>
+        </div>
 
           {/* Mobile Menu Button & Mobile Auth Indicator */}
           <div className="flex lg:hidden items-center gap-2">
@@ -1070,11 +1075,11 @@ export default function Navbar() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-slate-900">All 20 CA Services</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Income Tax, GST, Company Setup, CMA</div>
+                    <div className="text-xs text-slate-500 font-normal">Income Tax, GST, Company Setup, CMA</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                  <span className="bg-emerald-600 text-white text-xs font-extrabold px-2 py-0.5 rounded-full">
                     20
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${mobileServicesOpen ? 'rotate-180 text-emerald-600' : ''}`} />
@@ -1096,7 +1101,7 @@ export default function Navbar() {
                   </div>
 
                   {/* Category Filter Pills */}
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 text-[10px] no-scrollbar">
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
                     <button
                       onClick={() => setMobileCategory('all')}
                       className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-colors ${
@@ -1158,14 +1163,14 @@ export default function Navbar() {
                               <div className="text-xs font-bold text-slate-900 truncate group-hover:text-emerald-700">
                                 <span className="text-emerald-600 font-mono mr-1">#{svc.num}</span> {svc.title}
                               </div>
-                              <div className="text-[10px] text-slate-500 truncate">{svc.sub}</div>
+                              <div className="text-xs text-slate-500 truncate">{svc.sub}</div>
                             </div>
                           </div>
                           <div className="text-right shrink-0 pl-2">
-                            <span className="text-[11px] font-extrabold text-slate-900 block leading-none">
+                            <span className="text-xs font-extrabold text-slate-900 block leading-none">
                               {getService(svc.slug)?.startingPrice || svc.price}
                             </span>
-                            <span className="text-[9px] text-emerald-700 font-semibold">
+                            <span className="text-xs text-emerald-700 font-semibold">
                               {getService(svc.slug)?.tat || svc.tat}
                             </span>
                           </div>
@@ -1197,11 +1202,11 @@ export default function Navbar() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-slate-900">Tax & Compliance Suite</div>
-                    <div className="text-[10px] text-slate-500 font-normal">3 Free Calculators + 5 Pro Audit SaaS Utilities</div>
+                    <div className="text-xs text-slate-500 font-normal">3 Free Calculators + 5 Pro Audit SaaS Utilities</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                  <span className="bg-indigo-600 text-white text-xs font-extrabold px-2 py-0.5 rounded-full">
                     8 Tools
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180 text-indigo-600' : ''}`} />
@@ -1210,7 +1215,7 @@ export default function Navbar() {
 
               {mobileToolsOpen && (
                 <div className="px-3 pb-3 pt-1 border-t border-slate-200 bg-white space-y-2">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 pt-1 flex items-center gap-1">
+                  <div className="text-xs font-bold uppercase tracking-wider text-emerald-700 pt-1 flex items-center gap-1">
                     <Calculator className="w-3 h-3" /> Free Calculators (3)
                   </div>
                   <div className="space-y-1">
@@ -1222,12 +1227,12 @@ export default function Navbar() {
                         className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 text-xs transition-colors"
                       >
                         <span className="font-semibold text-slate-800">{t.name}</span>
-                        <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded">FREE</span>
+                        <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded">FREE</span>
                       </Link>
                     ))}
                   </div>
 
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 pt-2 border-t border-slate-100 flex items-center gap-1">
+                  <div className="text-xs font-bold uppercase tracking-wider text-indigo-700 pt-2 border-t border-slate-100 flex items-center gap-1">
                     <Sparkles className="w-3 h-3" /> Pro Audit Utilities (5)
                   </div>
                   <div className="space-y-1">
@@ -1239,7 +1244,7 @@ export default function Navbar() {
                         className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 text-xs transition-colors"
                       >
                         <span className="font-semibold text-slate-800">{t.name}</span>
-                        <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">₹{getToolPrice(t.id, t.price)}</span>
+                        <span className="text-xs bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded">₹{getToolPrice(t.id, t.price)}</span>
                       </Link>
                     ))}
                   </div>
@@ -1263,7 +1268,7 @@ export default function Navbar() {
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-center transition-colors"
               >
                 <div className="text-xs font-bold text-slate-900">Track Filing</div>
-                <div className="text-[10px] text-slate-500">Live Status & ARN</div>
+                <div className="text-xs text-slate-500">Live Status & ARN</div>
               </Link>
               <Link
                 href="/pay"
@@ -1271,7 +1276,7 @@ export default function Navbar() {
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-center transition-colors"
               >
                 <div className="text-xs font-bold text-slate-900">Pay Online</div>
-                <div className="text-[10px] text-slate-500">Instant UPI & Cards</div>
+                <div className="text-xs text-slate-500">Instant UPI & Cards</div>
               </Link>
             </div>
 
@@ -1280,7 +1285,7 @@ export default function Navbar() {
               href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white text-center font-bold rounded-xl flex items-center justify-center gap-2 shadow-md text-xs"
+              className="w-full py-2.5 bg-[#00a859] hover:bg-[#008f4c] text-white text-center font-bold rounded-xl flex items-center justify-center gap-2 shadow-md text-xs transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Consult a CA on WhatsApp</span>

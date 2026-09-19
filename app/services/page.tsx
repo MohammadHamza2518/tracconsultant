@@ -75,13 +75,13 @@ export default function ServicesDirectoryPage() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
   const categories = [
-    { id: 'all', label: 'All 20 Services', count: 20 },
-    { id: 'income_tax', label: '⚖️ Income Tax & Appeals', count: 3 },
-    { id: 'corporate_legal', label: '🏢 Business Setup & Corporate', count: 5 },
-    { id: 'gst', label: '🧾 GST Compliance', count: 1 },
-    { id: 'accounting_cma', label: '📊 Accounting & CMA', count: 3 },
-    { id: 'advisory_wealth', label: '📈 Tax Planning & RSUs', count: 3 },
-    { id: 'licenses_certifications', label: '🛡️ Licenses & Certifications', count: 5 },
+    { id: 'all', label: 'All 20 Services', icon: Briefcase },
+    { id: 'income_tax', label: 'Income Tax & Appeals', icon: Scale },
+    { id: 'corporate_legal', label: 'Business Setup & Corporate', icon: Building2 },
+    { id: 'gst', label: 'GST Compliance', icon: Receipt },
+    { id: 'accounting_cma', label: 'Accounting & CMA', icon: BarChart3 },
+    { id: 'advisory_wealth', label: 'Tax Planning & RSUs', icon: TrendingUp },
+    { id: 'licenses_certifications', label: 'Licenses & Certifications', icon: ShieldCheck },
   ];
 
   const filteredServices = useMemo(() => {
@@ -141,8 +141,8 @@ export default function ServicesDirectoryPage() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#C9933B]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto text-center relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+        <div className="max-w-6xl mx-auto text-center relative z-10 space-y-5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide">
             <ShieldCheck className="w-3.5 h-3.5" /> Handled by Senior In-House Chartered Accountants
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white max-w-3xl mx-auto">
@@ -152,52 +152,73 @@ export default function ServicesDirectoryPage() {
             From ITR filing and Company Incorporation to GST, Trademark, and CMA bank loan projections. Zero notice hassle with maximum legal tax deductions.
           </p>
 
+          {/* Primary Action Path in Hero */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <a
+              href="#services-grid"
+              className="w-full sm:w-auto px-7 py-3.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-900/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Explore All 20 Services Below</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="https://wa.me/917275922162?text=Hello%20Tracconsultant!%20I%20need%20expert%20CA%20advice%20for%20my%20tax%20or%20business."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-6 py-3.5 bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-400" />
+              <span>Consult CA on WhatsApp</span>
+            </a>
+          </div>
+
           {/* Trust Metrics Bar */}
           <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto text-left">
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
               <div className="text-xl sm:text-2xl font-black text-emerald-400">15,000+</div>
-              <div className="text-[11px] text-slate-300 font-medium">Filings & Compliances</div>
+              <div className="text-xs text-slate-300 font-medium">Filings &amp; Compliances</div>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
               <div className="text-xl sm:text-2xl font-black text-[#C9933B]">100%</div>
-              <div className="text-[11px] text-slate-300 font-medium">Notice Protection Guard</div>
+              <div className="text-xs text-slate-300 font-medium">Notice Protection Guard</div>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
               <div className="text-xl sm:text-2xl font-black text-emerald-400">24-48h</div>
-              <div className="text-[11px] text-slate-300 font-medium">Average Turnaround</div>
+              <div className="text-xs text-slate-300 font-medium">Average Turnaround</div>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
               <div className="text-xl sm:text-2xl font-black text-[#C9933B]">ICAI Reg.</div>
-              <div className="text-[11px] text-slate-300 font-medium">In-House CA Advisory</div>
+              <div className="text-xs text-slate-300 font-medium">In-House CA Advisory</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 relative z-10">
+      <div id="services-grid" className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 relative z-10 scroll-mt-20">
+        <h2 className="sr-only">Directory of Chartered Accountant Services</h2>
+        
         {/* Controls: Category Filter & Search Bar */}
         <div className="bg-white rounded-3xl p-4 sm:p-5 shadow-lg shadow-slate-200/50 border border-slate-200 mb-8 space-y-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Horizontal Scrollable Category Pills */}
             <div className="flex gap-2 overflow-x-auto w-full pb-1 md:pb-0 text-xs font-bold text-slate-600 no-scrollbar">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                    activeCategory === cat.id
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    activeCategory === cat.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
-                  }`}>
-                    {cat.count}
-                  </span>
-                </button>
-              ))}
+              {categories.map(cat => {
+                const CatIcon = cat.icon;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                      activeCategory === cat.id
+                        ? 'bg-[#00a859] text-white shadow-md shadow-emerald-600/20'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <CatIcon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Search Input */}
@@ -257,14 +278,14 @@ export default function ServicesDirectoryPage() {
                       <span className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 font-black text-xs flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                         #{service.number.toString().padStart(2, '0')}
                       </span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
                         {service.categoryLabel}
                       </span>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[9px] text-slate-400 block uppercase font-bold tracking-wider leading-none">Starting</span>
-                      <span className="font-black text-slate-900 text-sm sm:text-base text-emerald-700">{displayPrice}</span>
+                      <span className="text-xs text-slate-500 font-semibold block leading-tight">Starting from</span>
+                      <span className="font-extrabold text-slate-900 text-base sm:text-lg text-emerald-700">{displayPrice}</span>
                     </div>
                   </div>
 
@@ -286,54 +307,56 @@ export default function ServicesDirectoryPage() {
                     {service.shortDesc}
                   </p>
 
-                  {/* Subservices Pill List (if available) */}
-                  {service.subServices && service.subServices.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {service.subServices.slice(0, 3).map((sub, idx) => (
-                        <span key={idx} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                          {sub}
-                        </span>
-                      ))}
-                      {service.subServices.length > 3 && (
-                        <span className="text-[10px] text-slate-400 px-1 py-0.5 font-medium">
-                          +{service.subServices.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {/* Subservices Pill List (fixed min-height to maintain grid alignment) */}
+                  <div className="mt-3 min-h-[32px] flex flex-wrap items-center gap-1">
+                    {service.subServices && service.subServices.length > 0 ? (
+                      <>
+                        {service.subServices.slice(0, 3).map((sub, idx) => (
+                          <span key={idx} className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                            {sub}
+                          </span>
+                        ))}
+                        {service.subServices.length > 3 && (
+                          <span className="text-xs text-slate-400 px-1 py-0.5 font-medium">
+                            +{service.subServices.length - 3} more
+                          </span>
+                        )}
+                      </>
+                    ) : null}
+                  </div>
 
                   {/* Turnaround Time & Notice Protection */}
                   <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5 text-slate-600">
                       <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-[11px] font-semibold">{displayTat}</span>
+                      <span className="text-xs font-semibold">{displayTat}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                    <div className="text-xs text-emerald-700 font-medium flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Senior CA Lead</span>
+                      <span>Notice Protected</span>
                     </div>
                   </div>
 
                   {/* Highlights Bullet Points */}
                   <ul className="mt-3 space-y-1.5 pt-3 border-t border-slate-100">
                     {service.highlights.slice(0, 2).map((h, idx) => (
-                      <li key={idx} className="text-[11px] text-slate-600 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span className="truncate">{h}</span>
+                      <li key={idx} className="text-xs text-slate-600 flex items-start gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="leading-snug">{h}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Bottom Action Buttons */}
+                {/* Bottom Action Area: Primary Consult & File + WhatsApp + Details Link */}
                 <div className="p-4 bg-slate-50/80 border-t border-slate-100 space-y-2">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setConsultModalService(service)}
-                      className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 px-3 bg-[#00a859] hover:bg-[#008f4c] active:bg-[#007a3e] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <PhoneCall className="w-3.5 h-3.5" />
-                      <span>Consult CA</span>
+                      <span>Consult &amp; File with CA</span>
                     </button>
                     <a
                       href={`https://wa.me/917275922162?text=${encodeURIComponent(
@@ -341,7 +364,8 @@ export default function ServicesDirectoryPage() {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2.5 px-3 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5"
+                      className="py-2.5 px-3 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-emerald-700 font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5"
+                      title="Inquire on WhatsApp"
                     >
                       <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                       <span>WhatsApp</span>
@@ -350,9 +374,9 @@ export default function ServicesDirectoryPage() {
 
                   <Link
                     href={`/services/${service.slug}`}
-                    className="block text-center text-[11px] font-bold text-slate-500 hover:text-emerald-700 transition-colors pt-1"
+                    className="block text-center text-xs font-semibold text-slate-500 hover:text-emerald-700 transition-colors pt-0.5"
                   >
-                    View Complete Details, Documents & Pricing →
+                    View Scope, Documents &amp; Pricing →
                   </Link>
                 </div>
               </div>
@@ -434,7 +458,7 @@ export default function ServicesDirectoryPage() {
               ) : (
                 <>
                   <div className="mb-5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                       Service #{consultModalService.number} • {getService(consultModalService.id)?.startingPrice || consultModalService.startingPrice}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mt-1">{consultModalService.title}</h3>

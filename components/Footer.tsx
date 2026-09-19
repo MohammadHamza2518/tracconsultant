@@ -23,9 +23,9 @@ export default function Footer() {
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">100% Notice Protection</h4>
-                <p className="text-xs text-slate-400">Complete legal CA backing on every filing</p>
+              <div className="flex flex-col justify-center">
+                <h4 className="text-white font-semibold text-sm leading-snug">100% Notice Protection</h4>
+                <p className="text-xs text-slate-400 mt-0.5">Complete legal CA backing on every filing</p>
               </div>
             </div>
 
@@ -33,9 +33,9 @@ export default function Footer() {
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">Maximum Refund Claimed</h4>
-                <p className="text-xs text-slate-400">Full 80C, 80D, HRA & 87A rebate optimization</p>
+              <div className="flex flex-col justify-center">
+                <h4 className="text-white font-semibold text-sm leading-snug">Maximum Refund Claimed</h4>
+                <p className="text-xs text-slate-400 mt-0.5">Full 80C, 80D, HRA & 87A rebate optimization</p>
               </div>
             </div>
 
@@ -43,9 +43,9 @@ export default function Footer() {
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
                 <Lock className="w-6 h-6" />
               </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">Bank-Grade Encryption</h4>
-                <p className="text-xs text-slate-400">256-bit SSL secured confidential data storage</p>
+              <div className="flex flex-col justify-center">
+                <h4 className="text-white font-semibold text-sm leading-snug">Bank-Grade Encryption</h4>
+                <p className="text-xs text-slate-400 mt-0.5">256-bit SSL secured confidential data storage</p>
               </div>
             </div>
 
@@ -53,9 +53,9 @@ export default function Footer() {
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
                 <FileText className="w-6 h-6" />
               </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">Dedicated Personal CA</h4>
-                <p className="text-xs text-slate-400">Direct WhatsApp & call access on every file</p>
+              <div className="flex flex-col justify-center">
+                <h4 className="text-white font-semibold text-sm leading-snug">Dedicated Personal CA</h4>
+                <p className="text-xs text-slate-400 mt-0.5">Direct WhatsApp & call access on every file</p>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function Footer() {
 
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 xl:gap-10">
           
           {/* Brand & About */}
           <div className="lg:col-span-2 space-y-5">
@@ -99,7 +99,7 @@ export default function Footer() {
 
           {/* Column 1: ITR Services */}
           <div>
-            <h4 className="text-white font-semibold text-sm tracking-wider uppercase mb-4 border-b border-slate-800 pb-2">
+            <h4 className="text-white font-bold text-sm mb-4 border-b border-slate-800 pb-2.5">
               Income Tax Filing
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
@@ -115,7 +115,7 @@ export default function Footer() {
 
           {/* Column 2: GST & Notices */}
           <div>
-            <h4 className="text-white font-semibold text-sm tracking-wider uppercase mb-4 border-b border-slate-800 pb-2">
+            <h4 className="text-white font-bold text-sm mb-4 border-b border-slate-800 pb-2.5">
               GST & Tax Notices
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
@@ -131,7 +131,7 @@ export default function Footer() {
 
           {/* Column 3: Tax & Compliance Suite */}
           <div>
-            <h4 className="text-white font-semibold text-sm tracking-wider uppercase mb-4 border-b border-slate-800 pb-2">
+            <h4 className="text-white font-bold text-sm mb-4 border-b border-slate-800 pb-2.5">
               Tax & Compliance Suite
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
@@ -153,8 +153,8 @@ export default function Footer() {
       <div className="border-t border-slate-800/80 py-6 bg-[#040e1b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <p>© {new Date().getFullYear()} Tracconsultant Advisory. All rights reserved. Registered Tax & Corporate Legal Consultants.</p>
-            <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center font-medium">
+            <p className="text-center md:text-left">© {new Date().getFullYear()} Tracconsultant Advisory. All rights reserved. Registered Tax & Corporate Legal Consultants.</p>
+            <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center md:justify-end font-medium">
               <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
               <Link href="/terms-of-service" className="hover:text-emerald-400 transition-colors">Terms of Service</Link>
               <Link href="/refund-policy" className="hover:text-emerald-400 transition-colors">Refund & Cancellation</Link>
@@ -165,11 +165,11 @@ export default function Footer() {
           </div>
           
           {/* Regulatory & Payment Gateway Compliance Strip */}
-          <div className="pt-3 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 text-center sm:text-left">
+          <div className="pt-3 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 text-center sm:text-left">
             <span>
               🔒 Payments processed securely via <strong>RBI Authorized Payment Gateways (Razorpay / UPI / NetBanking / Cards)</strong>. 256-Bit SSL Encrypted.
             </span>
-            <span>
+            <span className="shrink-0 text-slate-400">
               Office: 2nd Floor, Civil Lines, Kanpur, Uttar Pradesh - 208001 | Tel: +91 7275922162
             </span>
           </div>
