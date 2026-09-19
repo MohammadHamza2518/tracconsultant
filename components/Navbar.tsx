@@ -307,7 +307,7 @@ const SERVICE_GROUPS: ServiceGroup[] = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user, openAuthModal, logout } = useAuth();
+  const { user, isLoading, openAuthModal, logout } = useAuth();
   const { getService, getToolPrice } = useConfig();
   const [isScrolled, setIsScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -337,7 +337,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close dropdowns on outside click
+  // Close dropdowns on outside click or Escape key
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (servicesRef.current && !servicesRef.current.contains(event.target as Node)) {
@@ -350,8 +350,22 @@ export default function Navbar() {
         setUserMenuOpen(false);
       }
     };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setServicesOpen(false);
+        setToolsOpen(false);
+        setUserMenuOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const freeTools = TOOLS_LIST.filter(t => t.category === 'free');
@@ -914,7 +928,9 @@ export default function Navbar() {
 
           {/* User Auth Action (Right) */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-            {user ? (
+            {isLoading ? (
+              <div className="h-9 w-28 bg-slate-100/80 rounded-full animate-pulse shrink-0 border border-slate-200/50" />
+            ) : user ? (
               <div className="relative shrink-0" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -991,7 +1007,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => openAuthModal('login')}
-                className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 rounded-xl transition-all border border-emerald-200/80 flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 rounded-xl transition-all border border-emerald-200/80 flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <UserIcon className="w-4 h-4 shrink-0" />
                 <span className="whitespace-nowrap">Sign In</span>
@@ -1010,9 +1026,18 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button & Mobile Auth Indicator */}
           <div className="flex lg:hidden items-center gap-2">
-            {!user && (
+            {isLoading ? (
+              <div className="w-16 h-7 bg-slate-100 rounded-lg animate-pulse" />
+            ) : user ? (
+              <Link
+                href="/dashboard"
+                className="px-2.5 py-1.5 text-xs font-bold text-white bg-emerald-600 rounded-lg flex items-center gap-1 shadow-xs"
+              >
+                <span>{user.name.split(' ')[0]}</span>
+              </Link>
+            ) : (
               <button
                 onClick={() => openAuthModal('login')}
                 className="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg"
@@ -1270,7 +1295,11 @@ export default function Navbar() {
             </a>
 
             {/* Auth / Dashboard */}
-            {user ? (
+            {isLoading ? (
+              <div className="pt-2 border-t border-slate-100">
+                <div className="w-full h-10 bg-slate-100 animate-pulse rounded-xl" />
+              </div>
+            ) : user ? (
               <div className="pt-2 border-t border-slate-100">
                 <Link
                   href="/dashboard"
@@ -1281,7 +1310,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="w-full py-1.5 text-xs font-bold text-red-600 text-center block"
+                  className="w-full py-1.5 text-xs font-bold text-red-600 text-center block cursor-pointer"
                 >
                   Sign Out ({user.name})
                 </button>
@@ -1289,7 +1318,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => { openAuthModal('login'); setMobileMenuOpen(false); }}
-                className="w-full py-2.5 px-4 bg-emerald-600 text-white text-center font-bold rounded-xl block text-xs"
+                className="w-full py-2.5 px-4 bg-emerald-600 text-white text-center font-bold rounded-xl block text-xs cursor-pointer"
               >
                 Sign In / Register
               </button>

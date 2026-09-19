@@ -55,7 +55,7 @@ interface VaultDoc {
 }
 
 export default function ClientDashboard() {
-  const { user, hasToolAccess, openAuthModal, refreshUser } = useAuth();
+  const { user, isLoading, hasToolAccess, openAuthModal, refreshUser } = useAuth();
   const { toolPrices, getToolPrice } = useConfig();
   
   const [activeTab, setActiveTab] = useState<'tools' | 'filings' | 'new_service' | 'vault' | 'support'>('tools');
@@ -185,6 +185,26 @@ export default function ClientDashboard() {
   const handleDeleteDoc = (id: string) => {
     setVaultDocs(prev => prev.filter(d => d.id !== id));
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[75vh] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-pulse">
+        <div className="flex items-center justify-between pb-6 border-b border-slate-200">
+          <div className="space-y-2">
+            <div className="h-7 w-48 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-72 bg-slate-100 rounded-md" />
+          </div>
+          <div className="h-10 w-32 bg-slate-200 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-28 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs" />
+          ))}
+        </div>
+        <div className="h-64 bg-white border border-slate-200 rounded-3xl p-6 shadow-xs" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (

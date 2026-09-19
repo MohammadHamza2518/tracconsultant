@@ -45,6 +45,7 @@ import { SystemConfig, DEFAULT_SYSTEM_CONFIG } from '@/lib/systemConfigDefaults'
 export default function AdminPage() {
   // Auth state
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [passcode, setPasscode] = useState<string>('');
   const [authError, setAuthError] = useState<string>('');
 
@@ -124,10 +125,14 @@ export default function AdminPage() {
 
   // Auto-login check
   useEffect(() => {
-    const savedToken = localStorage.getItem('trac_admin_auth');
-    if (savedToken === 'true') {
-      setIsAuthenticated(true);
-      fetchAdminData();
+    try {
+      const savedToken = localStorage.getItem('trac_admin_auth');
+      if (savedToken === 'true') {
+        setIsAuthenticated(true);
+        fetchAdminData();
+      }
+    } finally {
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -495,6 +500,16 @@ export default function AdminPage() {
     link.download = `tracconsultant_filings_${Date.now()}.csv`;
     link.click();
   };
+
+  // CHECKING AUTH STATE - ELIMINATES LOGIN FORM FLICKER ON REFRESH
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs text-slate-400 font-medium tracking-wide">Validating Admin Gateway...</p>
+      </div>
+    );
+  }
 
   // LOGIN SCREEN - DEDICATED FULL-SCREEN SECURE GATEWAY
   if (!isAuthenticated) {
