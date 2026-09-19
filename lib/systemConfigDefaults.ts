@@ -1,0 +1,85 @@
+export interface TaxRatesConfig {
+  financialYear: string;
+  assessmentYear: string;
+  activeFY?: string;
+  activeAY?: string;
+  standardDeduction: number;
+  rebate87ALimit: number;
+  newRegimeZeroTaxCeiling: number; // e.g. 7,75,000 with standard deduction
+  cessPercent: number;
+  hraMetroPercent: number;
+  hraNonMetroPercent: number;
+  notes: string;
+}
+
+export interface ToolPricingConfig {
+  allAccessPass: number;
+  'pdf-redactor': number;
+  'tb-to-balancesheet': number;
+  'gstr2a-reconciliation': number;
+  'json-to-computation': number;
+  'gstr2a-cleaner': number;
+}
+
+export interface ServicePricingItem {
+  id: string;
+  title: string;
+  category: string;
+  startingPrice: string;
+  tat: string;
+  isActive: boolean;
+}
+
+export interface SystemConfig {
+  taxRates: TaxRatesConfig;
+  toolPrices: ToolPricingConfig;
+  servicePricing: ServicePricingItem[];
+  lastUpdated: string;
+  updatedBy: string;
+}
+
+export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
+  taxRates: {
+    financialYear: 'FY 2024-25',
+    assessmentYear: 'AY 2025-26',
+    standardDeduction: 75000,
+    rebate87ALimit: 700000,
+    newRegimeZeroTaxCeiling: 775000,
+    cessPercent: 4,
+    hraMetroPercent: 50,
+    hraNonMetroPercent: 40,
+    notes: 'Updated as per Union Budget 2024-25 (Finance Act). Standard deduction increased to ₹75,000 for salaried taxpayers.'
+  },
+  toolPrices: {
+    allAccessPass: 999,
+    'pdf-redactor': 199,
+    'tb-to-balancesheet': 299,
+    'gstr2a-reconciliation': 249,
+    'json-to-computation': 199,
+    'gstr2a-cleaner': 199
+  },
+  servicePricing: [
+    { id: 'itr-filing', title: 'ITR Filing (Income Tax Return)', category: 'Income Tax', startingPrice: '₹999', tat: '24-48 Hours', isActive: true },
+    { id: 'company-incorporation', title: 'Company Incorporation / LLP', category: 'Corporate & Legal', startingPrice: '₹4,999', tat: '5-7 Days', isActive: true },
+    { id: 'gst-filing', title: 'GST Registration & Returns', category: 'GST & Indirect Tax', startingPrice: '₹799/mo', tat: 'Monthly / Qtr', isActive: true },
+    { id: 'notice-assistance', title: 'Income Tax Notice Scrutiny 143(1)', category: 'Income Tax', startingPrice: '₹1,499', tat: 'Same Day / 24h', isActive: true },
+    { id: 'trademark-registration', title: 'Trademark Registration (Brand)', category: 'Corporate & Legal', startingPrice: '₹2,999', tat: '24 Hours', isActive: true },
+    { id: 'tax-planning', title: 'Strategic CA Tax Planning', category: 'Advisory & Wealth', startingPrice: '₹1,999', tat: '1-2 Days', isActive: true },
+    { id: 'trust-incorporation', title: 'Section 8 NGO & Trust Setup', category: 'Corporate & Legal', startingPrice: '₹7,999', tat: '7-10 Days', isActive: true },
+    { id: 'bookkeeping-accounting', title: 'Monthly Bookkeeping & MIS', category: 'Accounting & CMA', startingPrice: '₹2,499/mo', tat: 'Continuous', isActive: true },
+    { id: 'fssai-license', title: 'FSSAI Food License (State/Central)', category: 'Licenses', startingPrice: '₹1,499', tat: '2-3 Days', isActive: true },
+    { id: 'iso-certificates', title: 'ISO 9001 / 27001 Certification', category: 'Licenses', startingPrice: '₹3,999', tat: '3-5 Days', isActive: true },
+    { id: 'capital-gains', title: 'Capital Gains Audit (Stocks/Crypto)', category: 'Income Tax', startingPrice: '₹1,999', tat: '24 Hours', isActive: true },
+    { id: 'tds-returns', title: 'TDS Return Filing (24Q/26Q)', category: 'Accounting & CMA', startingPrice: '₹999/qtr', tat: 'Quarterly', isActive: true },
+    { id: 'msme-udyam', title: 'MSME / Udyam Registration', category: 'Corporate & Legal', startingPrice: '₹499', tat: 'Same Day', isActive: true },
+    { id: 'dsc-token', title: 'Class 3 Digital Signature (DSC)', category: 'Corporate & Legal', startingPrice: '₹999', tat: '2 Hours', isActive: true },
+    { id: 'cma-report', title: 'CMA Report & Bank Project Report', category: 'Accounting & CMA', startingPrice: '₹4,999', tat: '3-4 Days', isActive: true },
+    { id: 'startup-india', title: 'Startup India DPIIT Recognition', category: 'Corporate & Legal', startingPrice: '₹3,499', tat: '3-5 Days', isActive: true },
+    { id: 'rsu-esop-tax', title: 'Foreign RSUs / ESOP Taxation', category: 'Advisory & Wealth', startingPrice: '₹2,499', tat: '24-48 Hours', isActive: true },
+    { id: 'partnership-deed', title: 'Partnership Deed Drafting', category: 'Corporate & Legal', startingPrice: '₹1,499', tat: '24 Hours', isActive: true },
+    { id: 'pf-esi-compliance', title: 'EPF & ESI Monthly Compliance', category: 'Accounting & CMA', startingPrice: '₹1,299/mo', tat: 'Monthly', isActive: true },
+    { id: 'loans-syndication', title: 'Commercial Business Loans', category: 'Advisory & Wealth', startingPrice: 'Success Fee', tat: '7-14 Days', isActive: true }
+  ],
+  lastUpdated: new Date().toISOString(),
+  updatedBy: 'CA Anjan Agarwal (System Partner)'
+};

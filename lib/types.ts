@@ -1,0 +1,166 @@
+export type FilingStatus = 
+  | 'new'
+  | 'under_review'
+  | 'ca_assigned'
+  | 'docs_pending'
+  | 'draft_ready'
+  | 'filed'
+  | 'completed'
+  | 'rejected';
+
+export type ServiceCategory = 
+  | 'income_tax'
+  | 'gst'
+  | 'corporate_legal'
+  | 'accounting_cma'
+  | 'advisory_wealth'
+  | 'licenses_certifications';
+
+export type ServiceType = 
+  | 'ITR Filing'
+  | 'Company Incorporation / LLP'
+  | 'GST Filing'
+  | 'Income Tax Notice & Appeals'
+  | 'Trademark Registration'
+  | 'Tax Planning'
+  | 'Trust Incorporation'
+  | 'Bookkeeping & Accounting'
+  | 'Capital Gain Advisory'
+  | 'FSSAI License'
+  | 'ISO Certification'
+  | 'RSUs Advisory & Taxation'
+  | 'EPF / ESI Consultation'
+  | 'DSC Services'
+  | 'Partnership Deeds'
+  | 'MSME / Udyam Registration'
+  | 'Startup Registration'
+  | 'TDS Return Filing'
+  | 'CMA Report & Projections'
+  | 'Loans Consultancy';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: 'client' | 'admin';
+  authProvider: 'email' | 'google';
+  avatar?: string;
+  unlockedTools: string[]; // e.g. ['pdf-redactor', 'tb-to-balancesheet']
+  createdAt: string;
+  password?: string; // hashed or simulated
+}
+
+export interface ToolItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  category: 'free' | 'paid';
+  price: number;
+  badge?: string;
+  icon: string;
+  features: string[];
+}
+
+export interface ToolPurchase {
+  id: string; // e.g. TRAC-TOOL-8921
+  userId: string;
+  userName: string;
+  userEmail: string;
+  userPhone?: string;
+  toolId: string;
+  toolName: string;
+  amount: number;
+  paymentMode: 'UPI' | 'Card' | 'NetBanking' | 'Admin_Grant';
+  paymentId: string;
+  status: 'active' | 'revoked';
+  createdAt: string;
+}
+
+export interface LeadItem {
+  id: string;
+  fullName: string;
+  mobile: string;
+  email?: string;
+  serviceInterest: string;
+  message?: string;
+  city?: string;
+  source: string;
+  status: 'new' | 'contacted' | 'converted' | 'closed';
+  createdAt: string;
+}
+
+export interface DocumentItem {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  uploadDate: string;
+  url?: string;
+}
+
+export interface NoteItem {
+  id: string;
+  date: string;
+  author: string;
+  message: string;
+}
+
+export interface TimelineStep {
+  step: string;
+  title: string;
+  description: string;
+  date: string | null;
+  completed: boolean;
+  current: boolean;
+}
+
+export interface FilingItem {
+  id: string; // e.g. TRAC-2025-0814
+  userId?: string;
+  service: string;
+  plan: string;
+  fullName: string;
+  mobile: string;
+  email: string;
+  panNumber?: string;
+  city?: string;
+  financialYear: string;
+  status: FilingStatus;
+  estimatedRefund?: number;
+  assignedCA?: {
+    name: string;
+    phone: string;
+    email: string;
+    membershipNumber?: string;
+  };
+  notes: NoteItem[];
+  documents: DocumentItem[];
+  timeline: TimelineStep[];
+  clientNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+  whatsappLogs?: {
+    lastSentAt: string;
+    templateId: string;
+    status: 'sent' | 'failed' | 'queued';
+  }[];
+}
+
+export interface WhatsAppTemplate {
+  id: string;
+  title: string;
+  category: 'welcome' | 'docs_pending' | 'draft_ready' | 'filed' | 'notice' | 'custom';
+  content: string;
+  description: string;
+}
+
+export interface WhatsAppSettings {
+  enabled: boolean;
+  apiProvider: 'cloud_api' | 'twilio' | 'web_direct';
+  businessPhone: string;
+  apiKey?: string;
+  phoneNumberId?: string;
+  autoSendOnSubmission: boolean;
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "lead-1",
+    "fullName": "Rajesh Mehra",
+    "mobile": "9820012345",
+    "email": "rajesh.mehra@techcorp.in",
+    "serviceInterest": "Company Incorporation / LLP",
+    "message": "Want to incorporate a private limited software development agency in Kanpur/Noida.",
+    "city": "Kanpur",
+    "source": "Services Page",
+    "status": "new",
+    "createdAt": "2025-05-12T14:30:00Z"
+  },
+  {
+    "id": "lead-2",
+    "fullName": "Sunita Jain",
+    "mobile": "9845098765",
+    "email": "sunita.jain@gmail.com",
+    "serviceInterest": "Trademark Registration",
+    "message": "Brand name registration needed under Class 35 and Class 25.",
+    "city": "Lucknow",
+    "source": "Contact Form",
+    "status": "contacted",
+    "createdAt": "2025-05-11T16:00:00Z"
+  },
+  {
+    "id": "lead-3",
+    "fullName": "Harish Chawla",
+    "mobile": "9871122334",
+    "email": "harish@chawlaexports.com",
+    "serviceInterest": "GST LUT Filing & Export Compliance",
+    "message": "Need LUT filing renewal for FY 2025-26 zero-rated export of services.",
+    "city": "Delhi",
+    "source": "Mega Menu Banner",
+    "status": "converted",
+    "createdAt": "2025-05-10T10:45:00Z"
+  }
+]

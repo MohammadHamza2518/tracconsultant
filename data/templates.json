@@ -1,0 +1,37 @@
+[
+  {
+    "id": "tpl-welcome",
+    "title": "Welcome & File Confirmation",
+    "category": "welcome",
+    "description": "Sent automatically when a client registers or files an application online.",
+    "content": "Hello {client_name}! 🚀\n\nThank you for choosing *Tracconsultant* for your *{service}* (Application Ref: *{application_id}*).\n\nYour file has been assigned to our Chartered Accountant team. We are examining your details and will connect with you right here on WhatsApp within 15-30 minutes.\n\n📞 Direct CA Helpline: +91 7275922162 / 8052171196\n📧 Email: contact@tracconsultant.com\n\n*Tracconsultant — Tax Filing | Compliance | Business Support*"
+  },
+  {
+    "id": "tpl-docs-pending",
+    "title": "Missing Documents Reminder",
+    "category": "docs_pending",
+    "description": "Requests Form 16, Bank statements, or GST sales sheets from the client.",
+    "content": "Hi {client_name},\n\nThis is regarding your pending application *{application_id}* with *Tracconsultant*.\n\nOur CA needs the following document(s) to finalize your computation and claim your maximum tax refund:\n👉 Form 16 / Bank Statement / AIS Summary\n\nYou can simply reply and attach the PDF here on WhatsApp!\n\nNeed assistance? Call CA Desk: +91 7275922162."
+  },
+  {
+    "id": "tpl-draft-ready",
+    "title": "Tax Draft Ready For Review",
+    "category": "draft_ready",
+    "description": "Informs the client that their tax draft is calculated with refunds.",
+    "content": "Great news {client_name}! 🎉\n\nYour tax computation for *{application_id}* is ready.\n\n💰 *Estimated Refund Claimed:* ₹{refund_amount}\n🛡️ Deductions Optimized: 80C, 80D, HRA & 87A rebate applied\n\nPlease confirm if we should proceed with instant Govt e-filing. Reply *'YES'* to approve."
+  },
+  {
+    "id": "tpl-filed",
+    "title": "ITR Successfully Filed (ITR-V)",
+    "category": "filed",
+    "description": "Delivery of filing acknowledgement and confirmation.",
+    "content": "Congratulations {client_name}! 🏆\n\nYour *{service}* has been successfully filed with the Govt Income Tax Department (Ref: *{application_id}*).\n\nYour official ITR-V acknowledgement has been generated. Thank you for choosing *Tracconsultant*!\n\nSave our number (+91 7275922162) for year-round tax advisory & notices protection."
+  },
+  {
+    "id": "tpl-notice",
+    "title": "Tax Notice Scrutiny Advisory",
+    "category": "notice",
+    "description": "Immediate consultation response for Income Tax Notice cases.",
+    "content": "Hello {client_name},\n\nOur Legal Tax Cell has analyzed your Income Tax Notice under Ref: *{application_id}*.\n\nDon't worry — we have identified the discrepancy and prepared a solid rectification strategy to avoid any penalty.\n\nLet's discuss on call today: +91 7275922162 / 8052171196."
+  }
+]
