@@ -273,6 +273,16 @@ const DEFAULT_SETTINGS: WhatsAppSettings = {
   autoSendOnSubmission: true
 };
 
+function safeReadJSON<T>(filePath: string, fallback: T): T {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw.replace(/^\uFEFF/, ''));
+  } catch (err) {
+    console.error(`Error reading ${filePath}:`, err);
+    return fallback;
+  }
+}
+
 // Database Operations
 export function getFilings(): FilingItem[] {
   ensureDataDir();
@@ -280,13 +290,7 @@ export function getFilings(): FilingItem[] {
     fs.writeFileSync(FILINGS_FILE, JSON.stringify(DEFAULT_FILINGS, null, 2), 'utf-8');
     return DEFAULT_FILINGS;
   }
-  try {
-    const raw = fs.readFileSync(FILINGS_FILE, 'utf-8');
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('Error reading filings file:', err);
-    return DEFAULT_FILINGS;
-  }
+  return safeReadJSON<FilingItem[]>(FILINGS_FILE, DEFAULT_FILINGS);
 }
 
 export function saveFilings(filings: FilingItem[]): void {
@@ -460,11 +464,7 @@ export function getTemplates(): WhatsAppTemplate[] {
     fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(DEFAULT_TEMPLATES, null, 2), 'utf-8');
     return DEFAULT_TEMPLATES;
   }
-  try {
-    return JSON.parse(fs.readFileSync(TEMPLATES_FILE, 'utf-8'));
-  } catch {
-    return DEFAULT_TEMPLATES;
-  }
+  return safeReadJSON<WhatsAppTemplate[]>(TEMPLATES_FILE, DEFAULT_TEMPLATES);
 }
 
 export function saveTemplates(templates: WhatsAppTemplate[]): void {
@@ -479,11 +479,7 @@ export function getWhatsAppSettings(): WhatsAppSettings {
     fs.writeFileSync(SETTINGS_FILE, JSON.stringify(DEFAULT_SETTINGS, null, 2), 'utf-8');
     return DEFAULT_SETTINGS;
   }
-  try {
-    return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
+  return safeReadJSON<WhatsAppSettings>(SETTINGS_FILE, DEFAULT_SETTINGS);
 }
 
 export function saveWhatsAppSettings(settings: WhatsAppSettings): void {
@@ -553,11 +549,7 @@ export function getUsers(): User[] {
     fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2), 'utf-8');
     return DEFAULT_USERS;
   }
-  try {
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
-  } catch {
-    return DEFAULT_USERS;
-  }
+  return safeReadJSON<User[]>(USERS_FILE, DEFAULT_USERS);
 }
 
 export function saveUsers(users: User[]): void {
@@ -681,11 +673,7 @@ export function getToolPurchases(): ToolPurchase[] {
     fs.writeFileSync(TOOL_PURCHASES_FILE, JSON.stringify(DEFAULT_TOOL_PURCHASES, null, 2), 'utf-8');
     return DEFAULT_TOOL_PURCHASES;
   }
-  try {
-    return JSON.parse(fs.readFileSync(TOOL_PURCHASES_FILE, 'utf-8'));
-  } catch {
-    return DEFAULT_TOOL_PURCHASES;
-  }
+  return safeReadJSON<ToolPurchase[]>(TOOL_PURCHASES_FILE, DEFAULT_TOOL_PURCHASES);
 }
 
 export function saveToolPurchases(purchases: ToolPurchase[]): void {
@@ -779,11 +767,7 @@ export function getLeads(): LeadItem[] {
     fs.writeFileSync(LEADS_FILE, JSON.stringify(DEFAULT_LEADS, null, 2), 'utf-8');
     return DEFAULT_LEADS;
   }
-  try {
-    return JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8'));
-  } catch {
-    return DEFAULT_LEADS;
-  }
+  return safeReadJSON<LeadItem[]>(LEADS_FILE, DEFAULT_LEADS);
 }
 
 export function saveLeads(leads: LeadItem[]): void {
