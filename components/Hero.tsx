@@ -125,7 +125,7 @@ export default function Hero() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-black tracking-tight text-[#0B2545] leading-[1.12]">
+            <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-black tracking-tight text-[#0B2545] leading-[1.12]">
               Expert CA-Assisted <br className="hidden sm:inline" />
               Tax Filing &amp; Corporate <br className="hidden sm:inline" />
               <span className="text-[#0B2545]">Advisory</span>
@@ -183,23 +183,23 @@ export default function Hero() {
             <div className="relative mx-auto max-w-lg bg-white rounded-2xl border border-slate-200/90 shadow-2xl shadow-slate-200/80 overflow-hidden">
               
               {/* Window Header Bar (Dark Navy Browser Bar) */}
-              <div className="bg-[#0B2545] px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="bg-[#0B2545] px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-400/90 cursor-pointer" title="Tracconsultant Console" />
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-400/90 cursor-pointer" title="Auto-Reconcile" />
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/90 cursor-pointer" title="Live Desk Active" />
                 </div>
                 
-                <div className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>tracconsultant.com • Secure CA Console</span>
+                <div className="text-[11px] sm:text-xs font-medium text-slate-300 flex items-center gap-1 sm:gap-1.5 min-w-0 truncate">
+                  <Lock className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">tracconsultant.com • Secure CA Console</span>
                 </div>
 
                 <a 
                   href="https://wa.me/917275922162?text=Hello%20Tracconsultant!%20I%20want%20to%20connect%20with%20the%20live%20desk."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors cursor-pointer"
+                  className="shrink-0 flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer"
                   title="Click to chat with live CA desk"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -507,7 +507,7 @@ export default function Hero() {
                         <span className="text-xs text-slate-400">Click to Start</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <button
                           type="button"
                           onClick={handleScrollToFileNow}
@@ -610,20 +610,20 @@ export default function Hero() {
               </div>
 
               {/* Window Footer: 1-Click Consultation CTA Strip */}
-              <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs">
+              <div className="bg-slate-50 px-3 sm:px-4 py-2.5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2 text-[11px] sm:text-xs">
                 <div 
                   onClick={() => setActiveTab('security')}
-                  className="flex items-center gap-1.5 text-slate-600 text-xs cursor-pointer hover:text-emerald-700 transition-colors"
+                  className="flex items-center gap-1.5 text-slate-600 cursor-pointer hover:text-emerald-700 transition-colors"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>256-Bit SSL Encrypted Vault</span>
                 </div>
                 
                 <a
                   href="tel:+917275922162"
-                  className="text-emerald-700 font-bold hover:underline text-xs flex items-center gap-1"
+                  className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
                 >
-                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>Senior CA Direct: +91 7275922162</span>
                 </a>
               </div>

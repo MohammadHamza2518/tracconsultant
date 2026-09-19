@@ -33,10 +33,10 @@ export default function WhatsAppFloat() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30">
       {/* Expanded Chat Box */}
       {isOpen && (
-        <div className="mb-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+        <div className="mb-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-5 duration-200 overscroll-contain">
           
           {/* Chat Header */}
           <div className="bg-[#0B2545] p-4 text-white flex items-center justify-between">
@@ -143,14 +143,14 @@ export default function WhatsAppFloat() {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-14 h-14 rounded-full bg-[#00a859] hover:bg-[#008f4c] text-white shadow-2xl hover:shadow-emerald-600/50 flex items-center justify-center transition-all duration-300 transform hover:scale-105 cursor-pointer"
+          className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#00a859] hover:bg-[#008f4c] text-white shadow-2xl hover:shadow-emerald-600/50 flex items-center justify-center transition-all duration-300 transform hover:scale-105 cursor-pointer"
           aria-label="WhatsApp Expert CA Support"
         >
           {isOpen ? (
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           ) : (
             <>
-              <MessageCircle className="w-7 h-7" />
+              <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7" />
               <span className="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-400 border-2 border-white"></span>

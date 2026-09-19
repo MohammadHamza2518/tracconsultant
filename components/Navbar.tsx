@@ -320,7 +320,7 @@ export default function Navbar() {
   const [megaCategory, setMegaCategory] = useState<string>('all');
 
   // Mobile drawer states
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(true);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [mobileServiceSearch, setMobileServiceSearch] = useState('');
   const [mobileCategory, setMobileCategory] = useState<string>('all');
@@ -415,7 +415,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full transition-all">
+    <header className="sticky top-0 z-50 w-full transition-all">
       {/* Top Banner: Helpline & Trust */}
       <div className="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 sm:px-8 border-b border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
@@ -1038,9 +1038,11 @@ export default function Navbar() {
             ) : user ? (
               <Link
                 href="/dashboard"
-                className="px-2.5 py-1.5 text-xs font-bold text-white bg-emerald-600 rounded-lg flex items-center gap-1 shadow-xs"
+                className="px-2 sm:px-2.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1 shadow-xs max-w-[85px] sm:max-w-[120px] transition-colors"
+                title={user.name}
               >
-                <span>{user.name.split(' ')[0]}</span>
+                <UserIcon className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{user.name.split(' ')[0]}</span>
               </Link>
             ) : (
               <button
@@ -1062,7 +1064,7 @@ export default function Navbar() {
 
         {/* HIGH-IMPACT MOBILE NAVIGATION DRAWER */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-8 space-y-3 max-h-[85vh] overflow-y-auto">
+          <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-8 space-y-3 max-h-[85vh] overflow-y-auto overscroll-contain shadow-2xl">
             {/* 1. All 20 Services Accordion */}
             <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50/50">
               <button
@@ -1145,7 +1147,7 @@ export default function Navbar() {
                   </div>
 
                   {/* Filtered Services List (Mobile Cards) */}
-                  <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto overscroll-contain touch-pan-y pr-1">
                     {filteredMobileServices.map((svc) => {
                       const IconComp = svc.icon;
                       return (
