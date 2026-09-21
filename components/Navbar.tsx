@@ -477,7 +477,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links & Action Group */}
-          <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3.5 shrink-0">
             <div className="flex items-center gap-1 xl:gap-1.5">
               {/* Services Mega Dropdown */}
               <div className="relative" ref={servicesRef}>
@@ -1017,6 +1017,17 @@ export default function Navbar() {
                       </Link>
                     )}
 
+                    {/* Direct Senior CA Hotline */}
+                    <a
+                      href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20am%20logged%20in%20and%20need%20CA%20assistance."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
+                    >
+                      <PhoneCall className="w-4 h-4 text-emerald-600" />
+                      <span>Assigned CA Desk</span>
+                    </a>
+
                     <div className="border-t border-slate-100 my-1"></div>
 
                     <button
@@ -1039,16 +1050,18 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Direct WhatsApp / Consultation Callout - Unified Primary Emerald */}
-            <a
-              href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-bold text-white bg-[#00a859] hover:bg-[#008f4c] rounded-xl shadow-md shadow-emerald-900/10 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
-            >
-              <span className="whitespace-nowrap">Consult a CA</span>
-              <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            </a>
+            {/* Direct WhatsApp / Consultation Callout - Professional Emerald with Phone Icon */}
+            {(!user || pathname !== '/dashboard') && (
+              <a
+                href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs border border-emerald-500/30 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
+              >
+                <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Consult a CA</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -1321,9 +1334,9 @@ export default function Navbar() {
               href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2.5 bg-[#00a859] hover:bg-[#008f4c] text-white text-center font-bold rounded-xl flex items-center justify-center gap-2 shadow-md text-xs transition-colors"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-center font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs text-xs transition-colors"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <PhoneCall className="w-3.5 h-3.5" />
               <span>Consult a CA on WhatsApp</span>
             </a>
 

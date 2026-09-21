@@ -735,7 +735,7 @@ export default function ClientDashboard() {
                 href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20am%20logged%20into%20my%20Client%20Portal%20and%20need%20CA%20assistance."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
               >
                 <PhoneCall className="w-3.5 h-3.5" />
                 <span>Assigned CA Desk</span>
