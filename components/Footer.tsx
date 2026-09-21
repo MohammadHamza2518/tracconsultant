@@ -140,7 +140,8 @@ export default function Footer() {
               <li><Link href="/tools/capital-gain-calculator" className="text-emerald-400 hover:text-emerald-300 transition-colors font-semibold">Capital Gain Calculator (Budget 2024)</Link></li>
               <li><Link href="/tools/ecommerce-gst-converter" className="text-emerald-400 hover:text-emerald-300 transition-colors">E-Commerce GSTR-1 & TCS (Free)</Link></li>
               <li><Link href="/tools/gstin-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">GSTIN Search & Verified PDF (Free)</Link></li>
-              <li><Link href="/tools/hsn-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">HSN & SAC Code Finder (Free)</Link></li>
+              <li><Link href="/tools/hsn-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">HSN & SAC Master Directory (Free)</Link></li>
+              <li><Link href="/tools/gst-calculator" className="text-emerald-400 hover:text-emerald-300 transition-colors font-semibold">Online GST Calculator (Free)</Link></li>
               <li><Link href="/tools/tax-calculator" className="hover:text-white transition-colors">Income Tax Calc FY 2024-25 (Free)</Link></li>
               <li><Link href="/tools/advance-tax-calculator" className="hover:text-white transition-colors">Advance Tax Calc (Free)</Link></li>
               <li><Link href="/tools/gst-invoice-generator" className="hover:text-white transition-colors">GST Tax Invoice Pro (Paid)</Link></li>

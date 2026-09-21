@@ -73,25 +73,47 @@ export const TOOLS_LIST: ToolConfig[] = [
     ]
   },
 
-  // 3. HSN & SAC Code Search Tool
+  // 3. HSN & SAC Code Search Tool & GST Calculator
   {
     id: 'hsn-search',
     name: 'HSN & SAC Code Search Tool',
     slug: 'hsn-search',
     category: 'free',
     price: 0,
-    badge: 'UPDATED',
-    shortDesc: 'Fast search across 150+ Goods HSN & Services SAC codes with applicable GST tax slabs.',
-    description: 'Find official 2, 4, 6 or 8-digit HSN codes for goods and 99-series SAC codes for services. Filter by GST tax rates (0%, 5%, 12%, 18%, 28%) and copy codes instantly.',
+    badge: 'CBIC 22,616',
+    shortDesc: 'Official CBIC & GSTN Master Directory of 22,616 Goods HSN & Services SAC codes with instant search & integrated GST calculator.',
+    description: 'Search official 2, 4, 6 or 8-digit HSN codes for goods and 99-series SAC codes for services sourced directly from the GST Portal master dataset. Browse full 22,616 master list, copy codes, and calculate CGST, SGST & IGST.',
     icon: 'Hash',
-    tags: ['HSN Codes', 'SAC Codes', 'GST Rates', 'Tax Slabs', 'E-Commerce'],
+    tags: ['HSN Codes', 'SAC Codes', 'GST Rates', 'Tax Slabs', 'E-Commerce', 'GST Calculator'],
     features: [
-      'Fast keyword & code search across Goods & Services',
-      'Accurate GST rates: 0%, 5%, 12%, 18% & 28%',
-      'Chapter & Heading categorization',
-      'Popular keywords tagging for e-commerce products',
+      'Complete 22,616 Official GSTN & CBIC government master database',
+      'Fast search by HSN/SAC code or product/service keyword',
+      'Complete list browsing with 50-item pagination',
+      'Integrated GST Tax Calculator with Intra & Inter-state split',
       '1-Click copy code with instant confirmation',
-      'Direct link to E-Commerce GST converter & invoicing'
+      'Dual PDF and Excel computation statement download'
+    ]
+  },
+
+  // 3b. Dedicated GST Calculator
+  {
+    id: 'gst-calculator',
+    name: 'Online GST Tax Calculator',
+    slug: 'gst-calculator',
+    category: 'free',
+    price: 0,
+    badge: 'NEW',
+    shortDesc: 'Instant CGST, SGST & IGST calculation with inclusive/exclusive modes, HSN code lookup, and PDF/Excel reports.',
+    description: 'Compute exact Goods & Services Tax (0%, 5%, 12%, 18%, 28%) with Intra-State (CGST + SGST) vs Inter-State (IGST) split, reverse inclusive calculation, and download official PDF & Excel computation summaries.',
+    icon: 'Calculator',
+    tags: ['GST Calculator', 'CGST', 'SGST', 'IGST', 'Tax Invoice', 'HSN Lookup'],
+    features: [
+      'Intra-State (CGST + SGST) vs Inter-State (IGST) tax breakup',
+      'GST Inclusive (Reverse Calculation) & Exclusive modes',
+      'Direct integration with 22,616 HSN & SAC master codes',
+      'Download formal A4 GST Computation PDF with CA branding',
+      'Download structured multi-section Excel (.xlsx) statement',
+      '100% Free tool for taxpayers and businesses'
     ]
   },
 

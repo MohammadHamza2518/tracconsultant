@@ -189,7 +189,7 @@ export default function ClientDashboard() {
             completedFilings: (data.filings || []).filter((f: any) => f.status === 'completed').length,
             activeQueries: (data.queries || []).filter((q: any) => q.status !== 'resolved').length,
             resolvedQueries: (data.queries || []).filter((q: any) => q.status === 'resolved').length,
-            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'ecommerce-gst-converter', 'gstin-search', 'hsn-search', 'capital-gain-calculator'].includes(t)).length,
+            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'ecommerce-gst-converter', 'gstin-search', 'hsn-search', 'capital-gain-calculator', 'gst-calculator'].includes(t)).length,
             verifiedPayments: (data.payments || []).length
           }
         });
@@ -1570,18 +1570,45 @@ export default function ClientDashboard() {
                         <Hash className="w-5 h-5 text-purple-600" />
                       </div>
                       <span className="text-[10px] font-bold uppercase bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">
-                        150+ CODES
+                        22,616 CODES
                       </span>
                     </div>
                     <h3 className="text-sm font-black group-hover:text-purple-700 transition-colors">
                       HSN &amp; SAC Code Search
                     </h3>
                     <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                      Instant product keyword &amp; code search with applicable GST rates (0-28%) &amp; copy code.
+                      Official CBIC/GSTN master directory with instant search across 22,616 codes &amp; 1-click copy.
                     </p>
                   </div>
                   <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600 group-hover:text-purple-700">
-                    <span>Search HSN Codes</span>
+                    <span>Search 22,616 Codes</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* 5. Online GST Tax Calculator */}
+                <Link
+                  href="/tools/gst-calculator"
+                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <Calculator className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                        NEW • 100% FREE
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-black group-hover:text-emerald-700 transition-colors">
+                      Online GST Calculator
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                      Compute CGST, SGST &amp; IGST (0-28%) with inclusive/exclusive modes &amp; PDF/Excel downloads.
+                    </p>
+                  </div>
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
+                    <span>Calculate GST</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>

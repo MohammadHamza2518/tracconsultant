@@ -847,6 +847,7 @@ export default function Navbar() {
                             'ecommerce-gst-converter': ShoppingCart,
                             'gstin-search': ShieldCheck,
                             'hsn-search': Hash,
+                            'gst-calculator': Calculator,
                             'capital-gain-calculator': TrendingUp,
                             'hra-calculator': Calculator,
                             'advance-tax-calculator': Calendar,
