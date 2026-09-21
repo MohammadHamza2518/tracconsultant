@@ -845,6 +845,15 @@ export function getUserPortalData(userIdOrEmail: string) {
     return Boolean(pPhone && userPhoneClean && pPhone.length >= 10 && pPhone === userPhoneClean);
   });
 
+  // CA Consultation queries matching user id, email, or phone
+  const allQueries = getCAQueries();
+  const userQueries = allQueries.filter(q => {
+    if (q.userId && q.userId === syncedUser.id) return true;
+    if (q.clientEmail && userEmailClean && q.clientEmail.toLowerCase().trim() === userEmailClean) return true;
+    const qPhone = (q.clientPhone || '').replace(/\D/g, '').slice(-10);
+    return Boolean(qPhone && userPhoneClean && qPhone.length >= 10 && qPhone === userPhoneClean);
+  });
+
   const { password: _, ...safeUser } = syncedUser as any;
 
   return {
@@ -852,9 +861,12 @@ export function getUserPortalData(userIdOrEmail: string) {
     filings: userFilings,
     toolPurchases: userPurchases,
     payments: userPayments,
+    queries: userQueries,
     stats: {
       activeFilings: userFilings.filter(f => f.status !== 'completed' && f.status !== 'rejected').length,
       completedFilings: userFilings.filter(f => f.status === 'completed').length,
+      activeQueries: userQueries.filter(q => q.status !== 'resolved').length,
+      resolvedQueries: userQueries.filter(q => q.status === 'resolved').length,
       unlockedPaidTools: safeUser.unlockedTools.filter((t: string) => ALL_PRO_TOOLS.includes(t) || t === 'all-access-pass' || t === 'all-access').length,
       verifiedPayments: userPayments.filter(p => p.status === 'paid').length
     }

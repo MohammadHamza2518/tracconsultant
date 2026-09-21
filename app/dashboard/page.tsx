@@ -15,6 +15,7 @@ import {
   CheckCircle2, 
   Clock, 
   ArrowUpRight, 
+  ArrowRight, 
   Upload, 
   Sparkles, 
   Phone, 
@@ -54,8 +55,10 @@ import {
   CreditCard,
   History,
   FileCheck,
-  Camera
+  Camera,
+  MessageCircle
 } from 'lucide-react';
+import { CAQueryItem } from '@/lib/types';
 import { compressAvatarImage } from '@/lib/imageUtils';
 
 interface VaultDoc {
@@ -73,7 +76,7 @@ export default function ClientDashboard() {
   const { toolPrices, getToolPrice } = useConfig();
   
   // Tab navigation
-  const [activeTab, setActiveTab] = useState<'filings' | 'tools' | 'payments' | 'new_service' | 'vault' | 'profile'>('filings');
+  const [activeTab, setActiveTab] = useState<'filings' | 'queries' | 'tools' | 'payments' | 'new_service' | 'vault' | 'profile'>('filings');
   
   // Unauthenticated Portal Gate State
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -88,21 +91,27 @@ export default function ClientDashboard() {
   // Portal Backend Data
   const [portalData, setPortalData] = useState<{
     filings: any[];
+    queries: CAQueryItem[];
     toolPurchases: any[];
     payments: any[];
     stats: {
       activeFilings: number;
       completedFilings: number;
+      activeQueries: number;
+      resolvedQueries: number;
       unlockedPaidTools: number;
       verifiedPayments: number;
     };
   }>({
     filings: [],
+    queries: [],
     toolPurchases: [],
     payments: [],
     stats: {
       activeFilings: 0,
       completedFilings: 0,
+      activeQueries: 0,
+      resolvedQueries: 0,
       unlockedPaidTools: 0,
       verifiedPayments: 0
     }
@@ -170,11 +179,14 @@ export default function ClientDashboard() {
       if (res.ok && data.success) {
         setPortalData({
           filings: data.filings || [],
+          queries: data.queries || [],
           toolPurchases: data.toolPurchases || [],
           payments: data.payments || [],
           stats: data.stats || {
             activeFilings: (data.filings || []).filter((f: any) => f.status !== 'completed').length,
             completedFilings: (data.filings || []).filter((f: any) => f.status === 'completed').length,
+            activeQueries: (data.queries || []).filter((q: any) => q.status !== 'resolved').length,
+            resolvedQueries: (data.queries || []).filter((q: any) => q.status === 'resolved').length,
             unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner'].includes(t)).length,
             verifiedPayments: (data.payments || []).length
           }
@@ -897,26 +909,25 @@ export default function ClientDashboard() {
               </div>
             </div>
 
-            <a 
-              href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20to%20connect%20with%20Senior%20CA%20Desk."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-emerald-50/40 hover:border-emerald-200 transition-all flex flex-col justify-between min-h-[110px] cursor-pointer group"
+            <div 
+              onClick={() => setActiveTab('queries')}
+              className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[110px] ${
+                activeTab === 'queries' ? 'bg-amber-50/70 border-amber-400 shadow-xs ring-1 ring-amber-400/20' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
+              }`}
             >
-              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 group-hover:text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="truncate">CA Advisory Cell</span>
+              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span className="truncate">CA Advisory Desk</span>
               </div>
               <div className="my-1.5">
-                <div className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-emerald-800 flex items-center gap-1.5 truncate">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span className="truncate">Senior CA Desk Live</span>
+                <div className="text-xl sm:text-2xl font-black text-slate-900 leading-none">
+                  {(portalData.queries || []).length}
                 </div>
               </div>
-              <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate group-hover:text-emerald-700">
-                Helpline: +91 7275922162
+              <div className="text-[10px] sm:text-[11px] text-amber-700 font-semibold truncate">
+                {portalData.stats?.activeQueries || 0} in review • {portalData.stats?.resolvedQueries || 0} signed
               </div>
-            </a>
+            </div>
 
           </div>
 
@@ -933,6 +944,23 @@ export default function ClientDashboard() {
               >
                 <FileText className={`w-3.5 h-3.5 ${activeTab === 'filings' ? 'text-emerald-600' : 'text-slate-400'}`} />
                 <span>My Services &amp; Filings ({portalData.filings.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('queries')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'queries'
+                    ? 'bg-white text-amber-900 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <ShieldCheck className={`w-3.5 h-3.5 ${activeTab === 'queries' ? 'text-amber-600' : 'text-slate-400'}`} />
+                <span>CA Consultations &amp; Notices ({(portalData.queries || []).length})</span>
+                {(portalData.stats?.activeQueries || 0) > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                    {portalData.stats?.activeQueries}
+                  </span>
+                )}
               </button>
 
               <button
@@ -1156,6 +1184,233 @@ export default function ClientDashboard() {
               </div>
             )}
 
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB: MY CA CONSULTATIONS & NOTICE DESK */}
+        {/* ========================================================================= */}
+        {activeTab === 'queries' && (
+          <div className="space-y-6">
+            {/* Header banner */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-black text-slate-900">CA Advisory &amp; Notice Scrutiny Tickets</h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    Paid Consultation Desk
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Track your legal tax queries, view signed Senior CA opinions, and follow statutory action steps.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/consult-ca"
+                  className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Ask New Query (from ₹299)</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Queries List */}
+            {(portalData.queries || []).length > 0 ? (
+              <div className="space-y-4">
+                {(portalData.queries || []).map((query) => (
+                  <div
+                    key={query.id}
+                    className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-5 hover:border-slate-300 transition-all"
+                  >
+                    {/* Ticket Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-100">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono font-bold text-xs bg-slate-900 text-white px-2.5 py-0.5 rounded-full">
+                            {query.id}
+                          </span>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                            query.plan === 'priority'
+                              ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                              : 'bg-indigo-100 text-indigo-800'
+                          }`}>
+                            {query.plan === 'priority' ? '⚡ Priority Notice Scrutiny (₹599)' : 'Standard Written Opinion (₹299)'}
+                          </span>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full capitalize ${
+                            query.status === 'resolved'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : query.status === 'in_review'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {query.status.replace('_', ' ')}
+                          </span>
+                        </div>
+                        <h4 className="text-lg font-black text-slate-900 mt-2">{query.querySubject}</h4>
+                        <p className="text-xs text-slate-500">
+                          {query.category} • Submitted on {new Date(query.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/track?q=${query.id}`}
+                          target="_blank"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Live Public Tracker</span>
+                        </Link>
+
+                        <a
+                          href={`https://wa.me/917275922162?text=${encodeURIComponent(`Hello Tracconsultant, I am asking about my CA Consultation ticket ${query.id} (${query.querySubject}).`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>WhatsApp CA Desk</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Query Narrative */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                        Submitted Question / Notice Details
+                      </span>
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        {query.queryDetails}
+                      </div>
+                    </div>
+
+                    {/* Attached Documents */}
+                    {query.documents && query.documents.length > 0 && (
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          Attached Documents ({query.documents.length})
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {query.documents.map((doc, dIdx) => (
+                            <div key={dIdx} className="px-3 py-1.5 bg-white rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                              <span className="font-semibold text-slate-800 text-[11px] truncate max-w-[200px]">{doc.name}</span>
+                              <span className="text-[10px] text-slate-400">({doc.size})</span>
+                              {doc.dataUrl && (
+                                <a
+                                  href={doc.dataUrl}
+                                  download={doc.name}
+                                  className="text-[10px] text-emerald-600 hover:underline font-bold"
+                                >
+                                  Download
+                                </a>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Resolved CA Legal Opinion */}
+                    {query.caResponse && (
+                      <div className="p-6 bg-gradient-to-br from-slate-900 via-slate-950 to-[#071324] rounded-3xl text-white space-y-4 border border-slate-800 shadow-lg">
+                        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-white/10 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">
+                              CA
+                            </div>
+                            <div>
+                              <h5 className="font-bold text-sm text-white">
+                                {query.caResponse.caName || 'Senior Chartered Accountant (FCA)'}
+                              </h5>
+                              <p className="text-[10px] text-slate-400">
+                                {query.caResponse.membershipNumber || 'ICAI Panel Member'} • Signed Legal Opinion
+                              </p>
+                            </div>
+                          </div>
+
+                          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Legal Opinion Delivered</span>
+                          </span>
+                        </div>
+
+                        {query.caResponse.legalSectionsCited && (
+                          <div className="p-3 bg-white/5 rounded-xl border border-white/10 text-xs text-slate-300">
+                            <span className="text-[10px] uppercase font-bold text-emerald-400 block mb-0.5">
+                              Statutory Sections Cited:
+                            </span>
+                            <span className="font-mono text-white">{query.caResponse.legalSectionsCited}</span>
+                          </div>
+                        )}
+
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                            Authoritative Legal Opinion &amp; Technical Analysis
+                          </span>
+                          <div className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
+                            {query.caResponse.opinion}
+                          </div>
+                        </div>
+
+                        {query.caResponse.actionSteps && query.caResponse.actionSteps.length > 0 && (
+                          <div className="pt-2 border-t border-white/10 space-y-2">
+                            <span className="text-[10px] uppercase font-bold text-emerald-400 block">
+                              Recommended Next Action Steps for You:
+                            </span>
+                            <div className="space-y-1.5">
+                              {query.caResponse.actionSteps.map((step, sIdx) => (
+                                <div key={sIdx} className="flex items-start gap-2 text-xs text-slate-200">
+                                  <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                                    {sIdx + 1}
+                                  </span>
+                                  <span>{step}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Pending Review Notice */}
+                    {query.status !== 'resolved' && (
+                      <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 flex items-center gap-3 text-xs text-amber-900">
+                        <Clock className="w-5 h-5 text-amber-600 shrink-0 animate-spin" />
+                        <div>
+                          <p className="font-bold">Under Review by Senior CA Team</p>
+                          <p className="text-[11px] text-amber-800 mt-0.5">
+                            Your query and documents are currently being examined under relevant statutory laws. You will receive an instant WhatsApp alert as soon as the legal opinion is signed.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200/80 text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+                <div className="max-w-md mx-auto space-y-1">
+                  <h4 className="text-base font-bold text-slate-900">No Consultation Queries Found</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Have an Income Tax notice, GST demand, or compliance question? Connect with our Senior Chartered Accountant desk for an authoritative written opinion.
+                  </p>
+                </div>
+                <Link
+                  href="/consult-ca"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors"
+                >
+                  <span>Book Formal Consultation (from ₹299)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
