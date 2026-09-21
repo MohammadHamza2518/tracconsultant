@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Calculator, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 
 export const metadata = {
-  title: 'Income Tax Calculator FY 2024-25 & 2025-26 | Tracconsultant',
-  description: 'Side-by-side comparison of Old vs New Tax Regime with updated ₹75,000 Standard Deduction and Budget 2024-25 slabs.'
+  title: 'Income Tax Calculator FY 2023-24, 2024-25, 2025-26 & 2026-27 | Tracconsultant',
+  description: 'Side-by-side comparison of Old vs New Tax Regime across FY 2023-24, 24-25, 25-26 and 26-27 with ₹75,000 Standard Deduction, ClearTax-style 3-step wizard & instant computation download.'
 };
 
 export default function TaxCalculatorPage() {
@@ -17,11 +17,11 @@ export default function TaxCalculatorPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2 border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5" /> Updated for Union Budget FY 23-24, 24-25 &amp; 25-26
+              <Sparkles className="w-3.5 h-3.5" /> Updated for FY 23-24, 24-25, 25-26 &amp; 26-27
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">Income Tax Computation Tool</h1>
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">Income Tax Comparison Calculator</h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Side-by-side Old vs New Tax Regime calculation with dynamic standard deduction & 87A rebate.
+              ClearTax-style 3-step comparison for Old vs New Tax Regime with year-wise slab tables, salary, business &amp; deduction breakdown.
             </p>
           </div>
           <Link
