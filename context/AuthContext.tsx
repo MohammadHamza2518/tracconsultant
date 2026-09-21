@@ -36,7 +36,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(saved);
         setUser(parsed);
         // Refresh latest data from server
-        fetch(`/api/auth/me?id=${encodeURIComponent(parsed.id)}`)
+        const query = parsed.id ? `id=${encodeURIComponent(parsed.id)}&email=${encodeURIComponent(parsed.email || '')}` : `email=${encodeURIComponent(parsed.email || '')}`;
+        fetch(`/api/auth/me?${query}`)
           .then(res => res.json())
           .then(data => {
             if (data.user) {
@@ -69,7 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!currentId && !currentEmail) return;
 
     try {
-      const queryParam = currentId ? `id=${encodeURIComponent(currentId)}` : `email=${encodeURIComponent(currentEmail!)}`;
+      const queryParam = currentId 
+        ? `id=${encodeURIComponent(currentId)}&email=${encodeURIComponent(currentEmail || '')}` 
+        : `email=${encodeURIComponent(currentEmail!)}`;
       const res = await fetch(`/api/auth/me?${queryParam}`);
       const data = await res.json();
       if (data.user) {
@@ -167,32 +170,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasToolAccess = (toolId: string) => {
-    // Free & Basic tools are accessible to everyone unconditionally
+    // 1. Admins have unconditional free access to EVERY single tool!
+    if (
+      user?.role === 'admin' || 
+      user?.role?.toLowerCase() === 'admin'
+    ) {
+      return true;
+    }
+
+    // 2. Admin Gate session in browser
+    if (typeof window !== 'undefined') {
+      try {
+        if (localStorage.getItem('trac_admin_auth') === 'true') {
+          return true;
+        }
+      } catch {}
+    }
+
+    // 3. Free & Basic tools are accessible to everyone unconditionally
     if ([
       'hra-calculator', 
       'advance-tax-calculator', 
       'tax-calculator',
-      'pdf-redactor',
-      'tb-to-balancesheet',
-      'gstr2a-reconciliation',
-      'json-to-computation',
+      'pdf-redactor', 
+      'tb-to-balancesheet', 
+      'gstr2a-reconciliation', 
+      'json-to-computation', 
       'gstr2a-cleaner'
     ].includes(toolId)) {
       return true;
     }
-    // Admins have access to everything
-    if (user?.role === 'admin') {
+
+    // 4. All-access pass unlocks all pro tools
+    if (
+      user?.unlockedTools?.includes('all-access-pass') || 
+      user?.unlockedTools?.includes('all-access')
+    ) {
       return true;
     }
-    // All-access pass unlocks all pro tools
-    if (user?.unlockedTools?.includes('all-access-pass') || user?.unlockedTools?.includes('all-access')) {
-      return true;
-    }
-    // Check if user has unlocked the specific tool
+
+    // 5. Check if user has unlocked the specific tool
     if (user?.unlockedTools?.includes(toolId)) {
       return true;
     }
-    // Check saved session during SSR / initial hydration
+
+    // 6. Check saved session during SSR / initial hydration
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('trac_user_session');
       if (saved) {
@@ -200,6 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(saved);
           if (
             parsed.role === 'admin' ||
+            parsed.role?.toLowerCase() === 'admin' ||
             parsed.unlockedTools?.includes('all-access-pass') ||
             parsed.unlockedTools?.includes('all-access') ||
             parsed.unlockedTools?.includes(toolId)

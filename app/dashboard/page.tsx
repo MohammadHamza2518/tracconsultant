@@ -1179,14 +1179,37 @@ export default function ClientDashboard() {
                     Unlimited lifetime usage, client-side encryption, and zero restrictions across all tools.
                   </p>
                 </div>
-                <span className="py-2.5 px-4 bg-white text-slate-900 font-extrabold text-xs rounded-xl shadow-sm whitespace-nowrap">
-                  Active • Lifetime Single Firm License
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveLicenseModalTool({
+                    id: 'all-access-pass',
+                    name: 'All-Access CA Toolkit Pass (All 4 Advance & Pro Modules)',
+                    slug: 'all-access',
+                    category: 'paid',
+                    badge: 'PRO ALL-ACCESS',
+                    price: 699,
+                    description: 'Permanent lifetime unrestricted single-firm license unlocking all Advance & Pro modules.',
+                    shortDesc: 'All 4 Advance & Pro compliance tools unlocked permanently.',
+                    icon: 'Sparkles',
+                    tags: ['All-Access', 'Full Suite'],
+                    features: [
+                      'PDF Redactor Studio (Advance)',
+                      'Computation of Income Generator (Advance)',
+                      'Smart PDF & Image Compressor (Pro)',
+                      'GST Tax Invoice & E-Way Generator (Pro)'
+                    ]
+                  })}
+                  className="py-2.5 px-4 bg-white hover:bg-slate-50 text-slate-900 font-extrabold text-xs rounded-xl shadow-sm whitespace-nowrap cursor-pointer transition-all flex items-center gap-1.5 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
+                  title="Click to view Official All-Access Digital License Certificate"
+                >
+                  <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Active • Lifetime Single Firm License</span>
+                </button>
               </div>
             )}
 
             {/* 4 Advance / Pro Tools */}
-            <div className="space-y-4">
+            <div id="advance-pro-tools-section" className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-black text-slate-900">4 Advance &amp; Pro Compliance Modules</h2>
@@ -1811,14 +1834,29 @@ export default function ClientDashboard() {
                 <Printer className="w-4 h-4" />
                 <span>Print Certificate</span>
               </button>
-              <Link
-                href={`/tools/${activeLicenseModalTool.slug}`}
-                onClick={() => setActiveLicenseModalTool(null)}
-                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5"
-              >
-                <span>Launch Workstation</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
+              {activeLicenseModalTool.id === 'all-access-pass' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveLicenseModalTool(null);
+                    const el = document.getElementById('advance-pro-tools-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Explore 4 Workstations ↓</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <Link
+                  href={`/tools/${activeLicenseModalTool.slug}`}
+                  onClick={() => setActiveLicenseModalTool(null)}
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span>Launch Workstation</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              )}
             </div>
           </div>
         </div>

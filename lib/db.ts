@@ -469,6 +469,11 @@ export function createUser(userData: Partial<User> & { email: string; name: stri
 
   const initialTools = new Set<string>(userData.unlockedTools || FREE_TOOLS);
   FREE_TOOLS.forEach(t => initialTools.add(t));
+  if (userData.role === 'admin' || userData.role?.toLowerCase() === 'admin') {
+    ALL_PRO_TOOLS.forEach(t => initialTools.add(t));
+    initialTools.add('all-access-pass');
+    initialTools.add('all-access');
+  }
 
   const newUser: User = {
     id: userData.id || `usr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -511,6 +516,15 @@ export function updateUser(idOrEmail: string, updates: Partial<User>): User | nu
       return newUser;
     }
     return null;
+  }
+
+  if (updates.role === 'admin' || (users[idx].role === 'admin' && updates.role !== 'client')) {
+    const toolsSet = new Set<string>(users[idx].unlockedTools || FREE_TOOLS);
+    ALL_PRO_TOOLS.forEach(t => toolsSet.add(t));
+    FREE_TOOLS.forEach(t => toolsSet.add(t));
+    toolsSet.add('all-access-pass');
+    toolsSet.add('all-access');
+    updates.unlockedTools = Array.from(toolsSet);
   }
 
   users[idx] = { ...users[idx], ...updates };

@@ -34,6 +34,12 @@ export default function ToolsHubPage() {
   const [search, setSearch] = useState('');
   const [paywallTool, setPaywallTool] = useState<ToolConfig | null>(null);
 
+  const hasAllAccess = 
+    user?.role === 'admin' || 
+    user?.role?.toLowerCase() === 'admin' || 
+    hasToolAccess('all-access-pass') || 
+    hasToolAccess('all-access');
+
   const filteredTools = TOOLS_LIST.filter(tool => {
     const matchesFilter = filter === 'all' || tool.category === filter;
     const matchesSearch = tool.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -58,57 +64,56 @@ export default function ToolsHubPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-28 sm:pb-32">
-      {/* Header Banner - FinTech Modern Style */}
-      <div className="bg-gradient-to-b from-[#07152B] via-[#0B1E3B] to-[#0D2447] text-white pt-14 pb-12 sm:pt-16 sm:pb-14 px-4 sm:px-8 border-b border-[#143258] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-6xl mx-auto text-center relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide backdrop-blur-sm shadow-inner">
-            <Layers className="w-3.5 h-3.5" /> High-Accuracy Financial Computing Engines
+    <div className="min-h-screen bg-slate-50/70 pb-20">
+      {/* Hero Header */}
+      <div className="bg-slate-900 text-white relative overflow-hidden border-b border-slate-800">
+        <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 sm:py-16 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-4">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Chartered Accountant Utility Suite • Instant In-Browser Workstations</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white max-w-3xl mx-auto">
-            Tax & Compliance Digital Suite
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white mb-4">
+            Professional Tax &amp; Compliance Tools
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            From free Union Budget calculators and Basic audit tools to advance ITR 1-7 computation, PDF redaction studio, and GST billing.
+          <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed mb-8">
+            Engineered by Tracconsultant chartered accountants. Featuring 8 free foundational calculators and 4 advance browser workstations with client-side zero-leakage vector processing.
           </p>
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-300">
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 8 Free & Basic Tools</span>
-            <span className="text-slate-600">•</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 4 Advance & Pro Modules</span>
-            <span className="text-slate-600">•</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> DPDP Act & Rule 36(4) Compliant</span>
-          </div>
 
-          {/* Focal Hero Action Buttons */}
-          <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <a
               href="#tools-grid"
-              className="px-5 py-2.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center gap-2"
             >
               <span>Explore All 12 Tools</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
-            <button
-              type="button"
-              onClick={() => setPaywallTool({
-                id: 'all-access-pass',
-                name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
-                slug: 'all-access',
-                category: 'paid',
-                price: bundlePrice,
-                shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
-                description: 'Unlimited file processing pass for all professional tools.',
-                icon: 'Sparkles',
-                tags: ['Bundle', 'Full Suite'],
-                features: ['All 4 Advance/Pro Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
-              })}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Get All-Access Pass (₹{bundlePrice})</span>
-            </button>
+            {hasAllAccess ? (
+              <span className="px-4 py-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>All-Access Active ({user?.role === 'admin' ? 'Administrator' : 'Lifetime License'})</span>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPaywallTool({
+                  id: 'all-access-pass',
+                  name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
+                  slug: 'all-access',
+                  category: 'paid',
+                  price: bundlePrice,
+                  shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
+                  description: 'Unlimited file processing pass for all professional tools.',
+                  icon: 'Sparkles',
+                  tags: ['Bundle', 'Full Suite'],
+                  features: ['All 4 Advance/Pro Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
+                })}
+                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Get All-Access Pass (₹{bundlePrice})</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -252,36 +257,57 @@ export default function ToolsHubPage() {
           })}
         </div>
 
-        {/* Bottom Banner: All-Access Pass (Consistent Pure Indigo Action) */}
-        <div className="mt-12 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 shadow-xl border border-indigo-900/50 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 text-indigo-400 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" /> Comprehensive Tax & Compliance Suite
+        {/* Bottom Banner: All-Access Pass */}
+        {!hasAllAccess ? (
+          <div className="mt-12 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 shadow-xl border border-indigo-900/50 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center md:text-left">
+              <div className="inline-flex items-center gap-1.5 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-4 h-4" /> Comprehensive Tax &amp; Compliance Suite
+              </div>
+              <h2 className="text-2xl font-black text-white">Need all 4 Advance &amp; Pro Compliance Modules for your firm or practice?</h2>
+              <p className="text-slate-300 text-xs max-w-xl">
+                Get unlimited lifetime file processing across PDF Redactor Studio (Advance), Computation of Income Generator (Advance), Smart File Compressor, and GST Invoice Generator for flat ₹{bundlePrice}.
+              </p>
             </div>
-            <h2 className="text-2xl font-black text-white">Need all 4 Advance &amp; Pro Compliance Modules for your firm or practice?</h2>
-            <p className="text-slate-300 text-xs max-w-xl">
-              Get unlimited lifetime file processing across PDF Redactor Studio (Advance), Computation of Income Generator (Advance), Smart File Compressor, and GST Invoice Generator for flat ₹{bundlePrice}.
-            </p>
+            <button
+              onClick={() => setPaywallTool({
+                id: 'all-access-pass',
+                name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
+                slug: 'all-access',
+                category: 'paid',
+                price: bundlePrice,
+                shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
+                description: 'Unlimited file processing pass for all professional tools.',
+                icon: 'Sparkles',
+                tags: ['Bundle', 'Full Suite'],
+                features: ['All 4 Advance/Pro Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
+              })}
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-indigo-900/30 transition-all shrink-0 flex items-center gap-2 cursor-pointer hover:scale-105"
+            >
+              <span>Unlock All-Access Pass (₹{bundlePrice})</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={() => setPaywallTool({
-              id: 'all-access-pass',
-              name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
-              slug: 'all-access',
-              category: 'paid',
-              price: bundlePrice,
-              shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
-              description: 'Unlimited file processing pass for all professional tools.',
-              icon: 'Sparkles',
-              tags: ['Bundle', 'Full Suite'],
-              features: ['All 5 Paid Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
-            })}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-indigo-900/30 transition-all shrink-0 flex items-center gap-2 cursor-pointer hover:scale-105"
-          >
-            <span>Unlock All-Access Pass (₹{bundlePrice})</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+        ) : (
+          <div className="mt-12 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-3xl p-8 shadow-xl border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center md:text-left">
+              <div className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <Check className="w-4 h-4" /> All 4 Advance &amp; Pro Workstations 100% Unlocked
+              </div>
+              <h2 className="text-2xl font-black text-white">Full Professional Suite Access Active</h2>
+              <p className="text-slate-300 text-xs max-w-xl">
+                Your account ({user?.email || 'Administrator'}) has full unrestricted lifetime privileges across all 4 Advance &amp; Pro compliance modules.
+              </p>
+            </div>
+            <Link
+              href="/dashboard?tab=tools"
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0 flex items-center gap-2 cursor-pointer hover:scale-105"
+            >
+              <span>Open Workstations Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Paywall Modal */}
