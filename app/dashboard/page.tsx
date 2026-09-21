@@ -53,8 +53,10 @@ import {
   UserCheck,
   CreditCard,
   History,
-  FileCheck
+  FileCheck,
+  Camera
 } from 'lucide-react';
+import { compressAvatarImage } from '@/lib/imageUtils';
 
 interface VaultDoc {
   id: string;
@@ -67,7 +69,7 @@ interface VaultDoc {
 }
 
 export default function ClientDashboard() {
-  const { user, isLoading, hasToolAccess, login, register, loginWithGoogle, logout, refreshUser } = useAuth();
+  const { user, isLoading, hasToolAccess, login, register, loginWithGoogle, logout, refreshUser, updateUserProfile } = useAuth();
   const { toolPrices, getToolPrice } = useConfig();
   
   // Tab navigation
@@ -147,10 +149,16 @@ export default function ClientDashboard() {
   // Receipt Modal state
   const [viewReceiptPayment, setViewReceiptPayment] = useState<any | null>(null);
 
-  // Profile edit state
+  // Profile edit & Avatar DP state
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
+  const [profileAvatar, setProfileAvatar] = useState('');
   const [profileSaved, setProfileSaved] = useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [avatarSuccessMsg, setAvatarSuccessMsg] = useState('');
+  const [avatarErrorMsg, setAvatarErrorMsg] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const headerAvatarInputRef = useRef<HTMLInputElement>(null);
 
   // 1. Fetch user portal data from server
   const loadPortalData = async () => {
@@ -174,11 +182,71 @@ export default function ClientDashboard() {
         setClientPhone(user.phone || '');
         setProfileName(user.name || '');
         setProfilePhone(user.phone || '');
+        setProfileAvatar(user.avatar || '');
       }
     } catch (err) {
       console.error('Error loading portal data:', err);
     } finally {
       setIsDataLoading(false);
+    }
+  };
+
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setAvatarErrorMsg('Please select a valid image file (JPG, PNG, WEBP).');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setAvatarErrorMsg('Image size should be less than 10MB.');
+      return;
+    }
+
+    setIsAvatarUploading(true);
+    setAvatarErrorMsg('');
+    setAvatarSuccessMsg('');
+
+    try {
+      const compressedDataUrl = await compressAvatarImage(file, 400, 0.85);
+      setProfileAvatar(compressedDataUrl);
+
+      const res = await updateUserProfile({ avatar: compressedDataUrl });
+      if (res.success) {
+        setAvatarSuccessMsg('Profile picture updated and synchronized!');
+        setTimeout(() => setAvatarSuccessMsg(''), 4000);
+      } else {
+        setAvatarErrorMsg(res.error || 'Failed to update profile picture.');
+      }
+    } catch (err: any) {
+      setAvatarErrorMsg(err.message || 'Failed to process image.');
+    } finally {
+      setIsAvatarUploading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!confirm('Are you sure you want to remove your profile picture?')) return;
+    setIsAvatarUploading(true);
+    setAvatarErrorMsg('');
+    setAvatarSuccessMsg('');
+
+    try {
+      setProfileAvatar('');
+      const res = await updateUserProfile({ avatar: '' });
+      if (res.success) {
+        setAvatarSuccessMsg('Profile picture removed. Default avatar restored.');
+        setTimeout(() => setAvatarSuccessMsg(''), 4000);
+      } else {
+        setAvatarErrorMsg(res.error || 'Failed to remove profile picture.');
+      }
+    } catch (err: any) {
+      setAvatarErrorMsg(err.message || 'Failed to remove picture.');
+    } finally {
+      setIsAvatarUploading(false);
     }
   };
 
@@ -284,21 +352,16 @@ export default function ClientDashboard() {
     e.preventDefault();
     if (!user) return;
     try {
-      const res = await fetch('/api/user/portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update_profile',
-          userId: user.id,
-          email: user.email,
-          name: profileName,
-          phone: profilePhone
-        })
+      const res = await updateUserProfile({
+        name: profileName.trim(),
+        phone: profilePhone.trim(),
+        avatar: profileAvatar
       });
-      if (res.ok) {
+      if (res.success) {
         setProfileSaved(true);
-        refreshUser();
-        setTimeout(() => setProfileSaved(false), 3000);
+        setTimeout(() => setProfileSaved(false), 3500);
+      } else {
+        alert(res.error || 'Failed to update profile.');
       }
     } catch {
       alert('Failed to update profile.');
@@ -615,13 +678,28 @@ export default function ClientDashboard() {
             
             {/* User Details */}
             <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-emerald-900/10 shrink-0">
+              <div 
+                onClick={() => headerAvatarInputRef.current?.click()}
+                title="Click to update Profile Picture (DP)"
+                className="relative group w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-emerald-900/10 shrink-0 cursor-pointer overflow-hidden ring-2 ring-emerald-500/20 hover:ring-emerald-500 transition-all"
+              >
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-full h-full rounded-2xl object-cover" />
                 ) : (
                   user.name.charAt(0).toUpperCase()
                 )}
+                <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[9px] font-bold gap-0.5">
+                  <Camera className="w-4 h-4" />
+                  <span className="hidden sm:inline">Change</span>
+                </div>
               </div>
+              <input
+                type="file"
+                ref={headerAvatarInputRef}
+                accept="image/jpeg,image/png,image/webp,image/jpg"
+                className="hidden"
+                onChange={handleAvatarFileChange}
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight truncate">
@@ -1443,6 +1521,92 @@ export default function ClientDashboard() {
                 <span>Profile details updated and synchronized across all sessions!</span>
               </div>
             )}
+
+            {/* Section 1: Profile Photo (DP) Card */}
+            <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Profile Picture (DP)</h3>
+                  <p className="text-xs text-slate-500">Upload your professional photo or firm logo for your client portal and verified filings.</p>
+                </div>
+                {(profileAvatar || user.avatar) && (
+                  <span className="text-[10px] font-extrabold uppercase tracking-wide bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0">
+                    Custom DP Active
+                  </span>
+                )}
+              </div>
+
+              {/* Feedback messages for avatar */}
+              {avatarSuccessMsg && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-medium flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{avatarSuccessMsg}</span>
+                </div>
+              )}
+              {avatarErrorMsg && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                  <span>{avatarErrorMsg}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-1">
+                {/* DP Preview */}
+                <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-md ring-4 ring-emerald-50 border border-slate-200 shrink-0 overflow-hidden">
+                  {profileAvatar || user.avatar ? (
+                    <img 
+                      src={profileAvatar || user.avatar} 
+                      alt={user.name} 
+                      className="w-full h-full rounded-2xl object-cover"
+                    />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
+                  {isAvatarUploading && (
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center">
+                      <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                {/* DP Controls */}
+                <div className="space-y-2 flex-1 text-center sm:text-left">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <input
+                      type="file"
+                      ref={avatarInputRef}
+                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      className="hidden"
+                      onChange={handleAvatarFileChange}
+                    />
+                    <button
+                      type="button"
+                      disabled={isAvatarUploading}
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{isAvatarUploading ? 'Uploading...' : 'Upload New Photo'}</span>
+                    </button>
+
+                    {(profileAvatar || user.avatar) && (
+                      <button
+                        type="button"
+                        disabled={isAvatarUploading}
+                        onClick={handleRemoveAvatar}
+                        className="py-2 px-3 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remove Photo</span>
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Supports high-res JPG, PNG or WEBP (Max 10MB). Automatically cropped and compressed for ultra-fast loading.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>

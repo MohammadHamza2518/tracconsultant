@@ -82,18 +82,20 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
-    // Action 2: Update Profile (phone, pan, etc.)
+    // Action 2: Update Profile (phone, pan, avatar / DP, etc.)
     if (action === 'update_profile') {
-      const { name, phone } = body;
-      updateUser(user.id, {
+      const { name, phone, avatar } = body;
+      const updatedUser = updateUser(user.id, {
         ...(name ? { name } : {}),
-        ...(phone ? { phone } : {})
+        ...(phone !== undefined ? { phone } : {}),
+        ...(avatar !== undefined ? { avatar: avatar || '' } : {})
       });
 
       const updatedData = getUserPortalData(user.id);
       return NextResponse.json({
         success: true,
         message: 'Profile updated successfully!',
+        user: updatedUser,
         ...updatedData
       });
     }

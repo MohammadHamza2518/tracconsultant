@@ -17,6 +17,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   authModalMode: 'login' | 'register';
   setAuthModalMode: (mode: 'login' | 'register') => void;
+  updateUserProfile: (data: { name?: string; phone?: string; avatar?: string }) => Promise<{ success: boolean; user?: User; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -220,6 +221,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
+  const updateUserProfile = async (data: { name?: string; phone?: string; avatar?: string }) => {
+    if (!user) return { success: false, error: 'Not authenticated' };
+    try {
+      const res = await fetch('/api/user/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_profile',
+          userId: user.id,
+          email: user.email,
+          ...data
+        })
+      });
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        return { success: false, error: resData.error || 'Failed to update profile' };
+      }
+
+      const updatedUser: User = {
+        ...user,
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.phone !== undefined ? { phone: data.phone } : {}),
+        ...(data.avatar !== undefined ? { avatar: data.avatar } : {})
+      };
+      setUser(updatedUser);
+      localStorage.setItem('trac_user_session', JSON.stringify(updatedUser));
+      return { success: true, user: updatedUser };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error' };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -235,7 +268,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         openAuthModal,
         closeAuthModal,
         authModalMode,
-        setAuthModalMode
+        setAuthModalMode,
+        updateUserProfile
       }}
     >
       {children}
