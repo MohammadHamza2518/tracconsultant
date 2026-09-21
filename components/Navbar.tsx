@@ -789,7 +789,7 @@ export default function Navbar() {
                           Tax &amp; Compliance Software Suite
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          8 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
+                          9 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
                         </p>
                       </div>
                     </div>
@@ -798,6 +798,36 @@ export default function Navbar() {
                       <span>Instant Browser Processing • 100% Confidential</span>
                     </div>
                   </div>
+
+                  {/* Spotlight Banner: Featured E-Commerce GST Automation */}
+                  <Link
+                    href="/tools/ecommerce-gst-converter"
+                    onClick={() => setToolsOpen(false)}
+                    className="mb-4 p-3 bg-gradient-to-r from-[#0B2545] via-slate-900 to-emerald-950 rounded-2xl border border-emerald-500/40 flex items-center justify-between gap-3 group hover:border-emerald-400 hover:shadow-lg transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                        <ShoppingCart className="w-5 h-5 text-slate-950" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-black text-white group-hover:text-emerald-300 transition-colors">
+                            E-Commerce GSTR-1 &amp; TCS Converter
+                          </span>
+                          <span className="text-[10px] font-black bg-emerald-400 text-slate-950 px-1.5 py-0.5 rounded uppercase shadow-xs">
+                            NEW • 100% FREE
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 line-clamp-1 mt-0.5">
+                          Amazon MTR, Flipkart &amp; Meesho sales to Table 7 B2CS JSON &amp; Section 52 TCS credit.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 group-hover:bg-emerald-500 text-white shrink-0 transition-all flex items-center gap-1 shadow-sm">
+                      <span>Launch Tool</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </Link>
 
                   {/* 2-Column Suite Layout: Free/Basic vs Advance/Pro */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -810,9 +840,10 @@ export default function Navbar() {
                         <span className="text-xs font-bold text-emerald-600">100% Free</span>
                       </div>
 
-                      <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                      <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
                         {freeTools.map(t => {
                           const iconMap: Record<string, any> = {
+                            'ecommerce-gst-converter': ShoppingCart,
                             'hra-calculator': Calculator,
                             'advance-tax-calculator': Calendar,
                             'tax-calculator': TrendingUp,

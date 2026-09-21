@@ -29,6 +29,28 @@ export interface ServiceConfig {
 }
 
 export const TOOLS_LIST: ToolConfig[] = [
+  // 1. E-Commerce GSTR-1 & TCS Generator (Featured)
+  {
+    id: 'ecommerce-gst-converter',
+    name: 'E-Commerce GSTR-1 & TCS Generator',
+    slug: 'ecommerce-gst-converter',
+    category: 'free',
+    price: 0,
+    badge: 'NEW FREE',
+    shortDesc: 'Instant Amazon MTR, Flipkart, Meesho sales to Table 7 B2CS JSON & Sec 52 TCS audit.',
+    description: 'Convert messy marketplace order sheets into official government portal uploadable Table 7 B2CS JSON. Automatic Place of Supply aggregation, sales return deductions, and 1% TCS Section 52 audit.',
+    icon: 'ShoppingCart',
+    tags: ['E-Commerce', 'Amazon MTR', 'Flipkart GSTR', 'Meesho', 'GSTR-1 JSON', 'TCS Sec 52'],
+    features: [
+      'Multi-Marketplace: Amazon MTR, Flipkart, Meesho & CSV',
+      'Table 7 B2CS State-wise Place of Supply consolidation',
+      'Automatic deduction of return & cancelled orders',
+      'Section 52 TCS 1% reconciliation ledger',
+      'Direct Gov GST Portal offline JSON export',
+      '100% Client-side local processing — zero data leaves browser'
+    ]
+  },
+
   // 8 FREE & BASIC TOOLS
   {
     id: 'hra-calculator',
@@ -133,26 +155,6 @@ export const TOOLS_LIST: ToolConfig[] = [
     icon: 'Sparkles',
     tags: ['Basic', 'GSTR-2A', 'Supplier Summary', 'Excel Automation'],
     features: ['Removes duplicate & cancelled records', 'Aggregates by Vendor GSTIN', 'Calculates eligible vs ineligible ITC', 'Export clean single-sheet Excel']
-  },
-  {
-    id: 'ecommerce-gst-converter',
-    name: 'E-Commerce GSTR-1 & TCS Generator',
-    slug: 'ecommerce-gst-converter',
-    category: 'free',
-    price: 0,
-    badge: '100% Free',
-    shortDesc: 'Instant Amazon MTR, Flipkart, Meesho sales to Table 7 B2CS JSON & Sec 52 TCS audit.',
-    description: 'Convert messy marketplace order sheets into official government portal uploadable Table 7 B2CS JSON. Automatic Place of Supply aggregation, sales return deductions, and 1% TCS Section 52 audit.',
-    icon: 'ShoppingCart',
-    tags: ['E-Commerce', 'Amazon MTR', 'Flipkart GSTR', 'Meesho', 'GSTR-1 JSON', 'TCS Sec 52'],
-    features: [
-      'Multi-Marketplace: Amazon MTR, Flipkart, Meesho & CSV',
-      'Table 7 B2CS State-wise Place of Supply consolidation',
-      'Automatic deduction of return & cancelled orders',
-      'Section 52 TCS 1% reconciliation ledger',
-      'Direct Gov GST Portal offline JSON export',
-      '100% Client-side local processing — zero data leaves browser'
-    ]
   },
 
   // 4 NEW PAID / ADVANCE / PRO TOOLS
