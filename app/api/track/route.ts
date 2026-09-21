@@ -4,7 +4,7 @@ import { findFilingsByPhoneOrId } from '@/lib/db';
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const query = searchParams.get('q');
+    const query = searchParams.get('q') || searchParams.get('query');
 
     if (!query || query.trim().length < 4) {
       return NextResponse.json({

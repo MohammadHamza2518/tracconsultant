@@ -37,9 +37,10 @@ import {
   Sparkles,
   DollarSign,
   Upload,
-  Camera
+  Camera,
+  Receipt
 } from 'lucide-react';
-import { FilingItem, FilingStatus, WhatsAppTemplate, WhatsAppSettings, User, ToolPurchase, LeadItem } from '@/lib/types';
+import { FilingItem, FilingStatus, WhatsAppTemplate, WhatsAppSettings, User, ToolPurchase, LeadItem, PaymentTransaction } from '@/lib/types';
 import { TOOLS_LIST, SERVICES_LIST } from '@/lib/data';
 import { SystemConfig, DEFAULT_SYSTEM_CONFIG } from '@/lib/systemConfigDefaults';
 import { compressAvatarImage } from '@/lib/imageUtils';
@@ -63,10 +64,13 @@ export default function AdminPage() {
   const [filings, setFilings] = useState<FilingItem[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [toolPurchases, setToolPurchases] = useState<ToolPurchase[]>([]);
+  const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
   const [settings, setSettings] = useState<WhatsAppSettings | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [toolsSubTab, setToolsSubTab] = useState<'tools' | 'transactions'>('tools');
+  const [transactionSearchQuery, setTransactionSearchQuery] = useState<string>('');
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -249,13 +253,14 @@ export default function AdminPage() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [fRes, uRes, pRes, lRes, tRes, cRes] = await Promise.all([
+      const [fRes, uRes, pRes, lRes, tRes, cRes, txRes] = await Promise.all([
         fetch('/api/filings'),
         fetch('/api/admin/users'),
         fetch('/api/admin/tools-access'),
         fetch('/api/leads'),
         fetch('/api/whatsapp/templates'),
-        fetch('/api/admin/config')
+        fetch('/api/admin/config'),
+        fetch('/api/payment/transactions')
       ]);
 
       const fData = await fRes.json();
@@ -264,10 +269,12 @@ export default function AdminPage() {
       const lData = await lRes.json();
       const tData = await tRes.json();
       const cData = await cRes.json();
+      const txData = await txRes.json();
 
       if (fData.success) setFilings(fData.data || []);
       if (uData.users) setUsers(uData.users || []);
       if (pData.purchases) setToolPurchases(pData.purchases || []);
+      if (txData.success && txData.payments) setPayments(txData.payments || []);
       if (lData.leads) setLeads(lData.leads || []);
       if (tData.success) {
         setTemplates(tData.templates || []);
@@ -499,6 +506,9 @@ export default function AdminPage() {
   const totalRegisteredUsers = users.filter(u => u.role !== 'admin').length;
   const totalToolPurchasesCount = toolPurchases.length;
   const totalToolRevenue = toolPurchases.reduce((acc, p) => acc + (p.status === 'active' ? p.amount : 0), 0);
+  const totalServicePayments = payments.filter(p => p.status === 'paid' && !p.notes?.toolId);
+  const totalServiceRevenue = totalServicePayments.reduce((acc, p) => acc + (p.amount || 0), 0);
+  const totalPlatformRevenue = totalToolRevenue + totalServiceRevenue;
   const pendingReviews = filings.filter(f => f.status === 'new' || f.status === 'under_review').length;
   const inProgress = filings.filter(f => f.status === 'ca_assigned' || f.status === 'draft_ready').length;
   const completedFilings = filings.filter(f => f.status === 'filed' || f.status === 'completed').length;
@@ -796,11 +806,11 @@ export default function AdminPage() {
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
-              <span>Paid Tool Revenue</span>
-              <DollarSign className="w-4 h-4 text-indigo-600" />
+              <span>Platform Revenue</span>
+              <DollarSign className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-indigo-700">₹{totalToolRevenue.toLocaleString('en-IN')}</div>
-            <div className="text-[11px] text-indigo-600 font-semibold mt-1">{totalToolPurchasesCount} Tool Orders</div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900">₹{totalPlatformRevenue.toLocaleString('en-IN')}</div>
+            <div className="text-[11px] text-emerald-700 font-semibold mt-1">₹{totalToolRevenue.toLocaleString('en-IN')} Tools • ₹{totalServiceRevenue.toLocaleString('en-IN')} Services</div>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -1023,10 +1033,31 @@ export default function AdminPage() {
         {/* TAB 2: PAID TOOLS & SUBSCRIPTIONS */}
         {activeTab === 'tool_purchases' && (
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Paid Compliance Suite Purchases & Access Control</h3>
-                <p className="text-xs text-slate-500">Live feed of all client suite purchases, unlock status, and manual grants</p>
+            {/* Sub-tab Navigation */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setToolsSubTab('tools')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    toolsSubTab === 'tools'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <Wrench className="w-3.5 h-3.5" />
+                  <span>Tool Licenses & Access ({toolPurchases.length})</span>
+                </button>
+                <button
+                  onClick={() => setToolsSubTab('transactions')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    toolsSubTab === 'transactions'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <Receipt className="w-3.5 h-3.5" />
+                  <span>Fee Invoices & Gateway Transactions ({payments.length})</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -1034,91 +1065,173 @@ export default function AdminPage() {
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    value={purchaseSearchQuery}
-                    onChange={(e) => setPurchaseSearchQuery(e.target.value)}
-                    placeholder="Search client, tool, order ID..."
+                    value={toolsSubTab === 'tools' ? purchaseSearchQuery : transactionSearchQuery}
+                    onChange={(e) => toolsSubTab === 'tools' ? setPurchaseSearchQuery(e.target.value) : setTransactionSearchQuery(e.target.value)}
+                    placeholder={toolsSubTab === 'tools' ? "Search client, tool, order ID..." : "Search payer, receipt, ID..."}
                     className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500"
                   />
                 </div>
-                <button
-                  onClick={() => setGrantModalOpen(true)}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-colors whitespace-nowrap cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Manual Tool Grant</span>
-                </button>
+                {toolsSubTab === 'tools' && (
+                  <button
+                    onClick={() => setGrantModalOpen(true)}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-colors whitespace-nowrap cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Manual Tool Grant</span>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Purchases Table */}
-            <div className="border border-slate-200 rounded-2xl overflow-hidden overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-                  <tr>
-                    <th className="p-3">Order ID / Date</th>
-                    <th className="p-3">Client</th>
-                    <th className="p-3">Tool Unlocked</th>
-                    <th className="p-3">Amount</th>
-                    <th className="p-3">Payment Mode</th>
-                    <th className="p-3">Access Status</th>
-                    <th className="p-3 text-center">Toggle Access</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {toolPurchases.filter(p => {
-                    if (!purchaseSearchQuery.trim()) return true;
-                    const q = purchaseSearchQuery.toLowerCase();
-                    return p.userName.toLowerCase().includes(q) ||
-                           p.userEmail.toLowerCase().includes(q) ||
-                           p.toolName.toLowerCase().includes(q) ||
-                           p.id.toLowerCase().includes(q);
-                  }).map((purchase) => (
-                    <tr key={purchase.id} className="hover:bg-slate-50">
-                      <td className="p-3">
-                        <div className="font-mono font-bold text-slate-900">{purchase.id}</div>
-                        <div className="text-[10px] text-slate-400">{new Date(purchase.createdAt).toLocaleDateString('en-IN')}</div>
-                      </td>
-                      <td className="p-3">
-                        <div className="font-bold text-slate-800">{purchase.userName}</div>
-                        <div className="text-[10px] text-slate-400">{purchase.userEmail} {purchase.userPhone && `• ${purchase.userPhone}`}</div>
-                      </td>
-                      <td className="p-3">
-                        <span className="font-semibold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-                          {purchase.toolName}
-                        </span>
-                      </td>
-                      <td className="p-3 font-mono font-bold text-slate-800">
-                        ₹{purchase.amount}
-                      </td>
-                      <td className="p-3">
-                        <span className="text-[10px] font-bold uppercase bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                          {purchase.paymentMode}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          purchase.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {purchase.status === 'active' ? '✓ Active Access' : 'Revoked'}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        <button
-                          onClick={() => handleTogglePurchase(purchase.id)}
-                          className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-colors ${
-                            purchase.status === 'active'
-                              ? 'bg-red-50 text-red-700 hover:bg-red-100'
-                              : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                          }`}
-                        >
-                          {purchase.status === 'active' ? 'Revoke Access' : 'Grant Access'}
-                        </button>
-                      </td>
+            {/* Sub-view 1: Tool Purchases & Access Table */}
+            {toolsSubTab === 'tools' && (
+              <div className="border border-slate-200 rounded-2xl overflow-hidden overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Order ID / Date</th>
+                      <th className="p-3">Client</th>
+                      <th className="p-3">Tool Unlocked</th>
+                      <th className="p-3">Amount</th>
+                      <th className="p-3">Payment Mode</th>
+                      <th className="p-3">Access Status</th>
+                      <th className="p-3 text-center">Toggle Access</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {toolPurchases.filter(p => {
+                      if (!purchaseSearchQuery.trim()) return true;
+                      const q = purchaseSearchQuery.toLowerCase();
+                      return p.userName.toLowerCase().includes(q) ||
+                             p.userEmail.toLowerCase().includes(q) ||
+                             p.toolName.toLowerCase().includes(q) ||
+                             p.id.toLowerCase().includes(q);
+                    }).map((purchase) => (
+                      <tr key={purchase.id} className="hover:bg-slate-50">
+                        <td className="p-3">
+                          <div className="font-mono font-bold text-slate-900">{purchase.id}</div>
+                          <div className="text-[10px] text-slate-400">{new Date(purchase.createdAt).toLocaleDateString('en-IN')}</div>
+                        </td>
+                        <td className="p-3">
+                          <div className="font-bold text-slate-800">{purchase.userName}</div>
+                          <div className="text-[10px] text-slate-400">{purchase.userEmail} {purchase.userPhone && `• ${purchase.userPhone}`}</div>
+                        </td>
+                        <td className="p-3">
+                          <span className="font-semibold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                            {purchase.toolName}
+                          </span>
+                        </td>
+                        <td className="p-3 font-mono font-bold text-slate-800">
+                          ₹{purchase.amount}
+                        </td>
+                        <td className="p-3">
+                          <span className="text-[10px] font-bold uppercase bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                            {purchase.paymentMode}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            purchase.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {purchase.status === 'active' ? '✓ Active Access' : 'Revoked'}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <button
+                            onClick={() => handleTogglePurchase(purchase.id)}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                              purchase.status === 'active'
+                                ? 'bg-red-50 text-red-700 hover:bg-red-100'
+                                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            }`}
+                          >
+                            {purchase.status === 'active' ? 'Revoke Access' : 'Grant Access'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Sub-view 2: All Gateway Payments & Invoices Table */}
+            {toolsSubTab === 'transactions' && (
+              <div className="border border-slate-200 rounded-2xl overflow-hidden overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Receipt / Payment ID</th>
+                      <th className="p-3">Payer Details</th>
+                      <th className="p-3">Service / Item</th>
+                      <th className="p-3">Amount</th>
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {payments.filter(p => {
+                      if (!transactionSearchQuery.trim()) return true;
+                      const q = transactionSearchQuery.toLowerCase();
+                      return p.payerName.toLowerCase().includes(q) ||
+                             (p.payerEmail && p.payerEmail.toLowerCase().includes(q)) ||
+                             p.payerPhone.includes(q) ||
+                             p.id.toLowerCase().includes(q) ||
+                             (p.razorpayPaymentId && p.razorpayPaymentId.toLowerCase().includes(q)) ||
+                             p.planName.toLowerCase().includes(q);
+                    }).map((payment) => (
+                      <tr key={payment.id} className="hover:bg-slate-50">
+                        <td className="p-3">
+                          <div className="font-mono font-bold text-slate-900">{payment.id}</div>
+                          {payment.razorpayPaymentId ? (
+                            <div className="text-[10px] font-mono text-slate-400">Ref: {payment.razorpayPaymentId}</div>
+                          ) : (
+                            <div className="text-[10px] font-mono text-slate-400">Order: {payment.razorpayOrderId?.slice(-10)}</div>
+                          )}
+                        </td>
+                        <td className="p-3">
+                          <div className="font-bold text-slate-800">{payment.payerName}</div>
+                          <div className="text-[10px] text-slate-400">
+                            {payment.payerEmail && `${payment.payerEmail} • `}
+                            {payment.payerPhone}
+                            {payment.panNumber && ` • PAN: ${payment.panNumber}`}
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <span className="font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            {payment.planName || payment.service || 'CA Engagement'}
+                          </span>
+                        </td>
+                        <td className="p-3 font-mono font-extrabold text-slate-900">
+                          ₹{payment.amount}
+                        </td>
+                        <td className="p-3 text-slate-500">
+                          {new Date(payment.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </td>
+                        <td className="p-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            payment.status === 'paid' 
+                              ? 'bg-emerald-100 text-emerald-800' 
+                              : payment.status === 'created'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {payment.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {payments.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-400">
+                          No payment transactions recorded yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

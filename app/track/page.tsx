@@ -45,7 +45,7 @@ interface FilingTrackItem {
 
 function TrackContent() {
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
+  const initialQuery = searchParams.get('q') || searchParams.get('query') || '';
 
   const [query, setQuery] = useState(initialQuery);
   const [loading, setLoading] = useState(false);

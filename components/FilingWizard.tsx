@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { useAuth } from '@/context/AuthContext';
 import { 
   FileText, 
   Briefcase, 
@@ -83,6 +84,8 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
   const [selectedService, setSelectedService] = useState(initialService || SERVICE_OPTIONS[0].id);
   const [selectedPlan, setSelectedPlan] = useState(SERVICE_OPTIONS[0].plans[0].id);
   
+  const { user } = useAuth();
+
   // Form Fields
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
@@ -91,6 +94,15 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
   const [city, setCity] = useState('');
   const [clientNotes, setClientNotes] = useState('');
   
+  // Auto pre-fill if client is logged in
+  useEffect(() => {
+    if (user) {
+      if (user.name && !fullName) setFullName(user.name);
+      if (user.phone && !mobile) setMobile(user.phone.replace(/\D/g, '').slice(-10));
+      if (user.email && !email) setEmail(user.email);
+    }
+  }, [user]);
+
   // File uploads
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string; type: string }[]>([]);
   
@@ -134,6 +146,7 @@ export default function FilingWizard({ initialService }: FilingWizardProps) {
 
     try {
       const payload = {
+        userId: user?.id || undefined,
         service: selectedService,
         plan: selectedPlan,
         fullName: fullName.trim(),

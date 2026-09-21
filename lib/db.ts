@@ -114,8 +114,24 @@ export function createFiling(data: Partial<FilingItem>): FilingItem {
   const randomNum = Math.floor(1000 + Math.random() * 9000);
   const newId = `TRAC-${year}-${randomNum}`;
 
+  // Auto-resolve userId if not explicitly passed
+  let resolvedUserId = data.userId;
+  if (!resolvedUserId && (data.email || data.mobile)) {
+    const cleanEmail = data.email?.toLowerCase().trim();
+    const cleanMobile = data.mobile?.replace(/\D/g, '').slice(-10);
+    const existingUsers = getUsers();
+    const existingUser = existingUsers.find(u => 
+      (cleanEmail && u.email && u.email.toLowerCase().trim() === cleanEmail) ||
+      (cleanMobile && u.phone && u.phone.replace(/\D/g, '').slice(-10) === cleanMobile)
+    );
+    if (existingUser) {
+      resolvedUserId = existingUser.id;
+    }
+  }
+
   const newFiling: FilingItem = {
     id: newId,
+    userId: resolvedUserId || undefined,
     service: data.service || 'ITR Filing',
     plan: data.plan || 'Standard CA Assisted Filing',
     fullName: data.fullName || 'Anonymous Client',
@@ -124,9 +140,11 @@ export function createFiling(data: Partial<FilingItem>): FilingItem {
     panNumber: data.panNumber ? data.panNumber.toUpperCase() : undefined,
     city: data.city || 'India',
     financialYear: data.financialYear || 'FY 2024-25 (AY 2025-26)',
-    status: 'new',
+    status: data.status || 'new',
+    estimatedRefund: data.estimatedRefund !== undefined ? data.estimatedRefund : undefined,
+    assignedCA: data.assignedCA || undefined,
     clientNotes: data.clientNotes || '',
-    notes: [
+    notes: data.notes && data.notes.length > 0 ? data.notes : [
       {
         id: `note-${Date.now()}`,
         date: new Date().toISOString(),
@@ -135,7 +153,7 @@ export function createFiling(data: Partial<FilingItem>): FilingItem {
       }
     ],
     documents: data.documents || [],
-    timeline: [
+    timeline: data.timeline && data.timeline.length > 0 ? data.timeline : [
       {
         step: '1',
         title: 'Application Received',
@@ -183,6 +201,29 @@ export function createFiling(data: Partial<FilingItem>): FilingItem {
 
   filings.unshift(newFiling);
   saveFilings(filings);
+
+  // Auto-sync into Leads CRM so Admin CRM tab (Tab 4) is always updated
+  try {
+    const existingLeads = getLeads();
+    const isAlreadyLead = existingLeads.some(l => 
+      (l.message && l.message.includes(newId)) ||
+      (l.mobile && newFiling.mobile && l.mobile.replace(/\D/g, '').slice(-10) === newFiling.mobile.replace(/\D/g, '').slice(-10) && l.serviceInterest?.includes(newFiling.service))
+    );
+    if (!isAlreadyLead) {
+      createLead({
+        fullName: newFiling.fullName,
+        mobile: newFiling.mobile,
+        email: newFiling.email,
+        serviceInterest: `${newFiling.service} (${newFiling.plan})`,
+        message: `Filing Ref: ${newId}. Plan: ${newFiling.plan}. ${newFiling.clientNotes ? 'Notes: ' + newFiling.clientNotes : ''}`.trim(),
+        city: newFiling.city || 'India',
+        source: resolvedUserId ? 'Client Portal Booking' : 'Online Filing Intake'
+      });
+    }
+  } catch (leadErr) {
+    console.error('Failed to auto-replicate filing to CRM leads:', leadErr);
+  }
+
   return newFiling;
 }
 
@@ -407,7 +448,8 @@ export function updateUser(idOrEmail: string, updates: Partial<User>): User | nu
 
 export function toggleUserToolAccess(userId: string, toolId: string, grant: boolean): boolean {
   const users = getUsers();
-  const idx = users.findIndex(u => u.id === userId);
+  const searchId = (userId || '').trim().toLowerCase();
+  const idx = users.findIndex(u => u.id.toLowerCase() === searchId || (u.email && u.email.toLowerCase() === searchId));
   if (idx === -1) return false;
 
   const current = new Set(users[idx].unlockedTools || FREE_TOOLS);
@@ -614,13 +656,14 @@ export function syncUserPurchasedTools(user: User): User {
 
   // 1. Check all active tool purchases in tool_purchases.json
   const purchases = getToolPurchases();
-  const userPurchases = purchases.filter(p => 
-    p.status === 'active' && (
-      (p.userId && p.userId === user.id) ||
-      (p.userEmail && user.email && p.userEmail.toLowerCase() === user.email.toLowerCase()) ||
-      (p.userPhone && user.phone && p.userPhone.trim() !== '' && p.userPhone === user.phone)
-    )
-  );
+  const userPurchases = purchases.filter(p => {
+    if (p.status !== 'active') return false;
+    if (p.userId && p.userId === user.id) return true;
+    if (p.userEmail && user.email && p.userEmail.toLowerCase().trim() === user.email.toLowerCase().trim()) return true;
+    const pPhone = (p.userPhone || '').replace(/\D/g, '').slice(-10);
+    const uPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+    return Boolean(pPhone && uPhone && pPhone.length >= 10 && pPhone === uPhone);
+  });
 
   userPurchases.forEach(p => {
     if (p.toolId === 'all-access-pass' || p.toolId === 'all-access') {
@@ -633,13 +676,14 @@ export function syncUserPurchasedTools(user: User): User {
 
   // 2. Check verified payments in payments.json
   const payments = getPayments();
-  const userPayments = payments.filter(p =>
-    p.status === 'paid' && (
-      (p.notes?.userId && p.notes.userId === user.id) ||
-      (p.payerEmail && user.email && p.payerEmail.toLowerCase() === user.email.toLowerCase()) ||
-      (p.payerPhone && user.phone && p.payerPhone.trim() !== '' && p.payerPhone === user.phone)
-    )
-  );
+  const userPayments = payments.filter(p => {
+    if (p.status !== 'paid') return false;
+    if (p.notes?.userId && p.notes.userId === user.id) return true;
+    if (p.payerEmail && user.email && p.payerEmail.toLowerCase().trim() === user.email.toLowerCase().trim()) return true;
+    const pPhone = (p.payerPhone || '').replace(/\D/g, '').slice(-10);
+    const uPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+    return Boolean(pPhone && uPhone && pPhone.length >= 10 && pPhone === uPhone);
+  });
 
   userPayments.forEach(p => {
     const tid = p.notes?.toolId;
@@ -682,34 +726,37 @@ export function getUserPortalData(userIdOrEmail: string) {
 
   // Always reconcile tools first
   const syncedUser = syncUserPurchasedTools(user);
+  const userPhoneClean = (syncedUser.phone || '').replace(/\D/g, '').slice(-10);
+  const userEmailClean = (syncedUser.email || '').toLowerCase().trim();
 
   // Filings matching user id, email, or mobile
   const allFilings = getFilings();
-  const userFilings = allFilings.filter(f =>
-    (f.userId && f.userId === syncedUser.id) ||
-    (f.email && syncedUser.email && f.email.toLowerCase() === syncedUser.email.toLowerCase()) ||
-    (f.mobile && syncedUser.phone && f.mobile.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
-  );
+  const userFilings = allFilings.filter(f => {
+    if (f.userId && f.userId === syncedUser.id) return true;
+    if (f.email && userEmailClean && f.email.toLowerCase().trim() === userEmailClean) return true;
+    const fPhone = (f.mobile || '').replace(/\D/g, '').slice(-10);
+    return Boolean(fPhone && userPhoneClean && fPhone.length >= 10 && fPhone === userPhoneClean);
+  });
 
   // Tool purchases matching user id, email, or phone
   const allPurchases = getToolPurchases();
-  const userPurchases = allPurchases.filter(p =>
-    p.status === 'active' && (
-      (p.userId && p.userId === syncedUser.id) ||
-      (p.userEmail && syncedUser.email && p.userEmail.toLowerCase() === syncedUser.email.toLowerCase()) ||
-      (p.userPhone && syncedUser.phone && p.userPhone.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
-    )
-  );
+  const userPurchases = allPurchases.filter(p => {
+    if (p.status !== 'active') return false;
+    if (p.userId && p.userId === syncedUser.id) return true;
+    if (p.userEmail && userEmailClean && p.userEmail.toLowerCase().trim() === userEmailClean) return true;
+    const pPhone = (p.userPhone || '').replace(/\D/g, '').slice(-10);
+    return Boolean(pPhone && userPhoneClean && pPhone.length >= 10 && pPhone === userPhoneClean);
+  });
 
   // Payments matching user id, email, or phone
   const allPayments = getPayments();
-  const userPayments = allPayments.filter(p =>
-    (p.status === 'paid' || p.status === 'created') && (
-      (p.notes?.userId && p.notes.userId === syncedUser.id) ||
-      (p.payerEmail && syncedUser.email && p.payerEmail.toLowerCase() === syncedUser.email.toLowerCase()) ||
-      (p.payerPhone && syncedUser.phone && p.payerPhone.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
-    )
-  );
+  const userPayments = allPayments.filter(p => {
+    if (p.status !== 'paid' && p.status !== 'created') return false;
+    if (p.notes?.userId && p.notes.userId === syncedUser.id) return true;
+    if (p.payerEmail && userEmailClean && p.payerEmail.toLowerCase().trim() === userEmailClean) return true;
+    const pPhone = (p.payerPhone || '').replace(/\D/g, '').slice(-10);
+    return Boolean(pPhone && userPhoneClean && pPhone.length >= 10 && pPhone === userPhoneClean);
+  });
 
   const { password: _, ...safeUser } = syncedUser as any;
 

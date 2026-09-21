@@ -183,6 +183,25 @@ export default function ClientDashboard() {
         setProfileName(user.name || '');
         setProfilePhone(user.phone || '');
         setProfileAvatar(user.avatar || '');
+
+        // Reconcile server documents into Document Vault
+        const serverDocs: VaultDoc[] = [];
+        (data.filings || []).forEach((f: any) => {
+          (f.documents || []).forEach((d: any) => {
+            serverDocs.push({
+              id: d.id || `doc-${Date.now()}`,
+              name: d.name,
+              size: typeof d.size === 'number' ? `${(d.size / (1024 * 1024)).toFixed(2)} MB` : (d.size || '1.0 MB'),
+              type: d.type || (d.name?.endsWith('.pdf') ? 'PDF Document' : d.name?.endsWith('.xlsx') ? 'Excel Spreadsheet' : 'Tax Document'),
+              category: (d.name || '').toLowerCase().includes('form16') || (d.name || '').toLowerCase().includes('itr') ? 'Tax Returns' : 'Financials',
+              uploadDate: d.uploadDate ? (d.uploadDate.includes('T') ? new Date(d.uploadDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : d.uploadDate) : 'Verified',
+              status: 'verified'
+            });
+          });
+        });
+        if (serverDocs.length > 0) {
+          setVaultDocs(serverDocs);
+        }
       }
     } catch (err) {
       console.error('Error loading portal data:', err);
@@ -370,36 +389,73 @@ export default function ClientDashboard() {
     }
   };
 
-  // Vault File Upload Handler
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Vault File Upload Handler (Synced with Server & Admin Case Drawer)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0 || !user) return;
 
     setIsUploading(true);
-    const newDocs: VaultDoc[] = [];
+    try {
+      for (const file of Array.from(files)) {
+        const sizeStr = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+        const typeStr = file.type.includes('pdf') ? 'PDF Document' : file.name.endsWith('.xlsx') ? 'Excel Spreadsheet' : 'Tax Document';
 
-    Array.from(files).forEach((file, index) => {
-      const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-      newDocs.push({
-        id: `doc-${Date.now()}-${index}`,
-        name: file.name,
-        size: sizeStr,
-        type: file.type.includes('pdf') ? 'PDF Document' : file.name.endsWith('.xlsx') ? 'Excel Spreadsheet' : 'Tax Document',
-        category: file.name.toLowerCase().includes('form16') || file.name.toLowerCase().includes('itr') ? 'Tax Returns' : 'Financials',
-        uploadDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-        status: 'under_review'
-      });
-    });
+        const res = await fetch('/api/user/portal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'upload_vault_document',
+            userId: user.id,
+            email: user.email,
+            name: file.name,
+            size: sizeStr,
+            type: typeStr
+          })
+        });
 
-    setTimeout(() => {
-      setVaultDocs(prev => [...newDocs, ...prev]);
+        const resData = await res.json();
+        if (res.ok && resData.document) {
+          setVaultDocs(prev => [
+            {
+              id: resData.document.id,
+              name: resData.document.name,
+              size: resData.document.size,
+              type: resData.document.type,
+              category: resData.document.name.toLowerCase().includes('form16') || resData.document.name.toLowerCase().includes('itr') ? 'Tax Returns' : 'Financials',
+              uploadDate: resData.document.uploadDate,
+              status: 'verified'
+            },
+            ...prev
+          ]);
+        }
+      }
+      await loadPortalData();
+    } catch (uploadErr) {
+      console.error('Failed to upload document to vault:', uploadErr);
+    } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
-    }, 600);
+    }
   };
 
-  const handleDeleteDoc = (id: string) => {
+  const handleDeleteDoc = async (id: string) => {
     setVaultDocs(prev => prev.filter(d => d.id !== id));
+    if (user) {
+      try {
+        await fetch('/api/user/portal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_vault_document',
+            userId: user.id,
+            email: user.email,
+            docId: id
+          })
+        });
+      } catch (err) {
+        console.error('Failed to delete doc:', err);
+      }
+    }
   };
 
   // 4 Advance/Pro Tools Catalog
@@ -1027,7 +1083,7 @@ export default function ClientDashboard() {
 
                         <div className="flex items-center gap-2">
                           <Link
-                            href={`/track?query=${encodeURIComponent(filing.id)}`}
+                            href={`/track?q=${encodeURIComponent(filing.id)}`}
                             className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5"
                           >
                             <span>Track ARN</span>
