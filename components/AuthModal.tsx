@@ -132,23 +132,23 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden"
+        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Header Bar */}
-        <div className="h-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600" />
+        <div className="h-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 shrink-0" />
 
         {/* Close Button */}
         <button
           onClick={() => { closeAuthModal(); setGooglePromptOpen(false); setError(''); }}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer z-10"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-5 sm:p-8 overflow-y-auto">
           {/* Logo & Headline */}
           <div className="text-center mb-6">
             <div className="relative w-16 h-16 mx-auto mb-2.5">

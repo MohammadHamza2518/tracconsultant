@@ -69,7 +69,7 @@ interface VaultDoc {
 }
 
 export default function ClientDashboard() {
-  const { user, isLoading, hasToolAccess, login, register, loginWithGoogle, logout, refreshUser, updateUserProfile } = useAuth();
+  const { user, isLoading, hasToolAccess, login, register, loginWithGoogle, logout, refreshUser, updateUserProfile, openAuthModal } = useAuth();
   const { toolPrices, getToolPrice } = useConfig();
   
   // Tab navigation
@@ -314,17 +314,16 @@ export default function ClientDashboard() {
 
   const handleGooglePortalLogin = async () => {
     setAuthError('');
-    setAuthLoading(true);
-    const googlePromptEmail = authEmail.trim() || prompt('Enter your Google Account email address:') || '';
-    if (!googlePromptEmail) {
+    if (authEmail.trim()) {
+      setAuthLoading(true);
+      const res = await loginWithGoogle(authEmail.trim());
+      if (!res.success) {
+        setAuthError(res.error || 'Google authentication failed.');
+      }
       setAuthLoading(false);
-      return;
+    } else {
+      openAuthModal('login');
     }
-    const res = await loginWithGoogle(googlePromptEmail);
-    if (!res.success) {
-      setAuthError(res.error || 'Google authentication failed.');
-    }
-    setAuthLoading(false);
   };
 
   // Service Booking Handler
