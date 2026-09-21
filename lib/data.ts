@@ -95,6 +95,28 @@ export const TOOLS_LIST: ToolConfig[] = [
     ]
   },
 
+  // 4. Capital Gain Calculator (LTCG & STCG - Budget 2024 Updated)
+  {
+    id: 'capital-gain-calculator',
+    name: 'Capital Gain Tax Calculator (LTCG & STCG)',
+    slug: 'capital-gain-calculator',
+    category: 'free',
+    price: 0,
+    badge: 'BUDGET 2024',
+    shortDesc: 'Compute LTCG & STCG on Shares, Property, Gold & Mutual Funds with latest 12.5% & 20% rates.',
+    description: 'Advanced Capital Gains Tax calculator reflecting Union Budget 2024 amendments. Features listed equity 12.5% LTCG & 20% STCG, ₹1.25L exemption, real estate 12.5% vs 20% with CII dual comparison, Section 54/54EC exemptions & instant computation PDF.',
+    icon: 'TrendingUp',
+    tags: ['Capital Gains', 'LTCG', 'STCG', 'Budget 2024', 'Shares', 'Real Estate', 'Section 54'],
+    features: [
+      'Union Budget 2024 updated: 12.5% LTCG & 20% STCG',
+      'Increased ₹1,25,000 equity exemption u/s 112A',
+      'Real Estate Dual Option: 12.5% without indexation vs 20% with CII comparison',
+      'Section 54, 54EC (Bonds) & 54F tax reinvestment deductions',
+      'Complete CBDT Cost Inflation Index (CII) table (2001 to 2025)',
+      '1-Click Official Capital Gains Computation PDF export'
+    ]
+  },
+
   // 8 FREE & BASIC TOOLS
   {
     id: 'hra-calculator',

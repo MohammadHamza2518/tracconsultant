@@ -790,7 +790,7 @@ export default function Navbar() {
                           Tax &amp; Compliance Software Suite
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          11 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
+                          12 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
                         </p>
                       </div>
                     </div>
@@ -847,6 +847,7 @@ export default function Navbar() {
                             'ecommerce-gst-converter': ShoppingCart,
                             'gstin-search': ShieldCheck,
                             'hsn-search': Hash,
+                            'capital-gain-calculator': TrendingUp,
                             'hra-calculator': Calculator,
                             'advance-tax-calculator': Calendar,
                             'tax-calculator': TrendingUp,

@@ -189,7 +189,7 @@ export default function ClientDashboard() {
             completedFilings: (data.filings || []).filter((f: any) => f.status === 'completed').length,
             activeQueries: (data.queries || []).filter((q: any) => q.status !== 'resolved').length,
             resolvedQueries: (data.queries || []).filter((q: any) => q.status === 'resolved').length,
-            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'ecommerce-gst-converter', 'gstin-search', 'hsn-search'].includes(t)).length,
+            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'ecommerce-gst-converter', 'gstin-search', 'hsn-search', 'capital-gain-calculator'].includes(t)).length,
             verifiedPayments: (data.payments || []).length
           }
         });
@@ -1472,88 +1472,115 @@ export default function ClientDashboard() {
                     <Sparkles className="w-3 h-3 text-emerald-600" />
                     <span>NEW SUITE TOOLS • 100% FREE ACCESS</span>
                   </div>
-                  <h2 className="text-lg font-black text-slate-900">E-Commerce &amp; GST Compliance Launchpad</h2>
-                  <p className="text-xs text-slate-500">Official GST portal utilities for marketplace sellers, CAs, and business verifications.</p>
+                  <h2 className="text-lg font-black text-slate-900">Featured Compliance Suite Launchpad</h2>
+                  <p className="text-xs text-slate-500">Official GST portal utilities, Capital Gains calculator &amp; business verifications.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* 1. E-Commerce Converter */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* 1. Capital Gain Calculator */}
                 <Link
-                  href="/tools/ecommerce-gst-converter"
-                  className="p-5 bg-gradient-to-br from-[#0B2545] to-slate-900 text-white rounded-3xl border border-slate-700 hover:border-emerald-400 shadow-md hover:shadow-xl transition-all group flex flex-col justify-between"
+                  href="/tools/capital-gain-calculator"
+                  className="p-5 bg-gradient-to-br from-[#0B2545] to-[#133763] text-white rounded-3xl border border-slate-700 hover:border-emerald-400 shadow-md hover:shadow-xl transition-all group flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shadow-sm group-hover:scale-110 transition-transform">
-                        <ShoppingCart className="w-5 h-5 text-slate-950" />
+                        <TrendingUp className="w-5 h-5 text-slate-950" />
                       </div>
                       <span className="text-[10px] font-black uppercase bg-emerald-400 text-slate-950 px-2 py-0.5 rounded-full">
-                        NEW • FREE
+                        BUDGET 2024
                       </span>
                     </div>
                     <h3 className="text-sm font-black group-hover:text-emerald-300 transition-colors">
-                      E-Commerce GSTR-1 &amp; TCS Converter
+                      Capital Gain Tax Calculator
                     </h3>
                     <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                      Convert Amazon MTR, Flipkart &amp; Meesho sales into Table 7 B2CS JSON with 1% Sec 52 TCS credit.
+                      LTCG 12.5% &amp; STCG 20% on Shares, Property 12.5% vs 20% CII dual choice &amp; 54/54EC bonds.
                     </p>
                   </div>
                   <div className="pt-4 mt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-emerald-400 group-hover:text-emerald-300">
+                    <span>Compute Capital Gains</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* 2. E-Commerce Converter */}
+                <Link
+                  href="/tools/ecommerce-gst-converter"
+                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <ShoppingCart className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                        NEW • FREE
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-black group-hover:text-emerald-700 transition-colors">
+                      E-Commerce GSTR-1 &amp; TCS
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                      Amazon MTR, Flipkart &amp; Meesho sales to Table 7 B2CS JSON + Sec 52 TCS passbook.
+                    </p>
+                  </div>
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
                     <span>Launch Converter</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
 
-                {/* 2. GSTIN Search & Verification */}
+                {/* 3. GSTIN Search & Verification */}
                 <Link
                   href="/tools/gstin-search"
                   className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
-                        <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <ShieldCheck className="w-6 h-6 text-blue-600" />
                       </div>
-                      <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="text-[10px] font-bold uppercase bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
                         1-CLICK PDF
                       </span>
                     </div>
-                    <h3 className="text-sm font-black group-hover:text-emerald-700 transition-colors">
+                    <h3 className="text-sm font-black group-hover:text-blue-700 transition-colors">
                       GSTIN Search &amp; Verification
                     </h3>
                     <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                      Verify any 15-digit GSTIN, check active legal profile, 6-month returns, and download verified A4 PDF report.
+                      15-digit structural breakdown, legal profile, 6-month returns &amp; official PDF report.
                     </p>
                   </div>
-                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
-                    <span>Verify &amp; Download PDF</span>
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                    <span>Verify &amp; Download</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
 
-                {/* 3. HSN & SAC Code Finder */}
+                {/* 4. HSN & SAC Code Finder */}
                 <Link
                   href="/tools/hsn-search"
-                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
+                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-purple-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
-                        <Hash className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <Hash className="w-5 h-5 text-purple-600" />
                       </div>
-                      <span className="text-[10px] font-bold uppercase bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                      <span className="text-[10px] font-bold uppercase bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">
                         150+ CODES
                       </span>
                     </div>
-                    <h3 className="text-sm font-black group-hover:text-blue-700 transition-colors">
-                      HSN &amp; SAC Code Search Tool
+                    <h3 className="text-sm font-black group-hover:text-purple-700 transition-colors">
+                      HSN &amp; SAC Code Search
                     </h3>
                     <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                      Instant product keyword &amp; code search with applicable 0%, 5%, 12%, 18%, 28% GST tax rates &amp; 1-click copy.
+                      Instant product keyword &amp; code search with applicable GST rates (0-28%) &amp; copy code.
                     </p>
                   </div>
-                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600 group-hover:text-purple-700">
                     <span>Search HSN Codes</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>

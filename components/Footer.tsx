@@ -136,7 +136,8 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li><Link href="/calculators" className="text-emerald-400 font-bold hover:underline">19 Free Calculators Hub &rarr;</Link></li>
-              <li><Link href="/tools" className="hover:text-white transition-colors font-bold text-slate-200">Compliance Suite Hub (15 Tools) &rarr;</Link></li>
+              <li><Link href="/tools" className="hover:text-white transition-colors font-bold text-slate-200">Compliance Suite Hub (16 Tools) &rarr;</Link></li>
+              <li><Link href="/tools/capital-gain-calculator" className="text-emerald-400 hover:text-emerald-300 transition-colors font-semibold">Capital Gain Calculator (Budget 2024)</Link></li>
               <li><Link href="/tools/ecommerce-gst-converter" className="text-emerald-400 hover:text-emerald-300 transition-colors">E-Commerce GSTR-1 & TCS (Free)</Link></li>
               <li><Link href="/tools/gstin-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">GSTIN Search & Verified PDF (Free)</Link></li>
               <li><Link href="/tools/hsn-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">HSN & SAC Code Finder (Free)</Link></li>
