@@ -606,43 +606,48 @@ export default function ClientDashboard() {
   // 3. Authenticated: Systematic Client Control Panel
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-16">
+    <div className="min-h-screen bg-slate-50/50 pb-28 sm:pb-24">
       
       {/* Top Client Header Strip */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             
             {/* User Details */}
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xl flex items-center justify-center shadow-md shadow-emerald-900/10">
+            <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-emerald-900/10 shrink-0">
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-full h-full rounded-2xl object-cover" />
                 ) : (
                   user.name.charAt(0).toUpperCase()
                 )}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight truncate">
                     {user.name}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                     {user.role === 'admin' ? 'Administrator' : 'Verified Taxpayer'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {user.email} • Client ID: <span className="font-mono font-bold text-slate-700">TRAC-CL-{user.id.slice(-6).toUpperCase()}</span>
-                </p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 mt-1">
+                  <span className="truncate max-w-[220px] sm:max-w-none">{user.email}</span>
+                  <span className="hidden sm:inline text-slate-300">•</span>
+                  <span className="inline-flex items-center gap-1 font-mono text-[11px] sm:text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200/80 whitespace-nowrap shrink-0">
+                    <span className="font-sans text-slate-500">Client ID:</span>
+                    <strong className="text-slate-800">TRAC-CL-{user.id.slice(-6).toUpperCase()}</strong>
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Header Action Buttons */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               <button
                 onClick={loadPortalData}
                 disabled={isDataLoading}
-                className="p-2 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer"
+                className="p-2 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer shrink-0"
                 title="Refresh Portal Data"
               >
                 <RefreshCw className={`w-4 h-4 ${isDataLoading ? 'animate-spin' : ''}`} />
@@ -652,7 +657,7 @@ export default function ClientDashboard() {
                 href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20am%20logged%20into%20my%20Client%20Portal%20and%20need%20CA%20assistance."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5"
+                className="py-2 px-3 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
               >
                 <PhoneCall className="w-3.5 h-3.5" />
                 <span>Assigned CA Desk</span>
@@ -660,7 +665,7 @@ export default function ClientDashboard() {
 
               <button
                 onClick={logout}
-                className="py-2 px-3 text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-red-50 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                className="py-2 px-3 text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-red-50 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Sign Out</span>
@@ -670,156 +675,170 @@ export default function ClientDashboard() {
           </div>
 
           {/* Quick Metrics Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
             
             <div 
               onClick={() => setActiveTab('filings')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                activeTab === 'filings' ? 'bg-emerald-50/70 border-emerald-300 shadow-xs' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
+              className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[110px] ${
+                activeTab === 'filings' ? 'bg-emerald-50/70 border-emerald-400 shadow-xs ring-1 ring-emerald-400/20' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
               }`}
             >
-              <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Services &amp; Filings</span>
+              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate">Services &amp; Filings</span>
               </div>
-              <div className="text-2xl font-black text-slate-900 mt-1">
-                {portalData.filings.length}
+              <div className="my-1.5">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 leading-none">
+                  {portalData.filings.length}
+                </div>
               </div>
-              <div className="text-[11px] text-emerald-600 font-semibold mt-0.5">
-                {portalData.stats.activeFilings} active • {portalData.stats.completedFilings} completed
+              <div className="text-[10px] sm:text-[11px] text-emerald-700 font-semibold truncate">
+                {portalData.stats.activeFilings} active • {portalData.stats.completedFilings} done
               </div>
             </div>
 
             <div 
               onClick={() => setActiveTab('tools')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                activeTab === 'tools' ? 'bg-indigo-50/70 border-indigo-300 shadow-xs' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
+              className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[110px] ${
+                activeTab === 'tools' ? 'bg-indigo-50/70 border-indigo-400 shadow-xs ring-1 ring-indigo-400/20' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
               }`}
             >
-              <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Paid Compliance Tools</span>
+              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                <span className="truncate">Paid Tools</span>
               </div>
-              <div className="text-2xl font-black text-indigo-900 mt-1">
-                {hasAllAccess ? 'All 4 Pro' : `${portalData.stats.unlockedPaidTools} Unlocked`}
+              <div className="my-1.5">
+                <div className="text-xl sm:text-2xl font-black text-indigo-900 leading-none truncate">
+                  {hasAllAccess ? 'All 4 Pro' : `${portalData.stats.unlockedPaidTools} Unlocked`}
+                </div>
               </div>
-              <div className="text-[11px] text-indigo-600 font-semibold mt-0.5">
-                {hasAllAccess ? 'All-Access Pass Active' : 'Lifetime Digital Licenses'}
+              <div className="text-[10px] sm:text-[11px] text-indigo-700 font-semibold truncate">
+                {hasAllAccess ? 'All-Access Pass' : 'Lifetime Licenses'}
               </div>
             </div>
 
             <div 
               onClick={() => setActiveTab('payments')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                activeTab === 'payments' ? 'bg-teal-50/70 border-teal-300 shadow-xs' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
+              className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[110px] ${
+                activeTab === 'payments' ? 'bg-teal-50/70 border-teal-400 shadow-xs ring-1 ring-teal-400/20' : 'bg-slate-50/80 border-slate-200/80 hover:bg-slate-100/70'
               }`}
             >
-              <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Receipt className="w-3.5 h-3.5 text-teal-600" />
-                <span>Invoices &amp; Receipts</span>
+              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Receipt className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                <span className="truncate">Invoices &amp; Receipts</span>
               </div>
-              <div className="text-2xl font-black text-slate-900 mt-1">
-                {portalData.payments.length}
+              <div className="my-1.5">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 leading-none">
+                  {portalData.payments.length}
+                </div>
               </div>
-              <div className="text-[11px] text-teal-600 font-semibold mt-0.5">
+              <div className="text-[10px] sm:text-[11px] text-teal-700 font-semibold truncate">
                 100% Tax Compliant
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80">
-              <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>CA Advisory Cell</span>
+            <a 
+              href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20to%20connect%20with%20Senior%20CA%20Desk."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-emerald-50/40 hover:border-emerald-200 transition-all flex flex-col justify-between min-h-[110px] cursor-pointer group"
+            >
+              <div className="text-[10px] sm:text-[11px] font-bold text-slate-500 group-hover:text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate">CA Advisory Cell</span>
               </div>
-              <div className="text-xs font-black text-slate-900 mt-2 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Senior CA Desk Live</span>
+              <div className="my-1.5">
+                <div className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-emerald-800 flex items-center gap-1.5 truncate">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="truncate">Senior CA Desk Live</span>
+                </div>
               </div>
-              <div className="text-[11px] text-slate-500 font-medium mt-1">
-                Direct Helpline: +91 7275922162
+              <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate group-hover:text-emerald-700">
+                Helpline: +91 7275922162
               </div>
+            </a>
+
+          </div>
+
+          {/* Tab Navigation Strip - Responsive Segmented Control */}
+          <div className="mt-6 pt-4 border-t border-slate-100">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200/80">
+              <button
+                onClick={() => setActiveTab('filings')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'filings'
+                    ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <FileText className={`w-3.5 h-3.5 ${activeTab === 'filings' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                <span>My Services &amp; Filings ({portalData.filings.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('tools')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'tools'
+                    ? 'bg-white text-indigo-900 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Zap className={`w-3.5 h-3.5 ${activeTab === 'tools' ? 'text-indigo-600' : 'text-slate-400'}`} />
+                <span>Paid Compliance Tools</span>
+                {hasAllAccess && (
+                  <span className="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.5 rounded-full font-black">ALL-ACCESS</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('payments')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'payments'
+                    ? 'bg-white text-teal-900 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Receipt className={`w-3.5 h-3.5 ${activeTab === 'payments' ? 'text-teal-600' : 'text-slate-400'}`} />
+                <span>Invoices &amp; Payments ({portalData.payments.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('vault')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'vault'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <FolderLock className={`w-3.5 h-3.5 ${activeTab === 'vault' ? 'text-slate-800' : 'text-slate-400'}`} />
+                <span>Document Vault</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('new_service')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'new_service'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-emerald-700 hover:bg-emerald-50/80'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Book New Service</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'profile'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <UserIcon className={`w-3.5 h-3.5 ${activeTab === 'profile' ? 'text-slate-800' : 'text-slate-400'}`} />
+                <span>Account &amp; Security</span>
+              </button>
             </div>
-
           </div>
-
-          {/* Tab Navigation Strip */}
-          <div className="flex items-center gap-2 overflow-x-auto pt-6 border-t border-slate-100 mt-6 no-scrollbar">
-            <button
-              onClick={() => setActiveTab('filings')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'filings'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>My Services &amp; Filings ({portalData.filings.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('tools')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'tools'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Zap className="w-4 h-4" />
-              <span>My Active Paid Tools</span>
-              {hasAllAccess && (
-                <span className="bg-indigo-200 text-indigo-900 text-[10px] px-1.5 py-0.2 rounded-full font-black">ALL-ACCESS</span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab('payments')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'payments'
-                  ? 'bg-teal-700 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Receipt className="w-4 h-4" />
-              <span>Invoices &amp; Payments ({portalData.payments.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('vault')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'vault'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <FolderLock className="w-4 h-4" />
-              <span>Document Vault</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('new_service')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'new_service'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-emerald-700 hover:bg-emerald-50'
-              }`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Book New Service</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ml-auto ${
-                activeTab === 'profile'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <UserIcon className="w-4 h-4" />
-              <span>Account &amp; Security</span>
-            </button>
-          </div>
-
         </div>
       </div>
 

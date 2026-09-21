@@ -208,7 +208,7 @@ export default function ServicesDirectoryPage() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                    className={`shrink-0 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                       activeCategory === cat.id
                         ? 'bg-[#00a859] text-white shadow-md shadow-emerald-600/20'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'

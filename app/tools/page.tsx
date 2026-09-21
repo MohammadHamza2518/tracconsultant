@@ -134,7 +134,7 @@ export default function ToolsHubPage() {
                 filter === 'free' ? 'bg-white text-emerald-700 shadow-sm' : 'hover:text-emerald-700'
               }`}
             >
-              Free Calculators (3)
+              Free Utilities ({TOOLS_LIST.filter(t => t.category === 'free').length})
             </button>
             <button
               onClick={() => setFilter('paid')}
@@ -142,7 +142,7 @@ export default function ToolsHubPage() {
                 filter === 'paid' ? 'bg-white text-indigo-700 shadow-sm' : 'hover:text-indigo-700'
               }`}
             >
-              Pro Audit Utilities (5)
+              Advance &amp; Pro ({TOOLS_LIST.filter(t => t.category === 'paid').length})
             </button>
           </div>
 
