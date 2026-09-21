@@ -1086,24 +1086,26 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link
-                href="/dashboard"
-                className="px-2.5 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl transition-all border border-slate-300 shadow-xs flex items-center gap-1 xl:gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <UserIcon className="w-3.5 h-3.5 xl:w-4 xl:h-4 shrink-0 text-slate-500" />
-                <span className="whitespace-nowrap">Sign In</span>
-              </Link>
-            )}
+              <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
+                <Link
+                  href="/dashboard"
+                  className="px-2.5 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-xl transition-all border border-slate-300 shadow-xs flex items-center gap-1 xl:gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <UserIcon className="w-3.5 h-3.5 xl:w-4 xl:h-4 shrink-0 text-slate-500" />
+                  <span className="whitespace-nowrap">Sign In</span>
+                </Link>
 
-            {/* Direct Consultation Callout - High-converting CTA for all visitors */}
-            <Link
-              href="/consult-ca"
-              className="px-2.5 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs border border-emerald-500/30 transition-all flex items-center gap-1 xl:gap-1.5 whitespace-nowrap shrink-0"
-            >
-              <PhoneCall className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden xl:inline whitespace-nowrap">Consult a CA</span>
-              <span className="xl:hidden whitespace-nowrap">Consult CA</span>
-            </Link>
+                {/* Direct Consultation Callout - High-converting CTA for prospective visitors */}
+                <Link
+                  href="/consult-ca"
+                  className="px-2.5 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs border border-emerald-500/30 transition-all flex items-center gap-1 xl:gap-1.5 whitespace-nowrap shrink-0"
+                >
+                  <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden xl:inline whitespace-nowrap">Consult a CA</span>
+                  <span className="xl:hidden whitespace-nowrap">Consult CA</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
