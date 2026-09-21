@@ -10,6 +10,7 @@ const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const TOOL_PURCHASES_FILE = path.join(DATA_DIR, 'tool_purchases.json');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
 const PAYMENTS_FILE = path.join(DATA_DIR, 'payments.json');
+const GST_INVOICES_FILE = path.join(DATA_DIR, 'gst_invoices.json');
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -773,4 +774,53 @@ export function getUserPortalData(userIdOrEmail: string) {
     }
   };
 }
+
+// ----------------------------------------------------
+// Saved GST Invoices DB (Persistent History)
+// ----------------------------------------------------
+export interface SavedGstInvoice {
+  id: string;
+  savedAt: string;
+  number: string;
+  date: string;
+  buyer: string;
+  grandTotal: number;
+  formState: any;
+  userId?: string;
+}
+
+export function getSavedGstInvoices(): SavedGstInvoice[] {
+  ensureDataDir();
+  if (!fs.existsSync(GST_INVOICES_FILE)) {
+    fs.writeFileSync(GST_INVOICES_FILE, JSON.stringify([], null, 2), 'utf-8');
+    return [];
+  }
+  return safeReadJSON<SavedGstInvoice[]>(GST_INVOICES_FILE, []);
+}
+
+export function saveGstInvoicesList(list: SavedGstInvoice[]): void {
+  ensureDataDir();
+  fs.writeFileSync(GST_INVOICES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+}
+
+export function upsertSavedGstInvoice(inv: SavedGstInvoice): SavedGstInvoice {
+  const list = getSavedGstInvoices();
+  const existingIdx = list.findIndex(item => item.number?.toLowerCase() === inv.number?.toLowerCase());
+  if (existingIdx >= 0) {
+    list[existingIdx] = { ...list[existingIdx], ...inv, savedAt: new Date().toISOString() };
+  } else {
+    list.unshift(inv);
+  }
+  saveGstInvoicesList(list);
+  return inv;
+}
+
+export function deleteSavedGstInvoice(number: string): boolean {
+  const list = getSavedGstInvoices();
+  const filtered = list.filter(item => item.number?.toLowerCase() !== number?.toLowerCase());
+  if (filtered.length === list.length) return false;
+  saveGstInvoicesList(filtered);
+  return true;
+}
+
 

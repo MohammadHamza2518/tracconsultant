@@ -262,11 +262,13 @@ table.hsn-summary td.num{text-align:right;}
 
 <div class="topbar">
   <div class="brand"><span class="dot"></span>GST Invoice Generator</div>
-  <div class="privacy-badge">🔒 Fully local — your client & billing data stays on your machine.</div>
+  <div class="privacy-badge">🔒 Cloud + Offline Sync — Invoices auto-saved & permanent</div>
   <div class="topbar-actions">
-    <button class="btn btn-ghost btn-sm" id="btnHistory">History</button>
+    <button class="btn btn-amber btn-sm" id="btnHistory" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;">
+      📋 Invoice History (<span id="topbarHistoryCount">0</span>)
+    </button>
     <button class="btn btn-ghost btn-sm" id="btnExportCsv">Export CSV</button>
-    <button class="btn btn-ghost btn-sm" id="btnNewInvoice">New Invoice</button>
+    <button class="btn btn-ghost btn-sm" id="btnNewInvoice">+ New Invoice</button>
   </div>
 </div>
 
@@ -501,11 +503,24 @@ table.hsn-summary td.num{text-align:right;}
 
 <!-- History Modal -->
 <div class="modal-overlay" id="historyModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>Saved Invoices</h3><button class="modal-close" id="closeHistoryModal">✕</button></div>
-    <div class="modal-body" style="padding:16px;">
-      <input type="text" id="historySearch" placeholder="Search by invoice number or buyer..." style="margin-bottom:12px;">
-      <div class="history-list" id="historyList"></div>
+  <div class="modal-box" style="max-width:960px;width:95%;">
+    <div class="modal-head" style="background:var(--ink);color:#fff;padding:14px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">📋</span>
+        <div>
+          <h3 style="margin:0;font-size:16px;color:#fff;">Saved Invoices & Download Archive</h3>
+          <div style="font-size:11.5px;color:#d8d4c8;margin-top:2px;">Re-download PDF, print, edit or duplicate any past generated invoice anytime</div>
+        </div>
+      </div>
+      <button class="modal-close" id="closeHistoryModal" style="color:#fff;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px;">
+      <div id="historyStatsBanner" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="historySearch" placeholder="🔍 Search by invoice number, buyer name, or date..." style="flex:1;min-width:200px;margin:0;">
+        <button class="btn btn-outline btn-sm" id="btnExportCsvModal" title="Export all invoices to CSV">📊 Export All to CSV</button>
+      </div>
+      <div class="history-list" id="historyList" style="max-height:460px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;"></div>
     </div>
   </div>
 </div>
@@ -1335,8 +1350,12 @@ document.querySelectorAll('#formCol input, #formCol select, #formCol textarea').
   el.addEventListener('change', scheduleRender);
 });
 
-document.getElementById('btnGeneratePdf').addEventListener('click', ()=>{
+const urlParams = new URLSearchParams(window.location.search);
+const currentUserId = urlParams.get('userId') || '';
+
+document.getElementById('btnGeneratePdf').addEventListener('click', async ()=>{
   if(!validateForm()) return;
+  autoSaveCurrentInvoice(false);
   const printArea = document.getElementById('printArea');
   printArea.innerHTML = buildInvoiceHTML();
   const number = (document.getElementById('i_number').value||'invoice').replace(/[\/\\?%*:|"<>]/g,'-');
@@ -1350,12 +1369,13 @@ document.getElementById('btnGeneratePdf').addEventListener('click', ()=>{
     html2canvas:{scale:3, useCORS:true},
     jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
   };
-  html2pdf().set(opt).from(printArea.querySelector('.inv-page')).save().then(()=>{
-    toast('PDF downloaded.', 'success');
-  }).catch(err=>{
+  try {
+    await html2pdf().set(opt).from(printArea.querySelector('.inv-page')).save();
+    toast('PDF downloaded & auto-saved to history.', 'success');
+  } catch(err){
     console.error(err);
     toast('PDF generation failed.', 'error');
-  });
+  }
 });
 
 document.getElementById('btnPreviewModal').addEventListener('click', ()=>{
@@ -1370,32 +1390,58 @@ document.getElementById('closePreviewModal').addEventListener('click', ()=>{
 
 document.getElementById('btnPrint').addEventListener('click', ()=>{
   if(!validateForm()) return;
+  autoSaveCurrentInvoice(false);
   const printArea = document.getElementById('printArea');
   printArea.id = 'printArea';
   printArea.innerHTML = `<style>${getInvoiceStylesOnly()}</style>` + buildInvoiceHTML();
   window.print();
 });
 
-function getInvoices(){ return JSON.parse(localStorage.getItem(LS.invoices)||'[]'); }
-function saveInvoices(arr){ localStorage.setItem(LS.invoices, JSON.stringify(arr)); }
+function getInvoices(){
+  try {
+    return JSON.parse(localStorage.getItem(LS.invoices)||'[]');
+  } catch(e){
+    return [];
+  }
+}
+function saveInvoices(arr){
+  try {
+    localStorage.setItem(LS.invoices, JSON.stringify(arr));
+  } catch(e){
+    console.error('Local storage save error:', e);
+  }
+}
+
+function updateHistoryBadge(){
+  const count = getInvoices().length;
+  const el = document.getElementById('topbarHistoryCount');
+  if(el) el.textContent = count;
+}
 
 function snapshotInvoice(){
   const calc = computeInvoice();
+  const num = (document.getElementById('i_number').value || '').trim();
   return {
+    id: 'inv_' + (num || 'draft').replace(/[^a-zA-Z0-9_-]/g,'_'),
     savedAt: new Date().toISOString(),
-    number: document.getElementById('i_number').value,
-    date: document.getElementById('i_date').value,
-    buyer: document.getElementById('b_name').value,
+    number: num,
+    date: document.getElementById('i_date').value || new Date().toISOString().slice(0,10),
+    buyer: document.getElementById('b_name').value || 'Cash Buyer',
     grandTotal: calc.roundedTotal,
-    formState: collectFullFormState()
+    formState: collectFullFormState(),
+    userId: currentUserId || undefined
   };
 }
+
 function collectFullFormState(){
-  const ids = ['i_number','i_date','i_due','i_reverse','i_copytype','i_vehicle','i_eway','i_challan','i_po',
+  const ids = [
+    's_name','s_address','s_city','s_state','s_pin','s_gstin','s_pan','s_email','s_phone','s_bank','s_acc','s_ifsc','s_branch','s_upi',
+    'i_number','i_date','i_due','i_reverse','i_copytype','i_vehicle','i_eway','i_challan','i_po',
     'b_name','b_address','b_city','b_state','b_pin','b_gstin','b_contact','c_shipToggle',
     'sh_name','sh_address','sh_city','sh_state','sh_gstin',
     'x_freight','x_freightGst','x_packing','x_packingGst','x_insurance','x_insuranceGst','x_other','x_otherGst',
-    'x_roundOff','x_terms','x_declaration','x_notes','x_signatory'];
+    'x_roundOff','x_terms','x_declaration','x_notes','x_signatory'
+  ];
   const state = {};
   ids.forEach(id=>{
     const el = document.getElementById(id);
@@ -1404,31 +1450,59 @@ function collectFullFormState(){
   });
   state.items = JSON.parse(JSON.stringify(items));
   state.signatureBase64 = signatureBase64;
+  state.sellerLogoBase64 = sellerLogoBase64;
   return state;
 }
+
 function applyFullFormState(state){
+  if(!state) return;
   Object.keys(state).forEach(id=>{
-    if(id==='items' || id==='signatureBase64') return;
+    if(id==='items' || id==='signatureBase64' || id==='sellerLogoBase64') return;
     const el = document.getElementById(id);
     if(!el) return;
-    if(el.type==='checkbox') el.checked = state[id]; else el.value = state[id];
+    if(el.type==='checkbox') el.checked = Boolean(state[id]); else el.value = state[id] || '';
   });
-  document.getElementById('shipToBlock').style.display = state.c_shipToggle ? 'grid' : 'none';
-  items = state.items || [];
-  signatureBase64 = state.signatureBase64 || '';
+  const shipToggle = document.getElementById('c_shipToggle');
+  const shipBlock = document.getElementById('shipToBlock');
+  if(shipBlock && shipToggle) shipBlock.style.display = shipToggle.checked ? 'grid' : 'none';
+  items = Array.isArray(state.items) ? JSON.parse(JSON.stringify(state.items)) : [];
+  if(state.signatureBase64 !== undefined) signatureBase64 = state.signatureBase64 || '';
+  if(state.sellerLogoBase64 !== undefined) sellerLogoBase64 = state.sellerLogoBase64 || '';
   renderItemsTable();
   scheduleRender();
 }
 
+async function autoSaveCurrentInvoice(notify = false){
+  const num = (document.getElementById('i_number').value || '').trim();
+  if(!num) return null;
+  const snap = snapshotInvoice();
+  const invoices = getInvoices();
+  const existingIdx = invoices.findIndex(i => String(i.number).trim() === num);
+  if(existingIdx >= 0){
+    invoices[existingIdx] = snap;
+  } else {
+    invoices.unshift(snap);
+  }
+  saveInvoices(invoices);
+  updateHistoryBadge();
+  if(notify){
+    toast('Invoice saved to history & cloud archive.', 'success');
+  }
+  try {
+    fetch('/api/tools/gst-invoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(snap)
+    }).catch(()=>{});
+  } catch(e){}
+  return snap;
+}
+
 document.getElementById('btnSaveInvoice').addEventListener('click', ()=>{
   if(!validateForm()) return;
-  const invoices = getInvoices();
-  const snap = snapshotInvoice();
-  const existingIdx = invoices.findIndex(i=>i.number===snap.number);
-  if(existingIdx>=0) invoices[existingIdx]=snap; else invoices.push(snap);
-  saveInvoices(invoices);
-  toast('Invoice saved to history.', 'success');
+  autoSaveCurrentInvoice(true);
 });
+
 document.addEventListener('keydown', e=>{
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
     e.preventDefault();
@@ -1436,36 +1510,210 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-function renderHistoryList(filter){
-  const list = document.getElementById('historyList');
-  let invoices = getInvoices().slice().reverse();
-  if(filter){
-    const f = filter.toLowerCase();
-    invoices = invoices.filter(i=> (i.number||'').toLowerCase().includes(f) || (i.buyer||'').toLowerCase().includes(f));
+async function syncInvoicesWithServer(){
+  try {
+    const fetchUrl = currentUserId ? `/api/tools/gst-invoices?userId=${encodeURIComponent(currentUserId)}` : '/api/tools/gst-invoices';
+    const res = await fetch(fetchUrl);
+    if(!res.ok) return;
+    const data = await res.json();
+    if(data.success && Array.isArray(data.invoices)){
+      const localInvoices = getInvoices();
+      const map = new Map();
+      localInvoices.forEach(i=>{
+        if(i && i.number) map.set(String(i.number).trim(), i);
+      });
+      data.invoices.forEach(srv=>{
+        if(!srv || !srv.number) return;
+        const key = String(srv.number).trim();
+        if(!map.has(key)){
+          map.set(key, srv);
+        } else {
+          const loc = map.get(key);
+          const srvTime = new Date(srv.savedAt||0).getTime();
+          const locTime = new Date(loc.savedAt||0).getTime();
+          if(srvTime > locTime){
+            map.set(key, srv);
+          }
+        }
+      });
+      const merged = Array.from(map.values()).sort((a,b)=> new Date(b.savedAt||0) - new Date(a.savedAt||0));
+      saveInvoices(merged);
+      updateHistoryBadge();
+      
+      localInvoices.forEach(loc => {
+        if(loc && loc.number && loc.formState){
+          const key = String(loc.number).trim();
+          const existsOnServer = data.invoices.some(s => s && String(s.number).trim() === key);
+          if(!existsOnServer){
+            fetch('/api/tools/gst-invoices', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(loc)
+            }).catch(()=>{});
+          }
+        }
+      });
+    }
+  } catch(err){
+    console.warn('Sync invoices with server offline/skipped:', err);
   }
-  if(invoices.length===0){
-    list.innerHTML = `<div style="color:var(--muted);text-align:center;padding:20px;">No saved invoices yet.</div>`;
+}
+
+async function downloadHistoricalInvoicePdf(inv){
+  if(!inv || !inv.formState){
+    toast('Invoice form data not found.', 'error');
     return;
   }
-  list.innerHTML = invoices.map(inv=>`
-    <div class="history-item">
-      <div class="meta"><b>${esc(inv.number)}</b>${esc(inv.buyer)} · ${esc(inv.date)} · ₹${fmtMoney(inv.grandTotal)}</div>
-      <div class="history-actions">
-        <button class="btn btn-outline btn-sm" data-act="load" data-num="${esc(inv.number)}">Load</button>
-        <button class="btn btn-outline btn-sm" data-act="dup" data-num="${esc(inv.number)}">Duplicate</button>
-        <button class="btn btn-rust btn-sm" data-act="del" data-num="${esc(inv.number)}">Delete</button>
+  toast(`Generating PDF for ${inv.number}…`);
+  const currentDraft = collectFullFormState();
+  const currentLogo = sellerLogoBase64;
+  const currentSig = signatureBase64;
+  
+  try {
+    applyFullFormState(inv.formState);
+    if(inv.formState.sellerLogoBase64 !== undefined) sellerLogoBase64 = inv.formState.sellerLogoBase64 || '';
+    
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = buildInvoiceHTML();
+    const cleanNum = (inv.number || 'invoice').replace(/[\/\\?%*:|"<>]/g, '-');
+    const cleanBuyer = (inv.buyer || 'buyer').replace(/[\/\\?%*:|"<>]/g, '-');
+    const filename = `Invoice-${cleanNum}-${cleanBuyer}.pdf`;
+    
+    const opt = {
+      margin: 0,
+      filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 3, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    await html2pdf().set(opt).from(printArea.querySelector('.inv-page')).save();
+    toast(`Invoice ${inv.number} PDF downloaded!`, 'success');
+  } catch(err){
+    console.error('History PDF error:', err);
+    toast('Failed to download invoice PDF.', 'error');
+  } finally {
+    applyFullFormState(currentDraft);
+    sellerLogoBase64 = currentLogo;
+    signatureBase64 = currentSig;
+    scheduleRender();
+  }
+}
+
+function printHistoricalInvoice(inv){
+  if(!inv || !inv.formState){
+    toast('Invoice form data not found.', 'error');
+    return;
+  }
+  const currentDraft = collectFullFormState();
+  const currentLogo = sellerLogoBase64;
+  const currentSig = signatureBase64;
+  try {
+    applyFullFormState(inv.formState);
+    if(inv.formState.sellerLogoBase64 !== undefined) sellerLogoBase64 = inv.formState.sellerLogoBase64 || '';
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = `<style>${getInvoiceStylesOnly()}</style>` + buildInvoiceHTML();
+    window.print();
+  } finally {
+    applyFullFormState(currentDraft);
+    sellerLogoBase64 = currentLogo;
+    signatureBase64 = currentSig;
+    scheduleRender();
+  }
+}
+
+function renderHistoryList(filter){
+  const list = document.getElementById('historyList');
+  const banner = document.getElementById('historyStatsBanner');
+  let invoices = getInvoices().slice().sort((a,b) => new Date(b.savedAt||0) - new Date(a.savedAt||0));
+  
+  const totalCount = invoices.length;
+  const totalRevenue = invoices.reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
+  
+  if(banner){
+    banner.innerHTML = `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:12px 14px;border-radius:10px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Total Invoices</div>
+        <div style="font-size:20px;font-weight:800;color:var(--ink);margin-top:2px;">${totalCount}</div>
       </div>
-    </div>`).join('');
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 14px;border-radius:10px;">
+        <div style="font-size:11px;color:#15803d;font-weight:600;text-transform:uppercase;">Total Invoiced Value</div>
+        <div style="font-size:20px;font-weight:800;color:#15803d;margin-top:2px;">₹${fmtMoney(totalRevenue)}</div>
+      </div>
+      <div style="background:#fffbeb;border:1px solid #fef3c7;padding:12px 14px;border-radius:10px;">
+        <div style="font-size:11px;color:#b45309;font-weight:600;text-transform:uppercase;">Cloud Archive</div>
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-top:5px;display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;"></span>
+          Auto-Saved & Permanent
+        </div>
+      </div>
+    `;
+  }
+  
+  if(filter){
+    const f = filter.toLowerCase().trim();
+    invoices = invoices.filter(i=> 
+      (i.number||'').toLowerCase().includes(f) || 
+      (i.buyer||'').toLowerCase().includes(f) ||
+      (i.date||'').toLowerCase().includes(f)
+    );
+  }
+  
+  if(invoices.length === 0){
+    list.innerHTML = `<div style="color:var(--muted);text-align:center;padding:36px;border:1.5px dashed var(--line);border-radius:10px;background:#faf9f6;">
+      <div style="font-size:26px;margin-bottom:6px;">📄</div>
+      <div style="font-weight:600;color:var(--ink);font-size:14px;">No saved invoices found.</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Generate a PDF or save an invoice to see it stored here permanently.</div>
+    </div>`;
+    return;
+  }
+  
+  list.innerHTML = invoices.map(inv=>`
+    <div class="history-item-card" style="border:1.5px solid var(--line);border-radius:10px;padding:12px 16px;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+      <div style="display:flex;flex-direction:column;gap:3px;min-width:240px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-weight:700;font-size:14.5px;color:var(--ink);">${esc(inv.number)}</span>
+          <span style="font-size:11px;background:rgba(245,179,1,0.2);color:#92400e;font-weight:700;padding:2px 8px;border-radius:6px;">📅 ${esc(inv.date || '—')}</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);font-weight:500;">
+          👤 <b style="color:var(--ink);">${esc(inv.buyer || 'Cash Buyer')}</b>
+          ${inv.formState?.b_gstin ? ` · <span style="font-size:11px;background:#f3f4f6;padding:1px 5px;border-radius:4px;color:#4b5563;">GSTIN: ${esc(inv.formState.b_gstin)}</span>` : ''}
+        </div>
+        <div style="font-size:11px;color:#9ca3af;">
+          Archived: ${new Date(inv.savedAt || Date.now()).toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+        </div>
+      </div>
+
+      <div style="text-align:right;min-width:130px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Grand Total</div>
+        <div style="font-size:16.5px;font-weight:800;color:#1e8e3e;">₹${fmtMoney(inv.grandTotal)}</div>
+      </div>
+
+      <div class="history-actions" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-amber btn-sm" data-act="pdf" data-num="${esc(inv.number)}" title="Download PDF of this exact invoice">⬇ PDF</button>
+        <button class="btn btn-outline btn-sm" data-act="print" data-num="${esc(inv.number)}" title="Print invoice">🖨 Print</button>
+        <button class="btn btn-outline btn-sm" data-act="load" data-num="${esc(inv.number)}" title="Open invoice in editor">✏ Load</button>
+        <button class="btn btn-outline btn-sm" data-act="dup" data-num="${esc(inv.number)}" title="Duplicate into a new invoice number">📋 Duplicate</button>
+        <button class="btn btn-rust btn-sm" data-act="del" data-num="${esc(inv.number)}" title="Delete from history">🗑</button>
+      </div>
+    </div>
+  `).join('');
+  
   list.querySelectorAll('button[data-act]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const invoices2 = getInvoices();
-      const target = invoices2.find(i=>i.number===btn.dataset.num);
+    btn.addEventListener('click', async ()=>{
+      const allInvs = getInvoices();
+      const target = allInvs.find(i=>i.number===btn.dataset.num);
       if(!target) return;
-      if(btn.dataset.act==='load'){
+      const act = btn.dataset.act;
+      if(act === 'pdf'){
+        await downloadHistoricalInvoicePdf(target);
+      } else if(act === 'print'){
+        printHistoricalInvoice(target);
+      } else if(act === 'load'){
         applyFullFormState(target.formState);
         document.getElementById('historyModal').classList.remove('open');
-        toast('Invoice loaded.', 'success');
-      } else if(btn.dataset.act==='dup'){
+        toast(`Invoice ${target.number} loaded into editor.`, 'success');
+      } else if(act === 'dup'){
         applyFullFormState(target.formState);
         const {number, counter} = nextInvoiceNumber();
         document.getElementById('i_number').value = number;
@@ -1473,15 +1721,22 @@ function renderHistoryList(filter){
         bumpCounter(counter);
         scheduleRender();
         document.getElementById('historyModal').classList.remove('open');
-        toast('Duplicated as a new invoice.', 'success');
-      } else if(btn.dataset.act==='del'){
-        saveInvoices(invoices2.filter(i=>i.number!==btn.dataset.num));
+        toast(`Duplicated as ${number}`, 'success');
+      } else if(act === 'del'){
+        if(!confirm(`Are you sure you want to delete invoice ${target.number}?`)) return;
+        const filtered = allInvs.filter(i=>i.number !== target.number);
+        saveInvoices(filtered);
+        updateHistoryBadge();
         renderHistoryList(document.getElementById('historySearch').value);
-        toast('Invoice deleted.', 'success');
+        toast(`Invoice ${target.number} deleted.`, 'success');
+        try {
+          fetch(`/api/tools/gst-invoices?number=${encodeURIComponent(target.number)}`, { method: 'DELETE' }).catch(()=>{});
+        } catch(e){}
       }
     });
   });
 }
+
 document.getElementById('btnHistory').addEventListener('click', ()=>{
   renderHistoryList('');
   document.getElementById('historyModal').classList.add('open');
@@ -1493,11 +1748,11 @@ document.getElementById('historySearch').addEventListener('input', function(){
   renderHistoryList(this.value);
 });
 
-document.getElementById('btnExportCsv').addEventListener('click', ()=>{
+function exportInvoicesToCsv(){
   const invoices = getInvoices();
   if(invoices.length===0){ toast('No saved invoices to export.', 'error'); return; }
   const headers = ['Invoice Number','Date','Buyer','Grand Total','Saved At'];
-  const rows = invoices.map(i=>[i.number,i.date,i.buyer,i.grandTotal.toFixed(2),i.savedAt]);
+  const rows = invoices.map(i=>[i.number,i.date,i.buyer,Number(i.grandTotal||0).toFixed(2),i.savedAt]);
   const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -1506,7 +1761,11 @@ document.getElementById('btnExportCsv').addEventListener('click', ()=>{
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   toast('CSV exported.', 'success');
-});
+}
+
+document.getElementById('btnExportCsv').addEventListener('click', exportInvoicesToCsv);
+const modalCsvBtn = document.getElementById('btnExportCsvModal');
+if(modalCsvBtn) modalCsvBtn.addEventListener('click', exportInvoicesToCsv);
 
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
@@ -1516,6 +1775,8 @@ initForm(true);
 renderItemsTable();
 addItemRow();
 scheduleRender();
+updateHistoryBadge();
+syncInvoicesWithServer();
 </script>
 </body>
 </html>

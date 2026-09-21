@@ -122,7 +122,7 @@ export default function GstInvoiceGeneratorPage() {
           isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen' : 'h-[900px]'
         }`}>
           <iframe
-            src="/tools-embed/gst-invoice-generator.html"
+            src={`/tools-embed/gst-invoice-generator.html${user?.id ? `?userId=${encodeURIComponent(user.id)}` : ''}`}
             title="GST Tax Invoice & E-Way Generator"
             className="w-full h-full border-0"
           />
