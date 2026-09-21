@@ -136,13 +136,13 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li><Link href="/calculators" className="text-emerald-400 font-bold hover:underline">19 Free Calculators Hub &rarr;</Link></li>
-              <li><Link href="/tools" className="hover:text-white transition-colors">Compliance Suite Hub (12 Tools)</Link></li>
-              <li><Link href="/tools/hra-calculator" className="hover:text-white transition-colors">HRA Exemption Calc (Free)</Link></li>
+              <li><Link href="/tools" className="hover:text-white transition-colors font-bold text-slate-200">Compliance Suite Hub (15 Tools) &rarr;</Link></li>
+              <li><Link href="/tools/ecommerce-gst-converter" className="text-emerald-400 hover:text-emerald-300 transition-colors">E-Commerce GSTR-1 & TCS (Free)</Link></li>
+              <li><Link href="/tools/gstin-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">GSTIN Search & Verified PDF (Free)</Link></li>
+              <li><Link href="/tools/hsn-search" className="text-emerald-400 hover:text-emerald-300 transition-colors">HSN & SAC Code Finder (Free)</Link></li>
+              <li><Link href="/tools/tax-calculator" className="hover:text-white transition-colors">Income Tax Calc FY 2024-25 (Free)</Link></li>
               <li><Link href="/tools/advance-tax-calculator" className="hover:text-white transition-colors">Advance Tax Calc (Free)</Link></li>
-              <li><Link href="/tools/tax-calculator" className="hover:text-white transition-colors">Income Tax Calc (Free)</Link></li>
-              <li><Link href="/tools/pdf-redactor" className="hover:text-white transition-colors">PDF Redaction Tool (Paid)</Link></li>
-              <li><Link href="/tools/tb-to-balancesheet" className="hover:text-white transition-colors">Trial Balance to B/S (Paid)</Link></li>
-              <li><Link href="/tools/gstr2a-reconciliation" className="hover:text-white transition-colors">GSTR-2A Recon (Paid)</Link></li>
+              <li><Link href="/tools/gst-invoice-generator" className="hover:text-white transition-colors">GST Tax Invoice Pro (Paid)</Link></li>
               <li><Link href="/services" className="text-teal-400 font-bold hover:underline mt-1 block">20 Services Directory &rarr;</Link></li>
             </ul>
           </div>

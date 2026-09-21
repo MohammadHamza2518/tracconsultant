@@ -790,7 +790,7 @@ export default function Navbar() {
                           Tax &amp; Compliance Software Suite
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          9 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
+                          11 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
                         </p>
                       </div>
                     </div>
