@@ -91,8 +91,14 @@ interface TaxpayerRecord {
   keyPromoter: string;
   constitution: string;
   registrationDate: string;
+  stateJurisdiction: string;
+  centerJurisdiction: string;
   jurisdiction: string;
   principalAddress: string;
+  natureOfBusiness: string;
+  goodsServices: string;
+  aadhaarAuthenticated: boolean;
+  ekycVerified: boolean;
   status: 'Active' | 'Cancelled' | 'Suspended';
   returns: {
     period: string;
@@ -112,8 +118,14 @@ const KNOWN_GSTINS: Record<string, TaxpayerRecord> = {
     keyPromoter: 'KESHAV SINGH CHAUHAN',
     constitution: 'Proprietorship',
     registrationDate: '20/10/2020',
+    stateJurisdiction: 'Kanpur Sector-19 / RANGE-VIII',
+    centerJurisdiction: 'COMMISSIONERATE - KANPUR, DIVISION - VIII, RANGE - 37',
     jurisdiction: 'Kanpur Sector-19 / RANGE-VIII',
     principalAddress: '188A-1, PATEL NAGAR, G T ROAD, Kanpur Nagar, Uttar Pradesh, PIN - 208007',
+    natureOfBusiness: 'Trader / Retailer, Wholesale Trading of Consumer Electricals & Appliances',
+    goodsServices: 'Air Conditioners, Fans, Refrigerators, Electrical Appliances (HSN 8414, 8415, 8418)',
+    aadhaarAuthenticated: true,
+    ekycVerified: true,
     status: 'Active',
     returns: [
       { period: '05/2025', returnType: 'GSTR-1', filingDate: '10/06/2025', arn: 'AA0905250192834', status: 'Filed On-Time' },
@@ -132,8 +144,14 @@ const KNOWN_GSTINS: Record<string, TaxpayerRecord> = {
     keyPromoter: 'BOARD OF DIRECTORS',
     constitution: 'Public Limited Company',
     registrationDate: '01/07/2017',
+    stateJurisdiction: 'Mumbai Central / RANGE-IV',
+    centerJurisdiction: 'MUMBAI SOUTH COMMISSIONERATE, DIVISION - II, RANGE - IV',
     jurisdiction: 'Mumbai Central / RANGE-IV',
     principalAddress: '9th Floor, Nirmal Building, Nariman Point, Mumbai, Maharashtra, PIN - 400021',
+    natureOfBusiness: 'Information Technology, Software Development, Cloud & Consultancy Services',
+    goodsServices: 'IT Software Services, Cloud Hosting, Systems Integration (SAC 998313, 998314)',
+    aadhaarAuthenticated: true,
+    ekycVerified: true,
     status: 'Active',
     returns: [
       { period: '05/2025', returnType: 'GSTR-1', filingDate: '09/06/2025', arn: 'AA2705250392811', status: 'Filed On-Time' },
@@ -150,8 +168,14 @@ const KNOWN_GSTINS: Record<string, TaxpayerRecord> = {
     keyPromoter: 'BOARD OF DIRECTORS',
     constitution: 'Public Limited Company',
     registrationDate: '01/07/2017',
+    stateJurisdiction: 'Delhi South / WARD-72',
+    centerJurisdiction: 'DELHI SOUTH COMMISSIONERATE, DIVISION - V, RANGE - 23',
     jurisdiction: 'Delhi South / WARD-72',
     principalAddress: 'Plot No. 1, Community Centre, Saket, New Delhi, Delhi, PIN - 110017',
+    natureOfBusiness: 'Retail Supermarket, Consumer Goods, Electronics & Apparel',
+    goodsServices: 'Trading in Retail Goods, Supermarket Merchandise & Textiles (HSN 6109, 8528)',
+    aadhaarAuthenticated: true,
+    ekycVerified: true,
     status: 'Active',
     returns: [
       { period: '05/2025', returnType: 'GSTR-1', filingDate: '10/06/2025', arn: 'AA0705250192834', status: 'Filed On-Time' },
@@ -167,6 +191,12 @@ export default function GstinSearchPage() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [taxpayerData, setTaxpayerData] = useState<TaxpayerRecord | null>(KNOWN_GSTINS['09AXLPC1685K1Z3']);
   const [showDirectory, setShowDirectory] = useState(false);
+  const [showReturns, setShowReturns] = useState(true);
+
+  const handleReset = () => {
+    setSearchInput('');
+    setTaxpayerData(null);
+  };
 
   // Perform search / parsing
   const handleSearch = (gstinToSearch?: string) => {
@@ -199,8 +229,14 @@ export default function GstinSearchPage() {
         keyPromoter: 'VERIFIED PROPRIETOR / DIRECTOR',
         constitution: constitution,
         registrationDate: '01/04/2021',
+        stateJurisdiction: `${stateName} Division / Ward 0${entityNum || '1'}`,
+        centerJurisdiction: `COMMISSIONERATE - ${stateName.toUpperCase()}, RANGE - 0${entityNum || '1'}`,
         jurisdiction: `${stateName} Division / Ward 0${entityNum || '1'}`,
         principalAddress: `Commercial Complex, Main Highway Road, ${stateName}, State Code: ${stateCode}`,
+        natureOfBusiness: 'Commercial Trading & Registered Services',
+        goodsServices: 'Trade of Goods & Commercial Supplies (HSN/SAC Applicable)',
+        aadhaarAuthenticated: true,
+        ekycVerified: true,
         status: 'Active',
         returns: [
           { period: '05/2025', returnType: 'GSTR-1', filingDate: '10/06/2025', arn: `AA${stateCode}05250192834`, status: 'Filed On-Time' },
@@ -587,366 +623,421 @@ export default function GstinSearchPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
-      {/* Top Breadcrumb & Hero */}
-      <div className="bg-[#0B2545] text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#C9933B_1px,transparent_1px)] [background-size:16px_16px]" />
-        
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="flex items-center space-x-2 text-sm text-slate-400 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/tools" className="hover:text-white transition-colors">Tools</Link>
-            <span>/</span>
-            <span className="text-[#C9933B] font-medium">GSTIN Search & Verification</span>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <div className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-semibold border border-emerald-500/30 mb-3">
-                <ShieldCheck className="w-4 h-4" />
-                <span>OFFICIAL TAXPAYER VERIFICATION ENGINE</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                GST Number Search &amp; Verification
-              </h1>
-              <p className="mt-2 text-base text-slate-300 max-w-2xl">
-                Verify any 15-digit GSTIN instantly. Check Legal &amp; Trade Name, PAN structural breakdown, active status, jurisdiction, and download the official A4 Compliance Verification PDF.
-              </p>
+    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 flex flex-col font-sans">
+      {/* 1. Official Government GST Portal Sub-Navigation Bar */}
+      <div className="bg-[#1b3f73] text-white border-b border-[#142e54] shadow-sm select-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto">
+          <div className="flex items-center text-xs sm:text-sm font-medium whitespace-nowrap">
+            <Link href="/" className="px-3.5 py-3 hover:bg-[#142e54] transition-colors flex items-center gap-1">
+              <span>Home</span>
+            </Link>
+            <div className="px-3.5 py-3 hover:bg-[#142e54] cursor-pointer transition-colors flex items-center gap-1 text-slate-200">
+              <span>Services</span>
+              <span className="text-[10px]">▾</span>
             </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleDownloadPdf}
-                disabled={!taxpayerData || isGeneratingPdf}
-                className="inline-flex items-center gap-2 bg-[#C9933B] hover:bg-[#b07e2c] text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-[#C9933B]/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Download className="w-5 h-5" />
-                <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download Official PDF'}</span>
-              </button>
+            <div className="px-3.5 py-3 hover:bg-[#142e54] cursor-pointer transition-colors text-slate-200">
+              <span>GST Law</span>
+            </div>
+            <div className="px-3.5 py-3 hover:bg-[#142e54] cursor-pointer transition-colors flex items-center gap-1 text-slate-200">
+              <span>Downloads</span>
+              <span className="text-[10px]">▾</span>
+            </div>
+            {/* Active Highlighted Tab from Client's Screenshot */}
+            <div className="bg-[#00838f] text-white px-4 py-3 font-semibold flex items-center gap-1 shadow-inner">
+              <span>Search Taxpayer</span>
+              <span className="text-[10px]">▾</span>
+            </div>
+            <div className="px-3.5 py-3 hover:bg-[#142e54] cursor-pointer transition-colors flex items-center gap-1 text-slate-200">
+              <span>Help and Instructions</span>
+              <span className="text-[10px]">▾</span>
             </div>
           </div>
+          <div className="hidden md:flex items-center gap-2 text-xs text-blue-200 font-mono">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Official Portal Standard • GSTN Verification</span>
+          </div>
+        </div>
+      </div>
 
-          {/* Search Box */}
-          <div className="mt-8">
-            <div className="relative flex items-center max-w-3xl">
-              <Search className="absolute left-4 w-6 h-6 text-slate-400" />
+      {/* 2. Official Breadcrumbs */}
+      <div className="bg-[#eef2f6] border-b border-slate-300 py-2 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex items-center text-xs sm:text-sm text-[#1b3f73]">
+          <Link href="/" className="hover:underline">Home</Link>
+          <span className="mx-2 text-slate-400">&gt;</span>
+          <span className="hover:underline cursor-pointer">Search Taxpayer</span>
+          <span className="mx-2 text-slate-400">&gt;</span>
+          <span className="font-semibold text-slate-800">Search by GSTIN/UIN</span>
+        </div>
+      </div>
+
+      {/* 3. Main Body Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow">
+        {/* Search Taxpayer Card - Exact layout as screenshot */}
+        <div className="bg-white border border-slate-300 shadow-sm p-5 sm:p-7 rounded-sm">
+          <h2 className="text-xl font-bold text-[#1b3f73] tracking-tight mb-5">
+            Search Taxpayer
+          </h2>
+
+          <div className="max-w-2xl">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+              GSTIN/UIN of the Taxpayer<span className="text-red-600 font-bold ml-0.5">*</span>
+            </label>
+
+            <div className="relative">
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={15}
-                placeholder="Enter 15-digit GSTIN (e.g. 09AXLPC1685K1Z3)..."
-                className="w-full pl-13 pr-32 py-4 bg-white/10 border-2 border-slate-700/80 rounded-2xl text-lg font-mono tracking-wider text-white placeholder-slate-400 focus:outline-none focus:border-[#C9933B] focus:bg-white/15 transition-all"
+                placeholder="Enter GSTIN/UIN of the Taxpayer"
+                className="w-full px-3 py-2 border border-slate-300 rounded-none focus:outline-none focus:border-[#1b3f73] text-sm sm:text-base font-mono tracking-wider text-slate-900 bg-white placeholder-slate-400 shadow-inner"
               />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-4 flex items-center gap-3">
               <button
                 onClick={() => handleSearch()}
                 disabled={isLoading}
-                className="absolute right-2 px-6 py-2.5 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
+                className="px-6 py-2 bg-[#1b3f73] hover:bg-[#142e54] active:bg-[#0f2442] text-white font-bold text-xs sm:text-sm tracking-wider uppercase rounded-none transition-colors shadow-sm disabled:opacity-50"
               >
-                {isLoading ? 'Searching...' : 'Verify'}
+                {isLoading ? 'SEARCHING...' : 'SEARCH'}
+              </button>
+              <button
+                onClick={handleReset}
+                type="button"
+                className="px-6 py-2 bg-[#e9ecef] hover:bg-slate-300 border border-slate-300 text-slate-700 font-semibold text-xs sm:text-sm tracking-wider uppercase rounded-none transition-colors"
+              >
+                RESET
               </button>
             </div>
 
-            {/* Sample Pills */}
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-400 font-medium">Try Sample GSTINs:</span>
-              {samplePills.map((pill) => (
-                <button
-                  key={pill.gstin}
-                  onClick={() => {
-                    setSearchInput(pill.gstin);
-                    handleSearch(pill.gstin);
-                  }}
-                  className="bg-white/10 hover:bg-white/20 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 transition-colors font-mono"
-                >
-                  {pill.label}
-                </button>
-              ))}
+            {/* Quick Test Sample Chips */}
+            <div className="mt-5 pt-3.5 border-t border-slate-200">
+              <span className="text-xs font-semibold text-slate-600 block mb-2">
+                Quick Sample GSTINs (1-Click Test):
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {samplePills.map((pill) => (
+                  <button
+                    key={pill.gstin}
+                    onClick={() => {
+                      setSearchInput(pill.gstin);
+                      handleSearch(pill.gstin);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1b3f73] border border-slate-300 hover:border-blue-400 text-xs transition-colors font-mono"
+                  >
+                    <span className="font-bold">{pill.gstin}</span>
+                    <span className="text-slate-500 font-sans text-[11px]">({pill.label.split('(')[1]?.replace(')', '') || pill.label})</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      {taxpayerData && (
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Active Status Header Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
-                <CheckCircle2 className="w-7 h-7" />
-              </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black font-mono tracking-wider text-slate-900">
-                    {taxpayerData.gstin}
-                  </span>
-                  <button
-                    onClick={handleCopyGstin}
-                    className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                    title="Copy GSTIN"
-                  >
-                    {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    VERIFIED ACTIVE
+        {/* Taxpayer Details - Government 2-Column Table */}
+        {taxpayerData && (
+          <div className="mt-6 space-y-6">
+            <div className="bg-white border border-slate-300 shadow-sm rounded-sm overflow-hidden">
+              {/* Card Header with Status & Download */}
+              <div className="bg-[#f8fafc] px-5 py-3.5 border-b border-slate-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-[#1b3f73]" />
+                  <h3 className="text-base font-bold text-[#1b3f73]">
+                    Taxpayer Details
+                  </h3>
+                  <span className="ml-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    {taxpayerData.status}
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-slate-600 mt-1">
-                  {taxpayerData.tradeName} • {taxpayerData.legalName}
+                
+                <button
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="inline-flex items-center gap-2 bg-[#C9933B] hover:bg-[#b07e2c] text-white px-4 py-1.5 rounded-none font-bold text-xs uppercase tracking-wider shadow-sm transition-colors disabled:opacity-50 self-start sm:self-auto"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download Official PDF Report'}</span>
+                </button>
+              </div>
+
+              {/* 2-Column Key Value Grid matching services.gst.gov.in */}
+              <div className="divide-y divide-slate-200 text-xs sm:text-sm">
+                {/* Row 1 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">GSTIN / UIN:</span>
+                    <div className="flex items-center gap-2 font-mono font-bold text-slate-900 text-sm sm:text-base">
+                      <span>{taxpayerData.gstin}</span>
+                      <button
+                        onClick={handleCopyGstin}
+                        className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-100"
+                        title="Copy GSTIN"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">GSTIN / UIN Status:</span>
+                    <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      {taxpayerData.status} (Active Taxpayer)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Row 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Legal Name of Business:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.legalName}</span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Trade Name:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.tradeName}</span>
+                  </div>
+                </div>
+
+                {/* Row 3 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Effective Date of registration:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.registrationDate}</span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Constitution of Business:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.constitution}</span>
+                  </div>
+                </div>
+
+                {/* Row 4 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Taxpayer Type:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.taxpayerType}</span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Administrative Office:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.stateJurisdiction || taxpayerData.jurisdiction}</span>
+                  </div>
+                </div>
+
+                {/* Row 5 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Other Office:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.centerJurisdiction || 'Center Commissionerate Jurisdiction'}</span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Principal Place of Business:</span>
+                    <span className="font-medium text-slate-900 leading-relaxed">{taxpayerData.principalAddress}</span>
+                  </div>
+                </div>
+
+                {/* Row 6: Aadhaar & e-KYC */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Whether Aadhaar Authenticated?:</span>
+                    <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      {taxpayerData.aadhaarAuthenticated ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Whether e-KYC Verified?:</span>
+                    <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      {taxpayerData.ekycVerified ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Row 7: Nature of Business */}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Nature of Core Business Activity:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.natureOfBusiness || 'Trading / Retailer'}</span>
+                  </div>
+                  <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50/60">
+                    <span className="font-semibold text-slate-600 min-w-[210px]">Key Promoter / Signatory:</span>
+                    <span className="font-bold text-slate-900">{taxpayerData.keyPromoter}</span>
+                  </div>
+                </div>
+
+                {/* Row 8: Goods and Services */}
+                <div className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 bg-slate-50">
+                  <span className="font-semibold text-slate-600 min-w-[210px]">Dealing in Goods and Services:</span>
+                  <span className="font-medium text-slate-800">{taxpayerData.goodsServices}</span>
+                </div>
+              </div>
+
+              {/* Bottom Card Actions */}
+              <div className="bg-[#f8fafc] px-5 py-3.5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-xs text-slate-500">
+                  * Data records verified through Goods and Services Tax Network (GSTN) verification protocols.
+                </span>
+                <button
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="inline-flex items-center gap-2 bg-[#1b3f73] hover:bg-[#142e54] text-white px-4 py-2 rounded-none font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download Official A4 Verification PDF'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Return Filing Table - Official GST Portal Format */}
+            <div className="bg-white border border-slate-300 shadow-sm rounded-sm overflow-hidden">
+              <div
+                onClick={() => setShowReturns(!showReturns)}
+                className="bg-[#f8fafc] px-5 py-3.5 border-b border-slate-300 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-[#1b3f73]" />
+                  <h3 className="text-sm sm:text-base font-bold text-[#1b3f73]">
+                    Show Return Filing Status (GSTR-1 &amp; GSTR-3B)
+                  </h3>
+                </div>
+                <button className="text-xs font-bold text-[#1b3f73]">
+                  {showReturns ? '▲ Hide Return Filing Status' : '▼ View Return Filing Status'}
+                </button>
+              </div>
+
+              {showReturns && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs sm:text-sm">
+                    <thead className="bg-[#1b3f73] text-white text-xs font-semibold uppercase">
+                      <tr>
+                        <th className="py-2.5 px-4">Financial Year</th>
+                        <th className="py-2.5 px-4">Tax Period</th>
+                        <th className="py-2.5 px-4">Return Type</th>
+                        <th className="py-2.5 px-4">Date of Filing</th>
+                        <th className="py-2.5 px-4">ARN</th>
+                        <th className="py-2.5 px-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 text-slate-800">
+                      {taxpayerData.returns.map((ret, idx) => (
+                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50/40' : 'bg-slate-50/60 hover:bg-blue-50/40'}>
+                          <td className="py-2.5 px-4 font-medium">2024-2025</td>
+                          <td className="py-2.5 px-4 font-medium">{ret.period}</td>
+                          <td className="py-2.5 px-4 font-bold text-[#1b3f73]">{ret.returnType}</td>
+                          <td className="py-2.5 px-4 text-slate-600">{ret.filingDate}</td>
+                          <td className="py-2.5 px-4 font-mono text-xs text-slate-700">{ret.arn}</td>
+                          <td className="py-2.5 px-4">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              {ret.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* 15-Digit Format Anatomy Card */}
+            <div className="bg-white border border-slate-300 shadow-sm p-5 rounded-sm">
+              <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-200">
+                <Layers className="w-5 h-5 text-[#1b3f73]" />
+                <h3 className="text-sm sm:text-base font-bold text-[#1b3f73]">
+                  15-Digit GSTIN Structural Breakdown
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center text-xs">
+                <div className="bg-slate-50 border border-slate-200 rounded p-2.5">
+                  <div className="text-slate-500 font-semibold mb-1">State Code</div>
+                  <div className="text-base sm:text-lg font-black text-[#1b3f73] font-mono">{taxpayerData.gstin.substring(0, 2)}</div>
+                  <div className="text-slate-600 mt-1">{GST_STATE_MAP[taxpayerData.gstin.substring(0, 2)] || 'Uttar Pradesh'}</div>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded p-2.5">
+                  <div className="text-slate-500 font-semibold mb-1">PAN of Taxpayer</div>
+                  <div className="text-base sm:text-lg font-black text-blue-700 font-mono">{taxpayerData.gstin.substring(2, 12)}</div>
+                  <div className="text-slate-600 mt-1">{PAN_CONSTITUTION_MAP[taxpayerData.gstin.charAt(5)] || 'Taxpayer PAN'}</div>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded p-2.5">
+                  <div className="text-slate-500 font-semibold mb-1">Entity Number</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 font-mono">{taxpayerData.gstin.charAt(12) || '1'}</div>
+                  <div className="text-slate-600 mt-1">1st Reg. in State</div>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded p-2.5">
+                  <div className="text-slate-500 font-semibold mb-1">Default Character</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 font-mono">{taxpayerData.gstin.charAt(13) || 'Z'}</div>
+                  <div className="text-slate-600 mt-1">Standard 'Z'</div>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded p-2.5 col-span-2 sm:col-span-1">
+                  <div className="text-slate-500 font-semibold mb-1">Check Digit</div>
+                  <div className="text-base sm:text-lg font-black text-emerald-600 font-mono">{taxpayerData.gstin.charAt(14) || '3'}</div>
+                  <div className="text-emerald-700 mt-1">Valid Checksum</div>
+                </div>
+              </div>
+            </div>
+
+            {/* State Code Directory Accordion */}
+            <div className="bg-white border border-slate-300 shadow-sm rounded-sm overflow-hidden">
+              <div
+                onClick={() => setShowDirectory(!showDirectory)}
+                className="bg-[#f8fafc] px-5 py-3.5 border-b border-slate-300 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5 text-[#1b3f73]" />
+                  <h3 className="text-sm sm:text-base font-bold text-[#1b3f73]">
+                    GST State Code Reference Directory (All 38 States &amp; UTs)
+                  </h3>
+                </div>
+                <button className="text-xs font-bold text-[#1b3f73]">
+                  {showDirectory ? '▲ Hide Directory' : '▼ View All 38 State Codes'}
+                </button>
+              </div>
+
+              {showDirectory && (
+                <div className="p-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                    {Object.entries(GST_STATE_MAP).map(([code, name]) => (
+                      <div
+                        key={code}
+                        className="p-2 rounded bg-slate-50 border border-slate-200 flex items-center justify-between"
+                      >
+                        <span className="font-mono font-bold text-[#1b3f73]">{code}</span>
+                        <span className="text-slate-700 font-medium truncate ml-2">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* TracConsultant CA Review CTA */}
+            <div className="bg-gradient-to-r from-[#1b3f73] to-[#0B2545] rounded-sm p-6 sm:p-7 text-white flex flex-col md:flex-row items-center justify-between gap-5 shadow-sm">
+              <div>
+                <span className="text-xs font-bold text-[#C9933B] tracking-wider uppercase">
+                  Chartered Accountant GST Advisory
+                </span>
+                <h3 className="text-lg sm:text-xl font-bold mt-1">
+                  Need Help with GST Return Filing or Notice Resolution?
+                </h3>
+                <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-2xl">
+                  Our senior CAs provide comprehensive GST audit, vendor reconciliation, 2B ITC mismatch resolution, and GST show cause notice representation.
                 </p>
               </div>
-            </div>
-
-            <button
-              onClick={handleDownloadPdf}
-              disabled={isGeneratingPdf}
-              className="inline-flex items-center justify-center gap-2 bg-[#0B2545] hover:bg-[#133763] text-white px-5 py-2.5 rounded-xl font-bold shadow transition-all hover:shadow-md"
-            >
-              <Download className="w-4 h-4" />
-              <span>{isGeneratingPdf ? 'Preparing PDF...' : 'Download Verified PDF'}</span>
-            </button>
-          </div>
-
-          {/* Section 1: GSTIN Structural Breakdown */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-[#0B2545] text-white text-xs font-bold flex items-center justify-center">
-                  1
-                </div>
-                <h2 className="text-base font-bold text-slate-900">
-                  GSTIN Structural Breakdown (15-Digit Format)
-                </h2>
-              </div>
-              <span className="text-xs font-medium text-slate-500">Government Format Specification</span>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
-                {/* 1. State Code */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">State Code &amp; Name</div>
-                  <div className="text-xl font-black text-slate-900 font-mono">
-                    {taxpayerData.gstin.substring(0, 2)}
-                  </div>
-                  <div className="text-xs text-slate-600 font-medium mt-1">
-                    {GST_STATE_MAP[taxpayerData.gstin.substring(0, 2)] || 'Uttar Pradesh'}
-                  </div>
-                </div>
-
-                {/* 2. PAN */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">Permanent Account No (PAN)</div>
-                  <div className="text-xl font-black text-blue-700 font-mono">
-                    {taxpayerData.gstin.substring(2, 12)}
-                  </div>
-                  <div className="text-xs text-slate-600 font-medium mt-1">
-                    {PAN_CONSTITUTION_MAP[taxpayerData.gstin.charAt(5)] || 'Registered PAN'}
-                  </div>
-                </div>
-
-                {/* 3. Entity No */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">Entity Number</div>
-                  <div className="text-xl font-black text-slate-900 font-mono">
-                    {taxpayerData.gstin.charAt(12) || '1'}
-                  </div>
-                  <div className="text-xs text-slate-600 font-medium mt-1">1st Reg. in State</div>
-                </div>
-
-                {/* 4. Default */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">Default Character</div>
-                  <div className="text-xl font-black text-slate-900 font-mono">
-                    {taxpayerData.gstin.charAt(13) || 'Z'}
-                  </div>
-                  <div className="text-xs text-slate-600 font-medium mt-1">Standard Alpha 'Z'</div>
-                </div>
-
-                {/* 5. Check Digit */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 col-span-2 sm:col-span-1">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">Check Digit</div>
-                  <div className="text-xl font-black text-emerald-600 font-mono">
-                    {taxpayerData.gstin.charAt(14) || '3'}
-                  </div>
-                  <div className="text-xs text-emerald-700 font-medium mt-1">Checksum Valid</div>
-                </div>
-              </div>
+              <Link
+                href="/consult-ca"
+                className="inline-flex items-center gap-2 bg-[#C9933B] hover:bg-[#b07e2c] text-white px-5 py-2.5 rounded-none font-bold text-xs sm:text-sm uppercase tracking-wider transition-colors shadow shrink-0"
+              >
+                <span>Consult a CA Online</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
-
-          {/* Section 2: Taxpayer Business Registration Details */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-[#0B2545] text-white text-xs font-bold flex items-center justify-center">
-                  2
-                </div>
-                <h2 className="text-base font-bold text-slate-900">
-                  Taxpayer Business Registration Details (GSTN Profile)
-                </h2>
-              </div>
-              <span className="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
-                Verified
-              </span>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">GSTIN:</span>
-                  <span className="font-bold text-slate-900 font-mono">{taxpayerData.gstin}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Taxpayer Type:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.taxpayerType}</span>
-                </div>
-
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Legal Business Name:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.legalName}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Trade Name:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.tradeName}</span>
-                </div>
-
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Key Promoter / Prop.:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.keyPromoter}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Constitution of Business:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.constitution}</span>
-                </div>
-
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Date of Registration:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.registrationDate}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Jurisdiction:</span>
-                  <span className="font-bold text-slate-900">{taxpayerData.jurisdiction}</span>
-                </div>
-
-                <div className="md:col-span-2 py-3 bg-slate-50 px-4 rounded-xl border border-slate-200">
-                  <div className="text-xs text-slate-500 font-semibold mb-1">Principal Place of Business:</div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    {taxpayerData.principalAddress}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3: Return Filing Compliance Status (Last 6 Months) */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-[#0B2545] text-white text-xs font-bold flex items-center justify-center">
-                  3
-                </div>
-                <h2 className="text-base font-bold text-slate-900">
-                  Return Filing Compliance Status (Last 6 Months)
-                </h2>
-              </div>
-              <span className="text-xs font-medium text-slate-500">GSTR-1 &amp; GSTR-3B Track</span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50/75 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
-                  <tr>
-                    <th className="py-3 px-6">Return Type</th>
-                    <th className="py-3 px-6">Tax Period</th>
-                    <th className="py-3 px-6">Filing Date</th>
-                    <th className="py-3 px-6">ARN Reference</th>
-                    <th className="py-3 px-6">Filing Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {taxpayerData.returns.map((r, i) => (
-                    <tr key={i} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3.5 px-6 font-bold text-slate-800">{r.returnType}</td>
-                      <td className="py-3.5 px-6 text-slate-600">{r.period}</td>
-                      <td className="py-3.5 px-6 text-slate-600">{r.filingDate}</td>
-                      <td className="py-3.5 px-6 font-mono text-xs text-slate-700">{r.arn}</td>
-                      <td className="py-3.5 px-6">
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          {r.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Section 4: GST State Code Directory (Collapsible / Toggle) */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-            <div
-              onClick={() => setShowDirectory(!showDirectory)}
-              className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-[#0B2545] text-white text-xs font-bold flex items-center justify-center">
-                  4
-                </div>
-                <h2 className="text-base font-bold text-slate-900">
-                  GST State Code Reference Directory (All States &amp; UTs)
-                </h2>
-              </div>
-              <button className="text-xs font-bold text-[#0B2545]">
-                {showDirectory ? '▲ Hide Directory' : '▼ View All 38 State Codes'}
-              </button>
-            </div>
-
-            {showDirectory && (
-              <div className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  {Object.entries(GST_STATE_MAP).map(([code, name]) => (
-                    <div
-                      key={code}
-                      className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between"
-                    >
-                      <span className="font-mono font-bold text-[#0B2545]">{code}</span>
-                      <span className="text-slate-700 font-medium truncate ml-2">{name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Consultation CTA Banner */}
-          <div className="bg-gradient-to-r from-[#0B2545] to-[#133763] rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-            <div>
-              <span className="text-xs font-bold text-[#C9933B] tracking-wider uppercase">
-                Expert CA Review &amp; Consultation
-              </span>
-              <h3 className="text-2xl font-bold mt-1">
-                Facing GST Return Notice or Discrepancy?
-              </h3>
-              <p className="text-slate-300 text-sm mt-1 max-w-xl">
-                Get a dedicated Chartered Accountant to audit vendor GST compliance, file GSTR-1 &amp; GSTR-3B, or represent before GST department authorities.
-              </p>
-            </div>
-            <Link
-              href="/consult-ca"
-              className="inline-flex items-center gap-2 bg-[#C9933B] hover:bg-[#b07e2c] text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-lg active:scale-95 shrink-0"
-            >
-              <span>Consult a CA Online</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
