@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserPortalData, createFiling, createLead, updateUser, findUserById, findUserByEmail } from '@/lib/db';
+import { getUserPortalData, createFiling, createLead, updateUser, findUserById, findUserByEmail, createUser } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,6 +38,17 @@ export async function POST(req: NextRequest) {
     }
 
     let user = findUserById(identifier) || findUserByEmail(identifier);
+    if (!user) {
+      if (email || (identifier && identifier.includes('@'))) {
+        const userEmail = (email || identifier).toLowerCase().trim();
+        user = createUser({
+          email: userEmail,
+          name: body.name || userEmail.split('@')[0],
+          role: 'client'
+        });
+      }
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'User account not found.' }, { status: 404 });
     }
@@ -85,7 +96,7 @@ export async function POST(req: NextRequest) {
     // Action 2: Update Profile (phone, pan, avatar / DP, etc.)
     if (action === 'update_profile') {
       const { name, phone, avatar } = body;
-      const updatedUser = updateUser(user.id, {
+      const updatedUser = updateUser(user.id || user.email, {
         ...(name ? { name } : {}),
         ...(phone !== undefined ? { phone } : {}),
         ...(avatar !== undefined ? { avatar: avatar || '' } : {})
@@ -95,7 +106,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Profile updated successfully!',
-        user: updatedUser,
+        user: updatedUser || { ...user, avatar: avatar || '' },
         ...updatedData
       });
     }

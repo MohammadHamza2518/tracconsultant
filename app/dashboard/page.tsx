@@ -210,18 +210,20 @@ export default function ClientDashboard() {
     setAvatarSuccessMsg('');
 
     try {
-      const compressedDataUrl = await compressAvatarImage(file, 400, 0.85);
+      const compressedDataUrl = await compressAvatarImage(file, 320, 0.82);
       setProfileAvatar(compressedDataUrl);
 
       const res = await updateUserProfile({ avatar: compressedDataUrl });
       if (res.success) {
         setAvatarSuccessMsg('Profile picture updated and synchronized!');
-        setTimeout(() => setAvatarSuccessMsg(''), 4000);
+        setTimeout(() => setAvatarSuccessMsg(''), 5000);
       } else {
         setAvatarErrorMsg(res.error || 'Failed to update profile picture.');
+        setTimeout(() => setAvatarErrorMsg(''), 6000);
       }
     } catch (err: any) {
       setAvatarErrorMsg(err.message || 'Failed to process image.');
+      setTimeout(() => setAvatarErrorMsg(''), 6000);
     } finally {
       setIsAvatarUploading(false);
       if (e.target) e.target.value = '';
@@ -674,6 +676,26 @@ export default function ClientDashboard() {
       {/* Top Client Header Strip */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+          {/* Global Avatar Toast Feedback */}
+          {avatarSuccessMsg && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-800 font-bold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{avatarSuccessMsg}</span>
+              </div>
+              <button onClick={() => setAvatarSuccessMsg('')} className="text-emerald-700 hover:text-emerald-900 font-bold ml-2 cursor-pointer">✕</button>
+            </div>
+          )}
+          {avatarErrorMsg && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-300 rounded-2xl text-xs text-red-800 font-bold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>{avatarErrorMsg}</span>
+              </div>
+              <button onClick={() => setAvatarErrorMsg('')} className="text-red-700 hover:text-red-900 font-bold ml-2 cursor-pointer">✕</button>
+            </div>
+          )}
+
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             
             {/* User Details */}
@@ -683,8 +705,8 @@ export default function ClientDashboard() {
                 title="Click to update Profile Picture (DP)"
                 className="relative group w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-emerald-900/10 shrink-0 cursor-pointer overflow-hidden ring-2 ring-emerald-500/20 hover:ring-emerald-500 transition-all"
               >
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full rounded-2xl object-cover" />
+                {(profileAvatar || user.avatar) ? (
+                  <img src={profileAvatar || user.avatar} alt={user.name} className="w-full h-full rounded-2xl object-cover" />
                 ) : (
                   user.name.charAt(0).toUpperCase()
                 )}
@@ -692,11 +714,16 @@ export default function ClientDashboard() {
                   <Camera className="w-4 h-4" />
                   <span className="hidden sm:inline">Change</span>
                 </div>
+                {isAvatarUploading && (
+                  <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center text-white">
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                  </div>
+                )}
               </div>
               <input
                 type="file"
                 ref={headerAvatarInputRef}
-                accept="image/jpeg,image/png,image/webp,image/jpg"
+                accept="image/*"
                 className="hidden"
                 onChange={handleAvatarFileChange}
               />
@@ -1575,7 +1602,7 @@ export default function ClientDashboard() {
                     <input
                       type="file"
                       ref={avatarInputRef}
-                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      accept="image/*"
                       className="hidden"
                       onChange={handleAvatarFileChange}
                     />

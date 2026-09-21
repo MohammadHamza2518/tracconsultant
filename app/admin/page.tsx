@@ -161,7 +161,7 @@ export default function AdminPage() {
     setIsUploadingAdminAvatar(true);
     setUserEditError('');
     try {
-      const compressedDataUrl = await compressAvatarImage(file, 400, 0.85);
+      const compressedDataUrl = await compressAvatarImage(file, 320, 0.82);
       setEditUserAvatar(compressedDataUrl);
     } catch (err: any) {
       setUserEditError(err.message || 'Failed to process image.');
@@ -2415,7 +2415,7 @@ export default function AdminPage() {
                   <input
                     type="file"
                     ref={adminAvatarInputRef}
-                    accept="image/jpeg,image/png,image/webp,image/jpg"
+                    accept="image/*"
                     className="hidden"
                     onChange={handleAdminAvatarFileChange}
                   />

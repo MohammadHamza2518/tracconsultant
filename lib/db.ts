@@ -383,10 +383,22 @@ export function createUser(userData: Partial<User> & { email: string; name: stri
   return syncUserPurchasedTools(newUser);
 }
 
-export function updateUser(id: string, updates: Partial<User>): User | null {
+export function updateUser(idOrEmail: string, updates: Partial<User>): User | null {
   const users = getUsers();
-  const idx = users.findIndex(u => u.id === id);
-  if (idx === -1) return null;
+  const search = idOrEmail.toLowerCase().trim();
+  const idx = users.findIndex(u => u.id.toLowerCase() === search || u.email.toLowerCase() === search);
+  if (idx === -1) {
+    if (search.includes('@') || (updates.email && updates.email.includes('@'))) {
+      const email = search.includes('@') ? search : updates.email!;
+      const newUser = createUser({
+        email,
+        name: updates.name || email.split('@')[0],
+        ...updates
+      });
+      return newUser;
+    }
+    return null;
+  }
 
   users[idx] = { ...users[idx], ...updates };
   saveUsers(users);
