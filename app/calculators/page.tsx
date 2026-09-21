@@ -69,7 +69,7 @@ export default function CalculatorsPage() {
           {/* New Regime Slabs Card */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-900">New Tax Regime Slabs (FY 2024-25 / 2025-26)</h3>
+              <h3 className="font-bold text-lg text-slate-900">New Tax Regime Slabs (FY 2023-24, 2024-25 &amp; 2025-26)</h3>
               <span className="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">Default Regime</span>
             </div>
             <p className="text-xs text-slate-500">

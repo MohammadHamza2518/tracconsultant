@@ -885,6 +885,14 @@ export default function Navbar() {
                           );
                         })}
                       </div>
+
+                      {/* Union Budget Updated Note - Client Requested */}
+                      <div className="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-200/70 text-[11px] sm:text-xs text-emerald-900 flex items-center gap-2 mt-2">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span className="font-medium">
+                          Updated to Union Budget FY for all years used, FY 23-24, 24-25 and 25-26.
+                        </span>
+                      </div>
                     </div>
 
                     {/* Column 2: Advance & Pro Modules */}
@@ -1345,6 +1353,12 @@ export default function Navbar() {
                         <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded">FREE</span>
                       </Link>
                     ))}
+                  </div>
+
+                  {/* Union Budget Updated Note - Mobile */}
+                  <div className="p-2 bg-emerald-50/80 rounded-lg border border-emerald-200/80 text-[10px] text-emerald-900 flex items-center gap-1.5 my-1.5">
+                    <Sparkles className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <span>Updated to Union Budget FY for all years used, FY 23-24, 24-25 and 25-26.</span>
                   </div>
 
                   <div className="text-xs font-bold uppercase tracking-wider text-indigo-700 pt-2 border-t border-slate-100 flex items-center gap-1">

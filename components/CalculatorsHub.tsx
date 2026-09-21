@@ -42,7 +42,7 @@ export interface CalcDef {
 export const ALL_CALCULATORS: CalcDef[] = [
   { id: 'capital-gains', name: 'Capital Gains Calculator', category: 'tax_salary', icon: TrendingUp, shortDesc: 'Shares & Equity MFs LTCG @ 12.5% & STCG @ 20% with Budget 2024 grandfathering', badge: 'Budget 2024' },
   { id: 'interest', name: 'Interest Calculator', category: 'banking', icon: Percent, shortDesc: 'Simple interest computation on loans, deposits & promissory notes' },
-  { id: 'income-tax', name: 'Income Tax Calculator', category: 'tax_salary', icon: Calculator, shortDesc: 'Union Budget FY 24-25 & 25-26 Old vs New Regime comparison with 87A rebate', badge: 'Union Budget' },
+  { id: 'income-tax', name: 'Income Tax Calculator', category: 'tax_salary', icon: Calculator, shortDesc: 'Union Budget FY 23-24, 24-25 & 25-26 Old vs New Regime comparison with 87A rebate', badge: 'Union Budget' },
   { id: 'gratuity', name: 'Gratuity Calculator', category: 'tax_salary', icon: Award, shortDesc: '15/26 formula calculation under Payment of Gratuity Act 1972' },
   { id: 'sip', name: 'SIP Calculator', category: 'investments', icon: TrendingUp, shortDesc: 'Systematic Investment Plan future wealth & compounded gains projection', badge: 'Most Popular' },
   { id: 'pf', name: 'PF Calculator', category: 'banking', icon: PiggyBank, shortDesc: 'EPFO 8.25% retirement corpus with employee & employer 12% contributions' },
