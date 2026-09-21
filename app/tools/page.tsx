@@ -77,7 +77,7 @@ export default function ToolsHubPage() {
             Professional Tax &amp; Compliance Tools
           </h1>
           <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed mb-8">
-            Engineered by Tracconsultant chartered accountants. Featuring 8 free foundational calculators and 4 advance browser workstations with client-side zero-leakage vector processing.
+            Engineered by Tracconsultant chartered accountants. Featuring 8 free foundational tools and 4 advance browser workstations with client-side zero-leakage vector processing.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -131,7 +131,7 @@ export default function ToolsHubPage() {
                 filter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'hover:text-slate-900'
               }`}
             >
-              All Utilities ({TOOLS_LIST.length})
+              All Tools ({TOOLS_LIST.length})
             </button>
             <button
               onClick={() => setFilter('free')}
@@ -139,7 +139,7 @@ export default function ToolsHubPage() {
                 filter === 'free' ? 'bg-white text-emerald-700 shadow-sm' : 'hover:text-emerald-700'
               }`}
             >
-              Free Utilities ({TOOLS_LIST.filter(t => t.category === 'free').length})
+              Free Tools ({TOOLS_LIST.filter(t => t.category === 'free').length})
             </button>
             <button
               onClick={() => setFilter('paid')}
@@ -147,7 +147,7 @@ export default function ToolsHubPage() {
                 filter === 'paid' ? 'bg-white text-indigo-700 shadow-sm' : 'hover:text-indigo-700'
               }`}
             >
-              Advance &amp; Pro ({TOOLS_LIST.filter(t => t.category === 'paid').length})
+              Advance &amp; Pro Tools ({TOOLS_LIST.filter(t => t.category === 'paid').length})
             </button>
           </div>
 

@@ -19,7 +19,7 @@ export default function TaxCalculatorPage() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2 border border-emerald-500/30">
               <Sparkles className="w-3.5 h-3.5" /> Budget 2024-25 / 2025-26 Ready
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">Income Tax Calculator</h1>
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">Income Tax Computation Tool</h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
               Side-by-side Old vs New Tax Regime calculation with dynamic standard deduction & 87A rebate.
             </p>

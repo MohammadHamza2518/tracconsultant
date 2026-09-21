@@ -32,7 +32,7 @@ export const TOOLS_LIST: ToolConfig[] = [
   // 8 FREE & BASIC TOOLS
   {
     id: 'hra-calculator',
-    name: 'HRA Exemption Calculator',
+    name: 'HRA Exemption Tool',
     slug: 'hra-calculator',
     category: 'free',
     price: 0,
@@ -45,7 +45,7 @@ export const TOOLS_LIST: ToolConfig[] = [
   },
   {
     id: 'advance-tax-calculator',
-    name: 'Advance Tax Calculator',
+    name: 'Advance Tax Tool',
     slug: 'advance-tax-calculator',
     category: 'free',
     price: 0,
@@ -58,7 +58,7 @@ export const TOOLS_LIST: ToolConfig[] = [
   },
   {
     id: 'tax-calculator',
-    name: 'Income Tax Calculator (Budget FY 2024–25)',
+    name: 'Income Tax Computation Tool (Budget FY 2024–25)',
     slug: 'tax-calculator',
     category: 'free',
     price: 0,

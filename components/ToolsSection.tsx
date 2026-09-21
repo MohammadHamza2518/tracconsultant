@@ -49,7 +49,7 @@ export default function ToolsSection() {
               Tax & Compliance Digital Suite
             </h2>
             <p className="text-sm text-slate-400 max-w-2xl mt-2">
-              Free Union Budget calculators for taxpayers, plus enterprise-grade tools for GSTR-2A reconciliation, PDF sensitive data masking, and Schedule III Balance Sheets.
+              Free essential tax and compliance tools for taxpayers, plus enterprise-grade utilities for GSTR-2A reconciliation, PDF sensitive data masking, and Schedule III Balance Sheets.
             </p>
           </div>
 

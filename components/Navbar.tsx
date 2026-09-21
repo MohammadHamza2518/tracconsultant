@@ -778,7 +778,7 @@ export default function Navbar() {
                           Tax &amp; Compliance Software Suite
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          8 Free &amp; Basic calculators and 4 Advance &amp; Pro compliance modules
+                          8 Free &amp; Basic tools and 4 Advance &amp; Pro compliance modules
                         </p>
                       </div>
                     </div>
@@ -794,7 +794,7 @@ export default function Navbar() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
-                          <Calculator className="w-3 h-3" /> Free &amp; Basic Tools ({freeTools.length})
+                          <Layers className="w-3 h-3" /> Free &amp; Basic Tools ({freeTools.length})
                         </span>
                         <span className="text-xs font-bold text-emerald-600">100% Free</span>
                       </div>
@@ -845,7 +845,7 @@ export default function Navbar() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
-                          <Sparkles className="w-3 h-3" /> Advance &amp; Pro Utilities ({paidTools.length})
+                          <Sparkles className="w-3 h-3" /> Advance &amp; Pro Tools ({paidTools.length})
                         </span>
                         <span className="text-xs font-bold text-indigo-600">₹199 - ₹299</span>
                       </div>
