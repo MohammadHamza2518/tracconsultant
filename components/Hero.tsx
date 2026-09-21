@@ -23,7 +23,8 @@ import {
   FileCheck,
   Phone,
   Sparkles,
-  Zap
+  Zap,
+  Calculator
 } from 'lucide-react';
 
 export default function Hero() {
@@ -121,7 +122,10 @@ export default function Hero() {
               </span>
               <span className="font-bold text-slate-900">AY 2025–26 Tax Filing Active</span>
               <span className="text-slate-300">•</span>
-              <span className="text-emerald-700 font-medium">New ₹75,000 Deduction</span>
+              <Link href="/calculators" className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                <span>19 Free Calculators</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-black">NEW</span>
+              </Link>
             </div>
 
             {/* Main Headline */}
@@ -137,24 +141,32 @@ export default function Hero() {
             </p>
 
             {/* Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <button
                 type="button"
                 onClick={handleScrollToFileNow}
-                className="w-full sm:w-auto px-8 py-4 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                className="w-full sm:w-auto px-7 py-4 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <span>Start CA Filing</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
+              <Link
+                href="/calculators"
+                className="w-full sm:w-auto px-6 py-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
+              >
+                <Calculator className="w-4 h-4 text-emerald-600" />
+                <span>19 Free Calculators</span>
+              </Link>
+
               <a
                 href="https://wa.me/917275922162?text=Hello%20Tracconsultant!%20I%20would%20like%20to%20consult%20a%20Senior%20CA%20for%20my%20tax%20filing."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-7 py-4 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 hover:border-slate-400 rounded-xl font-semibold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2.5"
+                className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 hover:border-slate-400 rounded-xl font-semibold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-600" />
-                <span>Chat with Senior CA</span>
+                <span>Chat with CA</span>
               </a>
             </div>
 
