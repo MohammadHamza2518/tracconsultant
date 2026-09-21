@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { FilingItem, WhatsAppTemplate, WhatsAppSettings, FilingStatus, TimelineStep, User, ToolPurchase, LeadItem, PaymentTransaction } from './types';
+import { FilingItem, WhatsAppTemplate, WhatsAppSettings, FilingStatus, TimelineStep, User, ToolPurchase, LeadItem, PaymentTransaction, CAQueryItem } from './types';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const FILINGS_FILE = path.join(DATA_DIR, 'filings.json');
@@ -11,6 +11,7 @@ const TOOL_PURCHASES_FILE = path.join(DATA_DIR, 'tool_purchases.json');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
 const PAYMENTS_FILE = path.join(DATA_DIR, 'payments.json');
 const GST_INVOICES_FILE = path.join(DATA_DIR, 'gst_invoices.json');
+const CA_QUERIES_FILE = path.join(DATA_DIR, 'ca_queries.json');
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -906,6 +907,85 @@ export function deleteSavedGstInvoice(number: string): boolean {
   if (filtered.length === list.length) return false;
   saveGstInvoicesList(filtered);
   return true;
+}
+
+// ==========================================
+// CA ADVISORY & PAID QUERY DESK OPERATIONS
+// ==========================================
+
+export function getCAQueries(): CAQueryItem[] {
+  ensureDataDir();
+  if (!fs.existsSync(CA_QUERIES_FILE)) {
+    fs.writeFileSync(CA_QUERIES_FILE, JSON.stringify([], null, 2), 'utf-8');
+    return [];
+  }
+  return safeReadJSON<CAQueryItem[]>(CA_QUERIES_FILE, []);
+}
+
+export function saveCAQueriesList(list: CAQueryItem[]): void {
+  ensureDataDir();
+  fs.writeFileSync(CA_QUERIES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+}
+
+export function createCAQuery(data: Partial<CAQueryItem>): CAQueryItem {
+  const list = getCAQueries();
+  const randomNum = Math.floor(10000 + Math.random() * 90000);
+  const newQuery: CAQueryItem = {
+    id: data.id || `TRAC-QRY-${randomNum}`,
+    userId: data.userId || '',
+    clientName: data.clientName?.trim() || 'Valued Client',
+    clientEmail: data.clientEmail?.trim().toLowerCase() || '',
+    clientPhone: data.clientPhone?.trim() || '',
+    category: data.category || 'Income Tax & Legal Advisory',
+    plan: data.plan || 'standard',
+    amount: data.amount || (data.plan === 'priority' ? 599 : 299),
+    paymentId: data.paymentId || '',
+    orderId: data.orderId || '',
+    paymentStatus: data.paymentStatus || 'pending',
+    querySubject: data.querySubject?.trim() || 'Tax Notice / Advisory Question',
+    queryDetails: data.queryDetails?.trim() || '',
+    documents: data.documents || [],
+    status: data.status || 'pending',
+    assignedCA: data.assignedCA || {
+      name: 'CA Mohammad Farhan',
+      membershipNumber: 'ICAI-532189',
+      phone: '+917275922162'
+    },
+    createdAt: data.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  list.unshift(newQuery);
+  saveCAQueriesList(list);
+  return newQuery;
+}
+
+export function findCAQueryById(id: string): CAQueryItem | undefined {
+  const list = getCAQueries();
+  const search = id.trim().toLowerCase();
+  return list.find(q => q.id.toLowerCase() === search);
+}
+
+export function findCAQueryByOrderId(orderId: string): CAQueryItem | undefined {
+  const list = getCAQueries();
+  return list.find(q => q.orderId === orderId);
+}
+
+export function updateCAQuery(id: string, updates: Partial<CAQueryItem>): CAQueryItem | null {
+  const list = getCAQueries();
+  const idx = list.findIndex(q => q.id.toLowerCase() === id.trim().toLowerCase());
+  if (idx === -1) return null;
+
+  const current = list[idx];
+  const updated: CAQueryItem = {
+    ...current,
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+
+  list[idx] = updated;
+  saveCAQueriesList(list);
+  return updated;
 }
 
 

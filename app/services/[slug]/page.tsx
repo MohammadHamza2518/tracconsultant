@@ -55,10 +55,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const EXPLICIT_ROUTES = ['gst-filing', 'itr-filing', 'accounting-tds', 'company-registration', 'notice-assistance', 'ecommerce-gst-filing'];
+
 export async function generateStaticParams() {
-  return SERVICES_LIST.map((service) => ({
-    slug: service.slug,
-  }));
+  return SERVICES_LIST
+    .filter((service) => !EXPLICIT_ROUTES.includes(service.slug))
+    .map((service) => ({
+      slug: service.slug,
+    }));
 }
 
 export default async function ServiceDetailPage({ params }: Props) {

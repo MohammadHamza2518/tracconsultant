@@ -185,3 +185,36 @@ export interface PaymentTransaction {
   notes?: Record<string, any>;
 }
 
+export interface CAQueryItem {
+  id: string; // e.g. TRAC-QRY-2025-89102
+  userId?: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  category: string; // e.g. 'Income Tax Notice Scrutiny', 'GST & Input Tax Credit', etc.
+  plan: 'standard' | 'priority'; // Standard Written ₹299 vs Priority Notice Desk ₹599
+  amount: number; // 299 or 599
+  paymentId?: string;
+  orderId?: string;
+  paymentStatus: 'paid' | 'pending' | 'failed';
+  querySubject: string;
+  queryDetails: string;
+  documents?: { name: string; size: string; type?: string; dataUrl?: string }[];
+  status: 'pending' | 'in_review' | 'resolved';
+  assignedCA?: {
+    name: string;
+    membershipNumber?: string;
+    phone?: string;
+  };
+  caResponse?: {
+    caName: string;
+    membershipNumber?: string;
+    opinion: string;
+    legalSectionsCited?: string;
+    actionSteps?: string[];
+    respondedAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+

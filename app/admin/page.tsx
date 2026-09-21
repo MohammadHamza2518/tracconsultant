@@ -40,7 +40,7 @@ import {
   Camera,
   Receipt
 } from 'lucide-react';
-import { FilingItem, FilingStatus, WhatsAppTemplate, WhatsAppSettings, User, ToolPurchase, LeadItem, PaymentTransaction } from '@/lib/types';
+import { FilingItem, FilingStatus, WhatsAppTemplate, WhatsAppSettings, User, ToolPurchase, LeadItem, PaymentTransaction, CAQueryItem } from '@/lib/types';
 import { TOOLS_LIST, SERVICES_LIST } from '@/lib/data';
 import { SystemConfig, DEFAULT_SYSTEM_CONFIG } from '@/lib/systemConfigDefaults';
 import { compressAvatarImage } from '@/lib/imageUtils';
@@ -52,8 +52,8 @@ export default function AdminPage() {
   const [passcode, setPasscode] = useState<string>('');
   const [authError, setAuthError] = useState<string>('');
 
-  // Active Tab: filings, tool_purchases, users, leads, whatsapp, pricing_config, analytics
-  const [activeTab, setActiveTab] = useState<'filings' | 'tool_purchases' | 'users' | 'leads' | 'whatsapp' | 'pricing_config' | 'analytics'>('filings');
+  // Active Tab: filings, queries, tool_purchases, users, leads, whatsapp, pricing_config, analytics
+  const [activeTab, setActiveTab] = useState<'filings' | 'queries' | 'tool_purchases' | 'users' | 'leads' | 'whatsapp' | 'pricing_config' | 'analytics'>('filings');
 
   // Dynamic Pricing & Tax Config State
   const [config, setConfig] = useState<SystemConfig>(DEFAULT_SYSTEM_CONFIG);
@@ -71,6 +71,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [toolsSubTab, setToolsSubTab] = useState<'tools' | 'transactions'>('tools');
   const [transactionSearchQuery, setTransactionSearchQuery] = useState<string>('');
+
+  // CA Advisory Queries State
+  const [queries, setQueries] = useState<CAQueryItem[]>([]);
+  const [selectedQuery, setSelectedQuery] = useState<CAQueryItem | null>(null);
+  const [queryStatusFilter, setQueryStatusFilter] = useState<'all' | 'pending' | 'in_review' | 'resolved'>('all');
+  const [queryPlanFilter, setQueryPlanFilter] = useState<'all' | 'standard' | 'priority'>('all');
+  const [querySearchText, setQuerySearchText] = useState<string>('');
+  const [caOpinionText, setCaOpinionText] = useState<string>('');
+  const [caLegalSections, setCaLegalSections] = useState<string>('');
+  const [caActionSteps, setCaActionSteps] = useState<string>('');
+  const [caAssignedName, setCaAssignedName] = useState<string>('Senior Chartered Accountant (FCA)');
+  const [caMembershipNumber, setCaMembershipNumber] = useState<string>('ICAI #514298');
+  const [isSavingQueryResponse, setIsSavingQueryResponse] = useState<boolean>(false);
+  const [queryResponseSuccess, setQueryResponseSuccess] = useState<string>('');
+  const [queryResponseError, setQueryResponseError] = useState<string>('');
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -259,14 +274,15 @@ export default function AdminPage() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [fRes, uRes, pRes, lRes, tRes, cRes, txRes] = await Promise.all([
+      const [fRes, uRes, pRes, lRes, tRes, cRes, txRes, qRes] = await Promise.all([
         fetch('/api/filings'),
         fetch('/api/admin/users'),
         fetch('/api/admin/tools-access'),
         fetch('/api/leads'),
         fetch('/api/whatsapp/templates'),
         fetch('/api/admin/config'),
-        fetch('/api/payment/transactions')
+        fetch('/api/payment/transactions'),
+        fetch('/api/admin/queries')
       ]);
 
       const fData = await fRes.json();
@@ -276,6 +292,7 @@ export default function AdminPage() {
       const tData = await tRes.json();
       const cData = await cRes.json();
       const txData = await txRes.json();
+      const qData = await qRes.json();
 
       if (fData.success) setFilings(fData.data || []);
       if (uData.users) setUsers(uData.users || []);
@@ -288,6 +305,9 @@ export default function AdminPage() {
       }
       if (cData.success && cData.config) {
         setConfig(cData.config);
+      }
+      if (qData.success && qData.queries) {
+        setQueries(qData.queries || []);
       }
     } catch (err) {
       console.error('Failed to load admin data:', err);
@@ -517,10 +537,114 @@ export default function AdminPage() {
   const totalToolRevenue = toolPurchases.reduce((acc, p) => acc + (p.status === 'active' ? p.amount : 0), 0);
   const totalServicePayments = payments.filter(p => p.status === 'paid' && !p.notes?.toolId);
   const totalServiceRevenue = totalServicePayments.reduce((acc, p) => acc + (p.amount || 0), 0);
-  const totalPlatformRevenue = totalToolRevenue + totalServiceRevenue;
+  const totalQueries = queries.length;
+  const pendingQueriesCount = queries.filter(q => q.status !== 'resolved').length;
+  const resolvedQueriesCount = queries.filter(q => q.status === 'resolved').length;
+  const totalQueryRevenue = queries.filter(q => q.paymentStatus === 'paid').reduce((acc, q) => acc + (q.amount || 0), 0);
+  const totalPlatformRevenue = totalToolRevenue + totalServiceRevenue + totalQueryRevenue;
   const pendingReviews = filings.filter(f => f.status === 'new' || f.status === 'under_review').length;
   const inProgress = filings.filter(f => f.status === 'ca_assigned' || f.status === 'draft_ready').length;
   const completedFilings = filings.filter(f => f.status === 'filed' || f.status === 'completed').length;
+
+  // Filtered queries
+  const filteredQueries = queries.filter(q => {
+    const matchesSearch = 
+      q.id.toLowerCase().includes(querySearchText.toLowerCase()) ||
+      q.clientName.toLowerCase().includes(querySearchText.toLowerCase()) ||
+      q.clientPhone.includes(querySearchText) ||
+      q.clientEmail.toLowerCase().includes(querySearchText.toLowerCase()) ||
+      q.querySubject.toLowerCase().includes(querySearchText.toLowerCase()) ||
+      q.category.toLowerCase().includes(querySearchText.toLowerCase());
+
+    const matchesStatus = queryStatusFilter === 'all' || q.status === queryStatusFilter;
+    const matchesPlan = queryPlanFilter === 'all' || q.plan === queryPlanFilter;
+
+    return matchesSearch && matchesStatus && matchesPlan;
+  });
+
+  // Query Actions
+  const openQueryDrawer = (query: CAQueryItem) => {
+    setSelectedQuery(query);
+    setCaOpinionText(query.caResponse?.opinion || '');
+    setCaLegalSections(query.caResponse?.legalSectionsCited || '');
+    setCaActionSteps((query.caResponse?.actionSteps || []).join('\n'));
+    setCaAssignedName(query.caResponse?.caName || query.assignedCA?.name || 'Senior Chartered Accountant (FCA)');
+    setCaMembershipNumber(query.caResponse?.membershipNumber || query.assignedCA?.membershipNumber || 'ICAI #514298');
+    setQueryResponseSuccess('');
+    setQueryResponseError('');
+  };
+
+  const handleSaveQueryResponse = async (status: 'in_review' | 'resolved' = 'resolved') => {
+    if (!selectedQuery) return;
+    setIsSavingQueryResponse(true);
+    setQueryResponseError('');
+    setQueryResponseSuccess('');
+
+    try {
+      const actionStepsArray = caActionSteps
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const res = await fetch(`/api/admin/queries/${selectedQuery.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status,
+          assignedCA: {
+            name: caAssignedName,
+            membershipNumber: caMembershipNumber,
+            phone: '7275922162'
+          },
+          caResponse: {
+            caName: caAssignedName,
+            membershipNumber: caMembershipNumber,
+            opinion: caOpinionText,
+            legalSectionsCited: caLegalSections,
+            actionSteps: actionStepsArray
+          }
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setQueryResponseError(data.error || 'Failed to save CA response');
+        setIsSavingQueryResponse(false);
+        return;
+      }
+
+      setQueryResponseSuccess('Legal Opinion & Advice saved successfully! Public tracking updated.');
+      setQueries(prev => prev.map(q => q.id === selectedQuery.id ? data.query : q));
+      setSelectedQuery(data.query);
+      setTimeout(() => setQueryResponseSuccess(''), 3500);
+    } catch (err: any) {
+      setQueryResponseError(err.message || 'Error saving response');
+    } finally {
+      setIsSavingQueryResponse(false);
+    }
+  };
+
+  const handleDeleteQuery = async (queryId: string) => {
+    if (!confirm(`Are you sure you want to delete query ${queryId}?`)) return;
+    try {
+      const res = await fetch(`/api/admin/queries/${queryId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setQueries(prev => prev.filter(q => q.id !== queryId));
+        if (selectedQuery?.id === queryId) setSelectedQuery(null);
+      }
+    } catch (e: any) {
+      alert('Failed to delete query: ' + e.message);
+    }
+  };
+
+  const sendQueryWhatsApp = (query: CAQueryItem) => {
+    const cleanPhone = (query.clientPhone || '').replace(/\D/g, '').slice(-10);
+    const opinionSnippet = query.caResponse?.opinion 
+      ? `\n\n📋 *CA Legal Opinion Summary:*\n${query.caResponse.opinion.slice(0, 250)}...`
+      : '';
+    const text = `Hello ${query.clientName}! 👋\n\nRegarding your consultation query *${query.id}* (${query.querySubject}):\n\nOur Senior Chartered Accountant (${query.caResponse?.caName || 'ICAI Panel'}) has reviewed your case.${opinionSnippet}\n\n🔗 *Track your case & view full signed opinion:* https://tracconsultant.com/track?q=${query.id}\n\nFeel free to reply here if you have any questions!`;
+    window.open(`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   // Filtered filings
   const filteredFilings = filings.filter(f => {
@@ -821,7 +945,7 @@ export default function AdminPage() {
               <DollarSign className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-2xl sm:text-3xl font-black text-slate-900">₹{totalPlatformRevenue.toLocaleString('en-IN')}</div>
-            <div className="text-[11px] text-emerald-700 font-semibold mt-1">₹{totalToolRevenue.toLocaleString('en-IN')} Tools • ₹{totalServiceRevenue.toLocaleString('en-IN')} Services</div>
+            <div className="text-[11px] text-emerald-700 font-semibold mt-1">₹{totalToolRevenue.toLocaleString('en-IN')} Tools • ₹{totalServiceRevenue.toLocaleString('en-IN')} Services • ₹{totalQueryRevenue.toLocaleString('en-IN')} CA Desk</div>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -855,6 +979,23 @@ export default function AdminPage() {
           >
             <FileText className="w-4 h-4" />
             <span>20 Services Filings ({filings.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('queries')}
+            className={`pb-3 px-2 border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'queries'
+                ? 'border-amber-600 text-amber-700 font-black'
+                : 'border-transparent hover:text-slate-900'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <span>CA Advisory Desk ({queries.length})</span>
+            {pendingQueriesCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                {pendingQueriesCount}
+              </span>
+            )}
           </button>
 
           <button
@@ -1038,6 +1179,232 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* TAB: CA ADVISORY & PAID CONSULTATION DESK */}
+        {activeTab === 'queries' && (
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900">CA Advisory & Legal Opinion Desk</h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    Paid ₹299 / ₹599 Consultations
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Review tax notices, draft authoritative legal opinions, cite statutory sections & notify clients
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/consult-ca"
+                  target="_blank"
+                  className="px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Public Portal</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Queries</span>
+                <span className="text-xl font-black text-slate-900">{totalQueries}</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">All received cases</span>
+              </div>
+
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+                <span className="text-[10px] font-bold text-amber-700 uppercase block">Pending Review</span>
+                <span className="text-xl font-black text-amber-800">{pendingQueriesCount}</span>
+                <span className="text-[10px] text-amber-700 block mt-0.5">Needs CA written opinion</span>
+              </div>
+
+              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
+                <span className="text-[10px] font-bold text-emerald-700 uppercase block">Resolved Opinions</span>
+                <span className="text-xl font-black text-emerald-800">{resolvedQueriesCount}</span>
+                <span className="text-[10px] text-emerald-700 block mt-0.5">Delivered to client</span>
+              </div>
+
+              <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-200">
+                <span className="text-[10px] font-bold text-indigo-700 uppercase block">Advisory Revenue</span>
+                <span className="text-xl font-black text-indigo-900">₹{totalQueryRevenue.toLocaleString('en-IN')}</span>
+                <span className="text-[10px] text-indigo-700 block mt-0.5">100% Collected via Razorpay</span>
+              </div>
+            </div>
+
+            {/* Filters & Search */}
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  placeholder="Search client, query ID, phone, topic..."
+                  value={querySearchText}
+                  onChange={(e) => setQuerySearchText(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-xs flex-wrap">
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                  {(['all', 'pending', 'in_review', 'resolved'] as const).map(st => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setQueryStatusFilter(st)}
+                      className={`px-3 py-1 rounded-lg font-bold capitalize transition-colors cursor-pointer text-xs ${
+                        queryStatusFilter === st
+                          ? 'bg-white text-slate-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {st.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                <select
+                  value={queryPlanFilter}
+                  onChange={(e: any) => setQueryPlanFilter(e.target.value)}
+                  className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-1.5 font-bold text-slate-700 text-xs focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="all">All Tiers</option>
+                  <option value="standard">Standard (₹299)</option>
+                  <option value="priority">Priority Notice (₹599)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Queries Table */}
+            {filteredQueries.length > 0 ? (
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-900 text-white font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="p-3">Query ID & Date</th>
+                      <th className="p-3">Client Details</th>
+                      <th className="p-3">Tier & Paid</th>
+                      <th className="p-3">Category & Subject</th>
+                      <th className="p-3">Documents</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {filteredQueries.map((query) => (
+                      <tr key={query.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <span className="font-mono font-bold text-slate-900 block">{query.id}</span>
+                          <span className="text-[10px] text-slate-400">
+                            {new Date(query.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </span>
+                        </td>
+
+                        <td className="p-3">
+                          <span className="font-bold text-slate-900 block">{query.clientName}</span>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                            <a href={`tel:${query.clientPhone}`} className="text-emerald-700 hover:underline">
+                              {query.clientPhone}
+                            </a>
+                            <span>•</span>
+                            <span className="truncate max-w-[120px]">{query.clientEmail}</span>
+                          </div>
+                        </td>
+
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold block w-max ${
+                            query.plan === 'priority'
+                              ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                              : 'bg-indigo-100 text-indigo-800'
+                          }`}>
+                            {query.plan === 'priority' ? '⚡ Priority ₹599' : 'Standard ₹299'}
+                          </span>
+                          <span className="text-[10px] text-emerald-700 font-bold mt-1 block">
+                            ✓ Paid (Razorpay)
+                          </span>
+                        </td>
+
+                        <td className="p-3 max-w-xs">
+                          <span className="text-[10px] uppercase font-bold text-slate-500 block truncate">
+                            {query.category}
+                          </span>
+                          <span className="font-bold text-slate-900 block truncate" title={query.querySubject}>
+                            {query.querySubject}
+                          </span>
+                        </td>
+
+                        <td className="p-3">
+                          {query.documents && query.documents.length > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-md text-[10px] font-semibold text-slate-700">
+                              <FileText className="w-3 h-3 text-red-500" />
+                              <span>{query.documents.length} File{query.documents.length > 1 ? 's' : ''}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400">None</span>
+                          )}
+                        </td>
+
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize ${
+                            query.status === 'resolved'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : query.status === 'in_review'
+                              ? 'bg-amber-100 text-amber-800 animate-pulse'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {query.status.replace('_', ' ')}
+                          </span>
+                        </td>
+
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => openQueryDrawer(query)}
+                              className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
+                            >
+                              Draft Opinion
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => sendQueryWhatsApp(query)}
+                              className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                              title="WhatsApp Client"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteQuery(query.id)}
+                              className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                              title="Delete Query"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-12 text-center text-slate-400 space-y-2 border border-dashed border-slate-200 rounded-2xl">
+                <ShieldCheck className="w-8 h-8 mx-auto text-slate-300" />
+                <p className="text-xs font-semibold text-slate-600">No consultation queries found matching your filters.</p>
+                <p className="text-[11px] text-slate-400">
+                  Clients who submit and pay ₹299 / ₹599 on the Consult a CA page will appear here instantly.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -1969,6 +2336,267 @@ export default function AdminPage() {
                 {isGranting ? 'Granting...' : 'Confirm & Grant Tool Access'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* CA Advisory Desk Detail / Legal Opinion Drawer Modal */}
+      {selectedQuery && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+          <div className="w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex justify-between items-start pb-4 border-b border-slate-100">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white px-2.5 py-0.5 rounded-full font-mono">
+                    {selectedQuery.id}
+                  </span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                    selectedQuery.plan === 'priority'
+                      ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                      : 'bg-indigo-100 text-indigo-800'
+                  }`}>
+                    {selectedQuery.plan === 'priority' ? '⚡ Priority Notice Scrutiny (₹599)' : 'Standard Written Opinion (₹299)'}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    Paid ₹{selectedQuery.amount} (Razorpay)
+                  </span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full capitalize ${
+                    selectedQuery.status === 'resolved'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : selectedQuery.status === 'in_review'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {selectedQuery.status.replace('_', ' ')}
+                  </span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mt-2">{selectedQuery.querySubject}</h3>
+                <p className="text-xs text-slate-500">
+                  {selectedQuery.category} • Submitted on {new Date(selectedQuery.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedQuery(null)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Client Info Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
+              <div>
+                <span className="text-slate-400 font-semibold block text-[10px] uppercase">Client Name</span>
+                <span className="font-bold text-slate-900 text-sm">{selectedQuery.clientName}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 font-semibold block text-[10px] uppercase">Mobile Phone</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <a href={`tel:${selectedQuery.clientPhone}`} className="font-bold text-emerald-700 hover:underline">
+                    {selectedQuery.clientPhone}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => sendQueryWhatsApp(selectedQuery)}
+                    className="p-1 text-emerald-600 hover:bg-emerald-100 rounded transition-colors"
+                    title="Open WhatsApp"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+              <div>
+                <span className="text-slate-400 font-semibold block text-[10px] uppercase">Email</span>
+                <a href={`mailto:${selectedQuery.clientEmail}`} className="font-bold text-blue-700 hover:underline truncate block">
+                  {selectedQuery.clientEmail}
+                </a>
+              </div>
+            </div>
+
+            {/* Query Narrative */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Client Notice / Problem Description</h4>
+              <div className="p-4 bg-amber-50/70 rounded-2xl border border-amber-200 text-xs text-slate-800 whitespace-pre-wrap leading-relaxed">
+                {selectedQuery.queryDetails}
+              </div>
+            </div>
+
+            {/* Attached Documents */}
+            {selectedQuery.documents && selectedQuery.documents.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Attached Notice / Document Dossier ({selectedQuery.documents.length})
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {selectedQuery.documents.map((doc, idx) => (
+                    <div key={idx} className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between text-xs hover:border-slate-300 transition-colors">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-4 h-4 text-red-500 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-800 truncate text-[11px]">{doc.name}</p>
+                          <p className="text-[10px] text-slate-400">{doc.size}</p>
+                        </div>
+                      </div>
+                      {doc.dataUrl ? (
+                        <a
+                          href={doc.dataUrl}
+                          download={doc.name}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold shrink-0 transition-colors flex items-center gap-1"
+                        >
+                          <Download className="w-3 h-3" />
+                          <span>View/DL</span>
+                        </a>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-semibold">Attached</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CA Opinion Composer */}
+            <div className="p-5 bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl text-white space-y-4 border border-slate-800">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">
+                    CA
+                  </div>
+                  <h4 className="text-sm font-bold text-white">Senior Chartered Accountant Written Legal Opinion</h4>
+                </div>
+                <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  Signed Legal Advisory
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Assigned Senior CA</label>
+                  <input
+                    type="text"
+                    value={caAssignedName}
+                    onChange={(e) => setCaAssignedName(e.target.value)}
+                    placeholder="e.g. Senior Chartered Accountant (FCA)"
+                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">ICAI Membership No.</label>
+                  <input
+                    type="text"
+                    value={caMembershipNumber}
+                    onChange={(e) => setCaMembershipNumber(e.target.value)}
+                    placeholder="e.g. ICAI #514298"
+                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  Statutory Income Tax / GST Sections Cited
+                </label>
+                <input
+                  type="text"
+                  value={caLegalSections}
+                  onChange={(e) => setCaLegalSections(e.target.value)}
+                  placeholder="e.g. Section 143(1)(a), Section 139(9) Defective Return, Rule 86B"
+                  className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  Authoritative Written Legal Opinion & Analysis
+                </label>
+                <textarea
+                  rows={6}
+                  value={caOpinionText}
+                  onChange={(e) => setCaOpinionText(e.target.value)}
+                  placeholder="Draft your detailed legal assessment, statutory defense, and technical breakdown here..."
+                  className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 leading-relaxed font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  Recommended Action Steps for Client (One step per line)
+                </label>
+                <textarea
+                  rows={3}
+                  value={caActionSteps}
+                  onChange={(e) => setCaActionSteps(e.target.value)}
+                  placeholder="1. File rectification under Section 154 within 30 days&#10;2. Download updated AIS/TIS from Income Tax portal&#10;3. Submit grievance on IT e-filing portal"
+                  className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 leading-relaxed"
+                />
+              </div>
+
+              {queryResponseSuccess && (
+                <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{queryResponseSuccess}</span>
+                </div>
+              )}
+
+              {queryResponseError && (
+                <div className="p-3 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>{queryResponseError}</span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSaveQueryResponse('in_review')}
+                    disabled={isSavingQueryResponse}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Save Draft (Keep In Review)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSaveQueryResponse('resolved')}
+                    disabled={isSavingQueryResponse}
+                    className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {isSavingQueryResponse ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    )}
+                    <span>Submit & Mark Resolved</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/track?q=${selectedQuery.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Public Tracker</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => sendQueryWhatsApp(selectedQuery)}
+                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>WhatsApp Client</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "TRAC-QRY-2025-89102",
+    "clientName": "Vikramaditya Singhania",
+    "clientEmail": "vikram.singhania@gmail.com",
+    "clientPhone": "8826190281",
+    "category": "Income Tax Notice Scrutiny",
+    "plan": "priority",
+    "amount": 599,
+    "paymentId": "pay_PriyScrutiny89102",
+    "orderId": "order_PriorityNotice_89102",
+    "paymentStatus": "paid",
+    "querySubject": "Notice received under Section 143(1)(a) claiming mismatch in AIS interest and salary TDS",
+    "queryDetails": "I received an intimation u/s 143(1)(a) stating an apparent mismatch between the TDS claimed in my ITR-2 and the TDS reflected in 26AS/AIS. A tax demand of ₹42,500 has been raised. My employer deducted the tax properly, but the bank reported savings interest without applying Section 80TTA. What are my legal remedies and how should I respond on the e-filing portal?",
+    "documents": [
+      {
+        "name": "IT_Notice_Sec143_1a_Intimation.pdf",
+        "size": "1.4 MB",
+        "type": "application/pdf"
+      },
+      {
+        "name": "Form16_PartA_PartB.pdf",
+        "size": "2.1 MB",
+        "type": "application/pdf"
+      }
+    ],
+    "status": "resolved",
+    "assignedCA": {
+      "name": "Senior Chartered Accountant (FCA)",
+      "membershipNumber": "ICAI #514298",
+      "phone": "7275922162"
+    },
+    "caResponse": {
+      "caName": "Senior Chartered Accountant (FCA)",
+      "membershipNumber": "ICAI #514298",
+      "opinion": "Upon legal examination of the intimation notice under Section 143(1)(a), the assessing unit has prima facie treated the difference between Schedule TDS and AIS as undisclosed income without factoring in the standard deduction under Section 80TTA (up to ₹10,000 for non-senior citizens) and credit timing differences under Section 199 read with Rule 37BA of the Income Tax Rules. The demand of ₹42,500 is factually erroneous and legally contestable. Do NOT pay the demand. A formal Rectification Petition under Section 154 accompanied by an online disagreement response will vacate the demand without scrutiny penalty.",
+      "legalSectionsCited": "Section 143(1)(a), Section 154 (Rectification of Mistake), Section 80TTA, Section 199 read with Rule 37BA",
+      "actionSteps": [
+        "Login to incometax.gov.in > Pending Actions > Response to Outstanding Demand.",
+        "Select 'Demand is incorrect' and choose 'Rectification / Revised return filed'.",
+        "File online Rectification Request under Section 154 selecting 'Tax Credit Mismatch' and 'Deduction Recomputation'.",
+        "Download updated AIS feedback form to reconcile the bank TAN with Form 16."
+      ],
+      "respondedAt": "2026-09-21T18:00:00.000Z"
+    },
+    "createdAt": "2026-09-21T14:30:00.000Z",
+    "updatedAt": "2026-09-21T18:00:00.000Z"
+  },
+  {
+    "id": "TRAC-QRY-2025-91204",
+    "clientName": "Ananya Deshmukh",
+    "clientEmail": "ananya.deshmukh@craftkart.in",
+    "clientPhone": "9820173645",
+    "category": "GST & Input Tax Credit (ITC)",
+    "plan": "standard",
+    "amount": 299,
+    "paymentId": "pay_StdQuery91204",
+    "orderId": "order_StdQuery_91204",
+    "paymentStatus": "paid",
+    "querySubject": "Vendor under QRMP scheme; ITC of ₹68,400 not showing in monthly GSTR-2B",
+    "queryDetails": "Our raw material supplier in Gujarat is registered under the QRMP scheme and files returns quarterly. We purchased goods worth ₹3.8 Lakhs in May with ₹68,400 GST. Since the supplier has not filed IFF by 13th May, the ITC is missing from our GSTR-2B for May. Can we claim provisional ITC in GSTR-3B or will we receive a Rule 86B notice?",
+    "documents": [
+      {
+        "name": "Tax_Invoice_Vendor_CraftKart.pdf",
+        "size": "850 KB",
+        "type": "application/pdf"
+      }
+    ],
+    "status": "in_review",
+    "assignedCA": {
+      "name": "Senior Chartered Accountant (FCA)",
+      "membershipNumber": "ICAI #514298",
+      "phone": "7275922162"
+    },
+    "createdAt": "2026-09-21T17:15:00.000Z",
+    "updatedAt": "2026-09-21T17:15:00.000Z"
+  }
+]

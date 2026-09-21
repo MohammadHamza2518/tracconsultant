@@ -134,6 +134,26 @@ export const TOOLS_LIST: ToolConfig[] = [
     tags: ['Basic', 'GSTR-2A', 'Supplier Summary', 'Excel Automation'],
     features: ['Removes duplicate & cancelled records', 'Aggregates by Vendor GSTIN', 'Calculates eligible vs ineligible ITC', 'Export clean single-sheet Excel']
   },
+  {
+    id: 'ecommerce-gst-converter',
+    name: 'E-Commerce GSTR-1 & TCS Generator',
+    slug: 'ecommerce-gst-converter',
+    category: 'free',
+    price: 0,
+    badge: '100% Free',
+    shortDesc: 'Instant Amazon MTR, Flipkart, Meesho sales to Table 7 B2CS JSON & Sec 52 TCS audit.',
+    description: 'Convert messy marketplace order sheets into official government portal uploadable Table 7 B2CS JSON. Automatic Place of Supply aggregation, sales return deductions, and 1% TCS Section 52 audit.',
+    icon: 'ShoppingCart',
+    tags: ['E-Commerce', 'Amazon MTR', 'Flipkart GSTR', 'Meesho', 'GSTR-1 JSON', 'TCS Sec 52'],
+    features: [
+      'Multi-Marketplace: Amazon MTR, Flipkart, Meesho & CSV',
+      'Table 7 B2CS State-wise Place of Supply consolidation',
+      'Automatic deduction of return & cancelled orders',
+      'Section 52 TCS 1% reconciliation ledger',
+      'Direct Gov GST Portal offline JSON export',
+      '100% Client-side local processing — zero data leaves browser'
+    ]
+  },
 
   // 4 NEW PAID / ADVANCE / PRO TOOLS
   {
@@ -512,5 +532,40 @@ export const SERVICES_LIST: ServiceConfig[] = [
     tat: '7-14 Working Days',
     documentsRequired: ['Last 3 years filed ITRs & Audited Reports', 'Past 12 months primary bank statements', 'CMA Report and financial projections', 'Property / collateral documents (for secured loans)'],
     highlights: ['Tie-ups with leading Public, Private Banks & NBFCs', 'Lowest interest rate negotiation', 'Credit rating & CIBIL optimization advice', 'High sanction approval track record']
+  },
+
+  // 21. E-Commerce Seller GST Filing & TCS Management
+  {
+    id: 'ecommerce-gst-filing',
+    number: 21,
+    title: 'E-Commerce Seller GST Filing & TCS Management',
+    slug: 'ecommerce-gst-filing',
+    category: 'gst',
+    categoryLabel: 'GST Services & Compliance',
+    shortDesc: 'Automated MTR reconciliation & monthly GST filing for Amazon, Flipkart, Meesho, Shopify & Myntra sellers.',
+    subServices: [
+      'Amazon MTR & Flipkart Sales Reconciliation',
+      'Table 7 B2CS State-Wise Aggregation',
+      'Section 52 TCS Credit Claim against 3B Liability',
+      'Sales Return / RTO Reversals & Netting',
+      'Multi-State GST Compliance (APOB/VPOB)',
+      'Monthly GSTR-1 & GSTR-3B CA Certification'
+    ],
+    longDesc: 'Complete automated GST compliance built specifically for e-commerce marketplace sellers. We ingest messy Amazon MTR, Flipkart GSTR reports, and Meesho sales sheets, consolidate intra/inter-state supplies, claim your 1% Section 52 TCS cash credit, deduct RTO returns, and file accurate GSTR-1 and GSTR-3B without errors.',
+    startingPrice: '₹499/mo',
+    tat: '24-48 Hours',
+    documentsRequired: [
+      'Monthly Tax Report (MTR from Amazon Seller Central)',
+      'Flipkart Sales & GSTR Report CSV',
+      'Meesho Payment / GST Report',
+      'GST Portal Credentials / OTP Access',
+      'Purchase / Expense Invoices for ITC'
+    ],
+    highlights: [
+      'Zero manual data entry: automated script processing',
+      '100% Section 52 TCS credit claimed to reduce cash tax',
+      'State-wise Place of Supply compliance across all 37 States/UTs',
+      'RTO & Return deduction safeguard against over-taxation'
+    ]
   }
 ];

@@ -1074,18 +1074,16 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Direct WhatsApp / Consultation Callout - High-converting CTA for prospective visitors */}
+            {/* Direct Consultation Callout - High-converting CTA for prospective visitors */}
             {!user && (
-              <a
-                href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/consult-ca"
                 className="px-2.5 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs border border-emerald-500/30 transition-all flex items-center gap-1 xl:gap-1.5 whitespace-nowrap shrink-0"
               >
                 <PhoneCall className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden xl:inline whitespace-nowrap">Consult a CA</span>
                 <span className="xl:hidden whitespace-nowrap">Consult CA</span>
-              </a>
+              </Link>
             )}
           </div>
         </div>
@@ -1376,15 +1374,14 @@ export default function Navbar() {
             </div>
 
             {/* 4. Action Buttons */}
-            <a
-              href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/consult-ca"
+              onClick={() => setMobileMenuOpen(false)}
               className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-center font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs text-xs transition-colors"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>Consult a CA on WhatsApp</span>
-            </a>
+              <span>Paid CA Consultation Desk (₹299/₹599)</span>
+            </Link>
 
             <a
               href="tel:+917275922162"

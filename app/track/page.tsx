@@ -18,6 +18,7 @@ import Link from 'next/link';
 
 interface FilingTrackItem {
   id: string;
+  type?: 'filing' | 'query';
   service: string;
   plan: string;
   fullName: string;
@@ -30,6 +31,15 @@ interface FilingTrackItem {
     phone: string;
     email: string;
     membershipNumber?: string;
+  };
+  querySubject?: string;
+  caResponse?: {
+    caName: string;
+    membershipNumber?: string;
+    opinion: string;
+    legalSectionsCited?: string;
+    actionSteps?: string[];
+    respondedAt: string;
   };
   timeline: {
     step: string;
@@ -262,6 +272,39 @@ function TrackContent() {
                   <div className="my-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
                     <span>Your application is currently queued for CA assignment. You will receive an SMS/WhatsApp notification shortly.</span>
+                  </div>
+                )}
+
+                {/* CA Written Response if Available */}
+                {filing.caResponse && (
+                  <div className="my-6 p-5 sm:p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-left space-y-3 shadow-xs">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-emerald-200/80">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-emerald-700" />
+                        <span className="text-xs font-bold text-emerald-900">
+                          Official CA Legal Opinion &amp; Advisory Solution
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full">
+                        Resolved &amp; Verified
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line font-medium">
+                      {filing.caResponse.opinion}
+                    </div>
+
+                    {filing.caResponse.legalSectionsCited && (
+                      <div className="text-xs text-slate-700 bg-white/80 p-3 rounded-xl border border-emerald-100 mt-2">
+                        <span className="font-bold text-slate-900">Statutory Provisions &amp; Sections Cited: </span>
+                        <span>{filing.caResponse.legalSectionsCited}</span>
+                      </div>
+                    )}
+
+                    <div className="text-[11px] text-slate-500 pt-1 flex items-center justify-between">
+                      <span>Signed by: <strong>{filing.caResponse.caName}</strong> ({filing.caResponse.membershipNumber || 'Senior Tax Partner'})</span>
+                      <span>Responded: {new Date(filing.caResponse.respondedAt).toLocaleDateString('en-IN')}</span>
+                    </div>
                   </div>
                 )}
 

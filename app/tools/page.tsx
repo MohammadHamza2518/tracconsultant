@@ -23,7 +23,8 @@ import {
   FileCode2,
   Search,
   FileArchive,
-  Receipt
+  Receipt,
+  ShoppingCart
 } from 'lucide-react';
 
 export default function ToolsHubPage() {
@@ -59,6 +60,7 @@ export default function ToolsHubPage() {
       case 'FileCode2': return <FileCode2 className="w-6 h-6 text-indigo-600" />;
       case 'FileArchive': return <FileArchive className="w-6 h-6 text-indigo-600" />;
       case 'Receipt': return <Receipt className="w-6 h-6 text-indigo-600" />;
+      case 'ShoppingCart': return <ShoppingCart className="w-6 h-6 text-emerald-600" />;
       default: return <Sparkles className="w-6 h-6 text-indigo-600" />;
     }
   };
