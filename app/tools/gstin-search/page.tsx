@@ -181,6 +181,30 @@ const KNOWN_GSTINS: Record<string, TaxpayerRecord> = {
       { period: '05/2025', returnType: 'GSTR-1', filingDate: '10/06/2025', arn: 'AA0705250192834', status: 'Filed On-Time' },
       { period: '05/2025', returnType: 'GSTR-3B', filingDate: '20/06/2025', arn: 'AA0705250284719', status: 'Filed On-Time' }
     ]
+  },
+  '29AABCB3918L1ZT': {
+    gstin: '29AABCB3918L1ZT',
+    legalName: 'INFOSYS LIMITED',
+    tradeName: 'INFOSYS LIMITED',
+    taxpayerType: 'Regular',
+    keyPromoter: 'BOARD OF DIRECTORS',
+    constitution: 'Public Limited Company',
+    registrationDate: '01/07/2017',
+    stateJurisdiction: 'Bengaluru South / LGSTO-050',
+    centerJurisdiction: 'BENGALURU SOUTH COMMISSIONERATE, DIVISION - SOUTH-4',
+    jurisdiction: 'Bengaluru South / LGSTO-050',
+    principalAddress: 'Electronics City, Hosur Road, Bengaluru, Karnataka, PIN - 560100',
+    natureOfBusiness: 'IT Software Development, Consulting & Technology Solutions',
+    goodsServices: 'Software Development & IT Consultancy Services (SAC 998314)',
+    aadhaarAuthenticated: true,
+    ekycVerified: true,
+    status: 'Active',
+    returns: [
+      { period: '05/2025', returnType: 'GSTR-1', filingDate: '10/06/2025', arn: 'AA2905250192834', status: 'Filed On-Time' },
+      { period: '05/2025', returnType: 'GSTR-3B', filingDate: '19/06/2025', arn: 'AA2905250284719', status: 'Filed On-Time' },
+      { period: '04/2025', returnType: 'GSTR-1', filingDate: '09/05/2025', arn: 'AA2904250182746', status: 'Filed On-Time' },
+      { period: '04/2025', returnType: 'GSTR-3B', filingDate: '18/05/2025', arn: 'AA2904250274619', status: 'Filed On-Time' }
+    ]
   }
 };
 
@@ -192,17 +216,28 @@ export default function GstinSearchPage() {
   const [taxpayerData, setTaxpayerData] = useState<TaxpayerRecord | null>(KNOWN_GSTINS['09AXLPC1685K1Z3']);
   const [showDirectory, setShowDirectory] = useState(false);
   const [showReturns, setShowReturns] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleReset = () => {
     setSearchInput('');
     setTaxpayerData(null);
+    setErrorMessage('');
   };
 
   // Perform search / parsing
   const handleSearch = (gstinToSearch?: string) => {
     const raw = (gstinToSearch || searchInput).trim().toUpperCase();
-    if (!raw) return;
+    if (!raw) {
+      setErrorMessage('Please enter GSTIN/UIN of the Taxpayer.');
+      return;
+    }
 
+    if (raw.length !== 15) {
+      setErrorMessage('Please enter a valid 15-character GSTIN/UIN (e.g. 09AXLPC1685K1Z3)');
+      return;
+    }
+
+    setErrorMessage('');
     setIsLoading(true);
 
     setTimeout(() => {
@@ -687,13 +722,25 @@ export default function GstinSearchPage() {
               <input
                 type="text"
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value.toUpperCase())}
+                onChange={(e) => {
+                  setSearchInput(e.target.value.toUpperCase());
+                  if (errorMessage) setErrorMessage('');
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={15}
                 placeholder="Enter GSTIN/UIN of the Taxpayer"
-                className="w-full px-3 py-2 border border-slate-300 rounded-none focus:outline-none focus:border-[#1b3f73] text-sm sm:text-base font-mono tracking-wider text-slate-900 bg-white placeholder-slate-400 shadow-inner"
+                className={`w-full px-3 py-2 border rounded-none focus:outline-none text-sm sm:text-base font-mono tracking-wider text-slate-900 bg-white placeholder-slate-400 shadow-inner ${
+                  errorMessage ? 'border-red-500 focus:border-red-600' : 'border-slate-300 focus:border-[#1b3f73]'
+                }`}
               />
             </div>
+
+            {errorMessage && (
+              <div className="mt-2 text-xs font-semibold text-red-600 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="mt-4 flex items-center gap-3">
