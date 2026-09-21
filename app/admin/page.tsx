@@ -126,6 +126,7 @@ export default function AdminPage() {
   // Search & Filter in other tabs
   const [purchaseSearchQuery, setPurchaseSearchQuery] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'clients' | 'admins'>('all');
   const [leadStatusFilter, setLeadStatusFilter] = useState('all');
   const [leadSearchQuery, setLeadSearchQuery] = useState('');
 
@@ -508,7 +509,10 @@ export default function AdminPage() {
 
   // KPI Calculations
   const totalFilings = filings.length;
-  const totalRegisteredUsers = users.filter(u => u.role !== 'admin').length;
+  const totalRegisteredAccounts = users.length;
+  const adminAccountsCount = users.filter(u => u.role === 'admin' || u.role?.toLowerCase() === 'admin').length;
+  const clientAccountsCount = users.filter(u => u.role !== 'admin' && u.role?.toLowerCase() !== 'admin').length;
+  const totalRegisteredUsers = totalRegisteredAccounts;
   const totalToolPurchasesCount = toolPurchases.length;
   const totalToolRevenue = toolPurchases.reduce((acc, p) => acc + (p.status === 'active' ? p.amount : 0), 0);
   const totalServicePayments = payments.filter(p => p.status === 'paid' && !p.notes?.toolId);
@@ -802,11 +806,13 @@ export default function AdminPage() {
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
-              <span>Registered Clients</span>
+              <span>Registered Accounts</span>
               <Users className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900">{totalRegisteredUsers}</div>
-            <div className="text-[11px] text-blue-600 font-semibold mt-1">Google & Email Accounts</div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900">{totalRegisteredAccounts}</div>
+            <div className="text-[11px] text-blue-600 font-semibold mt-1">
+              {clientAccountsCount} Clients • {adminAccountsCount} Admins
+            </div>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -872,7 +878,7 @@ export default function AdminPage() {
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Client Accounts ({totalRegisteredUsers})</span>
+            <span>Registered Accounts ({totalRegisteredAccounts})</span>
           </button>
 
           <button
@@ -1240,24 +1246,55 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* TAB 3: CLIENT ACCOUNTS */}
+        {/* TAB 3: REGISTERED ACCOUNTS */}
         {activeTab === 'users' && (
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Registered Client Accounts</h3>
-                <p className="text-xs text-slate-500">Google OAuth & Email registered users with unlocked tools list</p>
+                <h3 className="text-base font-bold text-slate-900">Registered Accounts ({totalRegisteredAccounts})</h3>
+                <p className="text-xs text-slate-500">
+                  Google OAuth &amp; Email accounts • {clientAccountsCount} Clients, {adminAccountsCount} Admins
+                </p>
               </div>
 
-              <div className="relative w-full sm:w-64">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={userSearchQuery}
-                  onChange={(e) => setUserSearchQuery(e.target.value)}
-                  placeholder="Search user name or email..."
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500"
-                />
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                <div className="flex p-0.5 bg-slate-100 rounded-xl text-[11px] font-bold">
+                  <button
+                    onClick={() => setUserRoleFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg transition-colors ${
+                      userRoleFilter === 'all' ? 'bg-white text-blue-700 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    All ({totalRegisteredAccounts})
+                  </button>
+                  <button
+                    onClick={() => setUserRoleFilter('clients')}
+                    className={`px-2.5 py-1 rounded-lg transition-colors ${
+                      userRoleFilter === 'clients' ? 'bg-white text-blue-700 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Clients ({clientAccountsCount})
+                  </button>
+                  <button
+                    onClick={() => setUserRoleFilter('admins')}
+                    className={`px-2.5 py-1 rounded-lg transition-colors ${
+                      userRoleFilter === 'admins' ? 'bg-white text-blue-700 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Admins ({adminAccountsCount})
+                  </button>
+                </div>
+
+                <div className="relative w-full sm:w-56">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder="Search user name or email..."
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
             </div>
 
@@ -1265,7 +1302,7 @@ export default function AdminPage() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                   <tr>
-                    <th className="p-3">Client / DP</th>
+                    <th className="p-3">Account / DP</th>
                     <th className="p-3">Email</th>
                     <th className="p-3">Auth Type</th>
                     <th className="p-3">Role</th>
@@ -1276,6 +1313,9 @@ export default function AdminPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {users.filter(u => {
+                    const isAdmin = u.role === 'admin' || u.role?.toLowerCase() === 'admin';
+                    if (userRoleFilter === 'clients' && isAdmin) return false;
+                    if (userRoleFilter === 'admins' && !isAdmin) return false;
                     if (!userSearchQuery.trim()) return true;
                     const q = userSearchQuery.toLowerCase();
                     return u.name.toLowerCase().includes(q) ||
