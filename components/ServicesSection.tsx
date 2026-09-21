@@ -134,6 +134,20 @@ const SERVICES_DATA: Record<string, {
         ]
       },
       {
+        title: 'E-Commerce GST Retainership',
+        sub: 'Amazon, Flipkart, Meesho & Shopify sellers',
+        price: '₹499/mo',
+        turnaround: 'Monthly',
+        tag: 'E-Com Special',
+        features: [
+          'Amazon MTR & Flipkart report parsing',
+          'Return / RTO cancellations netted out',
+          'Section 52 TCS 1% credit claimed',
+          'State-wise Place of Supply Table 7 B2CS',
+          'Zero portal password sharing required'
+        ]
+      },
+      {
         title: 'Annual GSTR-9 & 9C',
         sub: 'Consolidated annual return and reconciliation',
         price: '₹3,499',

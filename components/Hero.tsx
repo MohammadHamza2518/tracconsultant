@@ -115,16 +115,20 @@ export default function Hero() {
           <div className="lg:col-span-6 xl:col-span-6 space-y-6 text-center lg:text-left">
             
             {/* Top Institutional Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs">
+            <div className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
               </span>
-              <span className="font-bold text-slate-900">AY 2025–26 Tax Filing Active</span>
+              <span className="font-bold text-slate-900">AY 2025–26 Live</span>
               <span className="text-slate-300">•</span>
-              <Link href="/calculators" className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
-                <span>19 Free Calculators</span>
+              <Link href="/consult-ca" className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                <span>Consult a CA (₹299)</span>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-black">NEW</span>
+              </Link>
+              <span className="text-slate-300">•</span>
+              <Link href="/calculators" className="text-slate-600 font-medium hover:text-emerald-700">
+                19 Calculators
               </Link>
             </div>
 
@@ -145,29 +149,27 @@ export default function Hero() {
               <button
                 type="button"
                 onClick={handleScrollToFileNow}
-                className="w-full sm:w-auto px-7 py-4 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 bg-[#00a859] hover:bg-[#008f4c] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Start CA Filing</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <Link
-                href="/calculators"
-                className="w-full sm:w-auto px-6 py-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
+                href="/consult-ca"
+                className="w-full sm:w-auto px-6 py-3.5 bg-[#0B2545] hover:bg-slate-800 text-white rounded-xl font-bold text-sm sm:text-base shadow-md transition-all flex items-center justify-center gap-2"
               >
-                <Calculator className="w-4 h-4 text-emerald-600" />
-                <span>19 Free Calculators</span>
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span>Consult a CA (₹299)</span>
               </Link>
 
-              <a
-                href="https://wa.me/917275922162?text=Hello%20Tracconsultant!%20I%20would%20like%20to%20consult%20a%20Senior%20CA%20for%20my%20tax%20filing."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 hover:border-slate-400 rounded-xl font-semibold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
+              <Link
+                href="/calculators"
+                className="w-full sm:w-auto px-5 py-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
               >
-                <MessageCircle className="w-4 h-4 text-emerald-600" />
-                <span>Chat with CA</span>
-              </a>
+                <Calculator className="w-4 h-4 text-emerald-600" />
+                <span>19 Calculators</span>
+              </Link>
             </div>
 
             {/* Trust Metrics Row */}
