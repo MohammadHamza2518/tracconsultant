@@ -378,15 +378,15 @@ export default function ClientDashboard() {
           <div className="lg:col-span-6 space-y-6 lg:pr-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-bold text-emerald-700">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Official Taxpayer &amp; Client Gateway</span>
+              <span>Official User &amp; Taxpayer Portal</span>
             </div>
 
             <div className="space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
-                Welcome to your <span className="text-emerald-600">Client Control Portal</span>
+                Welcome to your <span className="text-emerald-600">User Dashboard</span>
               </h1>
               <p className="text-sm sm:text-base text-slate-500 leading-relaxed">
-                Sign in to manage your filed income tax returns, launch purchased compliance software, view assigned Chartered Accountants, and download official receipts.
+                Sign in to manage your filed returns, launch purchased compliance tools, view assigned Chartered Accountants, and download tax invoices.
               </p>
             </div>
 
@@ -554,7 +554,7 @@ export default function ClientDashboard() {
                     <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <span>{authMode === 'login' ? 'Sign In to Portal' : 'Create Taxpayer Account'}</span>
+                      <span>{authMode === 'login' ? 'Sign In to Dashboard' : 'Create Taxpayer Account'}</span>
                       <ChevronRight className="w-4 h-4" />
                     </>
                   )}
@@ -588,7 +588,7 @@ export default function ClientDashboard() {
               <div className="pt-2 text-center">
                 <p className="text-[11px] text-slate-400">
                   {authMode === 'login' ? (
-                    <>New client? <button onClick={() => { setAuthMode('register'); setAuthError(''); }} className="text-emerald-600 font-bold hover:underline">Create your account</button></>
+                    <>New user? <button onClick={() => { setAuthMode('register'); setAuthError(''); }} className="text-emerald-600 font-bold hover:underline">Create your account</button></>
                   ) : (
                     <>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="text-emerald-600 font-bold hover:underline">Sign in here</button></>
                   )}

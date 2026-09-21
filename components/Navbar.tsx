@@ -933,13 +933,13 @@ export default function Navbar() {
               Pay Online
             </Link>
 
-            {/* Dedicated Client Portal */}
+            {/* User Dashboard */}
             <Link
               href="/dashboard"
               className="px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/60 whitespace-nowrap shrink-0 transition-colors flex items-center gap-1.5 shadow-xs"
             >
               <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Client Portal</span>
+              <span>Dashboard</span>
             </Link>
           </div>
 
@@ -1287,9 +1287,9 @@ export default function Navbar() {
               >
                 <div className="text-xs font-bold text-emerald-800 flex items-center justify-center gap-1">
                   <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Portal</span>
+                  <span>Dashboard</span>
                 </div>
-                <div className="text-[10px] text-emerald-600 font-medium">Client Panel</div>
+                <div className="text-[10px] text-emerald-600 font-medium">My Account</div>
               </Link>
               <Link
                 href="/track"
