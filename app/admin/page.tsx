@@ -193,6 +193,7 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: selectedUserForEdit.id,
+          email: selectedUserForEdit.email,
           name: editUserName.trim(),
           phone: editUserPhone.trim(),
           role: editUserRole,
@@ -208,7 +209,11 @@ export default function AdminPage() {
       }
 
       setUserEditSuccess('Client profile and DP successfully updated!');
-      setUsers(prev => prev.map(u => u.id === selectedUserForEdit.id ? { ...u, name: editUserName.trim(), phone: editUserPhone.trim(), role: editUserRole, avatar: editUserAvatar } : u));
+      setUsers(prev => prev.map(u => 
+        (u.id === selectedUserForEdit.id || (u.email && selectedUserForEdit.email && u.email.toLowerCase() === selectedUserForEdit.email.toLowerCase()))
+          ? { ...u, name: editUserName.trim(), phone: editUserPhone.trim(), role: editUserRole, avatar: editUserAvatar } 
+          : u
+      ));
       setTimeout(() => {
         setEditUserModalOpen(false);
         setUserEditSuccess('');

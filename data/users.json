@@ -22,5 +22,29 @@
       "all-access-pass"
     ],
     "createdAt": "2025-01-15T09:00:00Z"
+  },
+  {
+    "id": "usr-hamza-admin",
+    "name": "Mohammad Hamza",
+    "email": "mohammadhamza2518@gmail.com",
+    "phone": "+91 7233862626",
+    "role": "admin",
+    "authProvider": "google",
+    "unlockedTools": [
+      "hra-calculator",
+      "advance-tax-calculator",
+      "tax-calculator",
+      "pdf-redactor",
+      "tb-to-balancesheet",
+      "gstr2a-reconciliation",
+      "json-to-computation",
+      "gstr2a-cleaner",
+      "advanced-pdf-redactor",
+      "advanced-computation-generator",
+      "file-compressor",
+      "gst-invoice-generator",
+      "all-access-pass"
+    ],
+    "createdAt": "2026-09-21T12:00:00.000Z"
   }
 ]

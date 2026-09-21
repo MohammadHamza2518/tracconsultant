@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   let user = null;
   if (id) user = findUserById(id);
-  else if (email) user = findUserByEmail(email);
+  if (!user && email) user = findUserByEmail(email);
 
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });

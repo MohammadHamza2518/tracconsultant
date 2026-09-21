@@ -341,9 +341,38 @@ const DEFAULT_USERS: User[] = [
       'tb-to-balancesheet',
       'gstr2a-reconciliation',
       'json-to-computation',
-      'gstr2a-cleaner'
+      'gstr2a-cleaner',
+      'advanced-pdf-redactor',
+      'advanced-computation-generator',
+      'file-compressor',
+      'gst-invoice-generator',
+      'all-access-pass'
     ],
     createdAt: '2025-01-15T09:00:00Z'
+  },
+  {
+    id: 'usr-hamza-admin',
+    name: 'Mohammad Hamza',
+    email: 'mohammadhamza2518@gmail.com',
+    phone: '+91 7233862626',
+    role: 'admin',
+    authProvider: 'google',
+    unlockedTools: [
+      'hra-calculator',
+      'advance-tax-calculator',
+      'tax-calculator',
+      'pdf-redactor',
+      'tb-to-balancesheet',
+      'gstr2a-reconciliation',
+      'json-to-computation',
+      'gstr2a-cleaner',
+      'advanced-pdf-redactor',
+      'advanced-computation-generator',
+      'file-compressor',
+      'gst-invoice-generator',
+      'all-access-pass'
+    ],
+    createdAt: '2026-09-21T12:00:00.000Z'
   }
 ];
 
@@ -353,7 +382,36 @@ export function getUsers(): User[] {
     fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2), 'utf-8');
     return DEFAULT_USERS;
   }
-  return safeReadJSON<User[]>(USERS_FILE, DEFAULT_USERS);
+  const loaded = safeReadJSON<User[]>(USERS_FILE, DEFAULT_USERS);
+  const hasHamza = loaded.some(u => u.email && u.email.toLowerCase() === 'mohammadhamza2518@gmail.com');
+  if (!hasHamza) {
+    loaded.push({
+      id: 'usr-hamza-admin',
+      name: 'Mohammad Hamza',
+      email: 'mohammadhamza2518@gmail.com',
+      phone: '+91 7233862626',
+      role: 'admin',
+      authProvider: 'google',
+      unlockedTools: [
+        'hra-calculator',
+        'advance-tax-calculator',
+        'tax-calculator',
+        'pdf-redactor',
+        'tb-to-balancesheet',
+        'gstr2a-reconciliation',
+        'json-to-computation',
+        'gstr2a-cleaner',
+        'advanced-pdf-redactor',
+        'advanced-computation-generator',
+        'file-compressor',
+        'gst-invoice-generator',
+        'all-access-pass'
+      ],
+      createdAt: '2026-09-21T12:00:00.000Z'
+    });
+    saveUsers(loaded);
+  }
+  return loaded;
 }
 
 export function saveUsers(users: User[]): void {
@@ -381,7 +439,8 @@ export const FREE_TOOLS = [
 
 export function findUserByEmail(email: string): User | undefined {
   const users = getUsers();
-  const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const search = (email || '').toLowerCase().trim();
+  const found = users.find(u => u.email && u.email.toLowerCase() === search);
   if (found) {
     return syncUserPurchasedTools(found);
   }
@@ -390,7 +449,11 @@ export function findUserByEmail(email: string): User | undefined {
 
 export function findUserById(id: string): User | undefined {
   const users = getUsers();
-  const found = users.find(u => u.id === id);
+  const searchId = (id || '').trim().toLowerCase();
+  const found = users.find(u => 
+    (u.id && u.id.toLowerCase() === searchId) || 
+    (u.email && u.email.toLowerCase() === searchId)
+  );
   if (found) {
     return syncUserPurchasedTools(found);
   }
@@ -408,7 +471,7 @@ export function createUser(userData: Partial<User> & { email: string; name: stri
   FREE_TOOLS.forEach(t => initialTools.add(t));
 
   const newUser: User = {
-    id: `usr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    id: userData.id || `usr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     name: userData.name,
     email: userData.email,
     phone: userData.phone || '',
@@ -427,14 +490,22 @@ export function createUser(userData: Partial<User> & { email: string; name: stri
 
 export function updateUser(idOrEmail: string, updates: Partial<User>): User | null {
   const users = getUsers();
-  const search = idOrEmail.toLowerCase().trim();
-  const idx = users.findIndex(u => u.id.toLowerCase() === search || u.email.toLowerCase() === search);
+  const search = (idOrEmail || '').toLowerCase().trim();
+  const updateEmail = (updates.email || '').toLowerCase().trim();
+
+  const idx = users.findIndex(u => 
+    (u.id && u.id.toLowerCase() === search) || 
+    (u.email && u.email.toLowerCase() === search) ||
+    (updateEmail && u.email && u.email.toLowerCase() === updateEmail)
+  );
+
   if (idx === -1) {
-    if (search.includes('@') || (updates.email && updates.email.includes('@'))) {
-      const email = search.includes('@') ? search : updates.email!;
+    const targetEmail = search.includes('@') ? search : (updateEmail && updateEmail.includes('@') ? updateEmail : null);
+    if (targetEmail) {
       const newUser = createUser({
-        email,
-        name: updates.name || email.split('@')[0],
+        id: idOrEmail && !idOrEmail.includes('@') ? idOrEmail : undefined,
+        email: targetEmail,
+        name: updates.name || targetEmail.split('@')[0],
         ...updates
       });
       return newUser;
