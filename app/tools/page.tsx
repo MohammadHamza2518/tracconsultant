@@ -24,7 +24,8 @@ import {
   Search,
   FileArchive,
   Receipt,
-  ShoppingCart
+  ShoppingCart,
+  Hash
 } from 'lucide-react';
 
 export default function ToolsHubPage() {
@@ -61,6 +62,8 @@ export default function ToolsHubPage() {
       case 'FileArchive': return <FileArchive className="w-6 h-6 text-indigo-600" />;
       case 'Receipt': return <Receipt className="w-6 h-6 text-indigo-600" />;
       case 'ShoppingCart': return <ShoppingCart className="w-6 h-6 text-emerald-600" />;
+      case 'ShieldCheck': return <ShieldCheck className="w-6 h-6 text-emerald-600" />;
+      case 'Hash': return <Hash className="w-6 h-6 text-blue-600" />;
       default: return <Sparkles className="w-6 h-6 text-indigo-600" />;
     }
   };

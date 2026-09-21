@@ -49,7 +49,8 @@ import {
   GitCompare,
   FileCode2,
   FileArchive,
-  ShoppingCart
+  ShoppingCart,
+  Hash
 } from 'lucide-react';
 import { TOOLS_LIST } from '@/lib/data';
 
@@ -844,6 +845,8 @@ export default function Navbar() {
                         {freeTools.map(t => {
                           const iconMap: Record<string, any> = {
                             'ecommerce-gst-converter': ShoppingCart,
+                            'gstin-search': ShieldCheck,
+                            'hsn-search': Hash,
                             'hra-calculator': Calculator,
                             'advance-tax-calculator': Calendar,
                             'tax-calculator': TrendingUp,
@@ -1318,7 +1321,7 @@ export default function Navbar() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="bg-indigo-600 text-white text-xs font-extrabold px-2 py-0.5 rounded-full">
-                    8 Tools
+                    {TOOLS_LIST.length} Tools
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180 text-indigo-600' : ''}`} />
                 </div>

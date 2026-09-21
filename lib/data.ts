@@ -51,6 +51,50 @@ export const TOOLS_LIST: ToolConfig[] = [
     ]
   },
 
+  // 2. GSTIN Search & Verification (Taxpayer Profile & Compliance PDF)
+  {
+    id: 'gstin-search',
+    name: 'GSTIN Search & Verification Tool',
+    slug: 'gstin-search',
+    category: 'free',
+    price: 0,
+    badge: 'FREE PDF',
+    shortDesc: 'Verify any 15-digit GSTIN, legal name, trade name, PAN breakdown & download verified A4 PDF report.',
+    description: 'Instant taxpayer verification engine. Validate 15-digit GSTIN structure, business registration details, 6-month GSTR-1/3B filing compliance, and export official stamped A4 compliance report.',
+    icon: 'ShieldCheck',
+    tags: ['GSTIN Search', 'GST Verification', 'Taxpayer Profile', 'PDF Report', 'Compliance'],
+    features: [
+      '15-digit GSTIN structural breakdown & state code lookup',
+      'PAN extraction & entity constitution classification',
+      'Legal Business Name, Trade Name & Principal Address',
+      '6-Month GSTR-1 & GSTR-3B return compliance history',
+      '1-Click Official Taxpayer Verification A4 PDF download',
+      'Complete 38 State & Union Territory GST directory'
+    ]
+  },
+
+  // 3. HSN & SAC Code Search Tool
+  {
+    id: 'hsn-search',
+    name: 'HSN & SAC Code Search Tool',
+    slug: 'hsn-search',
+    category: 'free',
+    price: 0,
+    badge: 'UPDATED',
+    shortDesc: 'Fast search across 150+ Goods HSN & Services SAC codes with applicable GST tax slabs.',
+    description: 'Find official 2, 4, 6 or 8-digit HSN codes for goods and 99-series SAC codes for services. Filter by GST tax rates (0%, 5%, 12%, 18%, 28%) and copy codes instantly.',
+    icon: 'Hash',
+    tags: ['HSN Codes', 'SAC Codes', 'GST Rates', 'Tax Slabs', 'E-Commerce'],
+    features: [
+      'Fast keyword & code search across Goods & Services',
+      'Accurate GST rates: 0%, 5%, 12%, 18% & 28%',
+      'Chapter & Heading categorization',
+      'Popular keywords tagging for e-commerce products',
+      '1-Click copy code with instant confirmation',
+      'Direct link to E-Commerce GST converter & invoicing'
+    ]
+  },
+
   // 8 FREE & BASIC TOOLS
   {
     id: 'hra-calculator',
