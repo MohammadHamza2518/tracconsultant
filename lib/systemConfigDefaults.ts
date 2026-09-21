@@ -14,11 +14,15 @@ export interface TaxRatesConfig {
 
 export interface ToolPricingConfig {
   allAccessPass: number;
-  'pdf-redactor': number;
-  'tb-to-balancesheet': number;
-  'gstr2a-reconciliation': number;
-  'json-to-computation': number;
-  'gstr2a-cleaner': number;
+  'advanced-pdf-redactor'?: number;
+  'advanced-computation-generator'?: number;
+  'file-compressor'?: number;
+  'gst-invoice-generator'?: number;
+  'pdf-redactor'?: number;
+  'tb-to-balancesheet'?: number;
+  'gstr2a-reconciliation'?: number;
+  'json-to-computation'?: number;
+  'gstr2a-cleaner'?: number;
 }
 
 export interface ServicePricingItem {
@@ -51,12 +55,16 @@ export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
     notes: 'Updated as per Union Budget 2024-25 (Finance Act). Standard deduction increased to ₹75,000 for salaried taxpayers.'
   },
   toolPrices: {
-    allAccessPass: 999,
-    'pdf-redactor': 199,
-    'tb-to-balancesheet': 299,
-    'gstr2a-reconciliation': 249,
-    'json-to-computation': 199,
-    'gstr2a-cleaner': 199
+    allAccessPass: 499,
+    'advanced-pdf-redactor': 199,
+    'advanced-computation-generator': 299,
+    'file-compressor': 199,
+    'gst-invoice-generator': 249,
+    'pdf-redactor': 0,
+    'tb-to-balancesheet': 0,
+    'gstr2a-reconciliation': 0,
+    'json-to-computation': 0,
+    'gstr2a-cleaner': 0
   },
   servicePricing: [
     { id: 'itr-filing', title: 'ITR Filing (Income Tax Return)', category: 'Income Tax', startingPrice: '₹999', tat: '24-48 Hours', isActive: true },

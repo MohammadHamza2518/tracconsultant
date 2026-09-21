@@ -83,7 +83,7 @@ export default function AdminPage() {
   // Manual Grant Tool Modal
   const [grantModalOpen, setGrantModalOpen] = useState(false);
   const [grantUserId, setGrantUserId] = useState('');
-  const [grantToolId, setGrantToolId] = useState('pdf-redactor');
+  const [grantToolId, setGrantToolId] = useState('advanced-pdf-redactor');
   const [isGranting, setIsGranting] = useState(false);
 
   // WhatsApp Quick Action Modal
@@ -1450,14 +1450,14 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                 <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-200/80">
                   <div className="flex justify-between items-center mb-1">
-                    <label className="font-extrabold text-indigo-950 uppercase">All-Access Toolkit Pass (All 5)</label>
-                    <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">BUNDLE</span>
+                    <label className="font-extrabold text-indigo-950 uppercase">All-Access Pro Toolkit Pass</label>
+                    <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">ALL 4 PRO</span>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-bold text-slate-500 text-sm">₹</span>
                     <input
                       type="number"
-                      value={config.toolPrices.allAccessPass}
+                      value={config.toolPrices.allAccessPass || 499}
                       onChange={(e) => setConfig({
                         ...config,
                         toolPrices: { ...config.toolPrices, allAccessPass: Number(e.target.value) }
@@ -1468,15 +1468,15 @@ export default function AdminPage() {
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <label className="block font-bold text-slate-700 uppercase mb-1">PDF Redactor Tool</label>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">Advanced PDF Redactor &amp; Blackout Pro</label>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-bold text-slate-500 text-sm">₹</span>
                     <input
                       type="number"
-                      value={config.toolPrices['pdf-redactor']}
+                      value={config.toolPrices['advanced-pdf-redactor'] ?? 199}
                       onChange={(e) => setConfig({
                         ...config,
-                        toolPrices: { ...config.toolPrices, 'pdf-redactor': Number(e.target.value) }
+                        toolPrices: { ...config.toolPrices, 'advanced-pdf-redactor': Number(e.target.value) }
                       })}
                       className="w-full p-2 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900"
                     />
@@ -1484,15 +1484,15 @@ export default function AdminPage() {
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <label className="block font-bold text-slate-700 uppercase mb-1">Trial Balance to Schedule III B/S</label>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">Advanced CA Tax Computation Generator</label>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-bold text-slate-500 text-sm">₹</span>
                     <input
                       type="number"
-                      value={config.toolPrices['tb-to-balancesheet']}
+                      value={config.toolPrices['advanced-computation-generator'] ?? 299}
                       onChange={(e) => setConfig({
                         ...config,
-                        toolPrices: { ...config.toolPrices, 'tb-to-balancesheet': Number(e.target.value) }
+                        toolPrices: { ...config.toolPrices, 'advanced-computation-generator': Number(e.target.value) }
                       })}
                       className="w-full p-2 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900"
                     />
@@ -1500,15 +1500,15 @@ export default function AdminPage() {
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <label className="block font-bold text-slate-700 uppercase mb-1">GSTR-2A vs Books Reconciliation</label>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">Ultra File Compressor &amp; PDF Optimizer</label>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-bold text-slate-500 text-sm">₹</span>
                     <input
                       type="number"
-                      value={config.toolPrices['gstr2a-reconciliation']}
+                      value={config.toolPrices['file-compressor'] ?? 199}
                       onChange={(e) => setConfig({
                         ...config,
-                        toolPrices: { ...config.toolPrices, 'gstr2a-reconciliation': Number(e.target.value) }
+                        toolPrices: { ...config.toolPrices, 'file-compressor': Number(e.target.value) }
                       })}
                       className="w-full p-2 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900"
                     />
@@ -1516,31 +1516,15 @@ export default function AdminPage() {
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <label className="block font-bold text-slate-700 uppercase mb-1">JSON to Tax Computation Converter</label>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">Smart GST Invoice &amp; E-Way Generator</label>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="font-bold text-slate-500 text-sm">₹</span>
                     <input
                       type="number"
-                      value={config.toolPrices['json-to-computation']}
+                      value={config.toolPrices['gst-invoice-generator'] ?? 249}
                       onChange={(e) => setConfig({
                         ...config,
-                        toolPrices: { ...config.toolPrices, 'json-to-computation': Number(e.target.value) }
-                      })}
-                      className="w-full p-2 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                  <label className="block font-bold text-slate-700 uppercase mb-1">Clean GSTR-2A & Supplier Summary</label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="font-bold text-slate-500 text-sm">₹</span>
-                    <input
-                      type="number"
-                      value={config.toolPrices['gstr2a-cleaner']}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        toolPrices: { ...config.toolPrices, 'gstr2a-cleaner': Number(e.target.value) }
+                        toolPrices: { ...config.toolPrices, 'gst-invoice-generator': Number(e.target.value) }
                       })}
                       className="w-full p-2 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900"
                     />
