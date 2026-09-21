@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Local PDF Redactor & Masking Studio</title>
+<!-- PDF processing libraries load from a CDN, but your PDF file NEVER leaves your computer -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --red:#d93025; --red-dark:#b3261d;
+    --green:#188038; --green-dark:#12602b;
+    --blue:#1a73e8;
+    --ink:#202124; --muted:#5f6368; --line:#e0e3e7; --bg:#f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--ink); margin:0; padding:20px; }
+
+  .toolbar { background:#fff; padding:14px 16px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.08);
+             margin-bottom:18px; position:sticky; top:10px; z-index:100; display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  h1 { margin:0; font-size:1.15rem; margin-right:8px; white-space:nowrap; }
+  .instructions { font-size:.82rem; color:var(--muted); flex-basis:100%; }
+  .note { font-size:.75rem; color:var(--muted); flex-basis:100%; margin-top:-4px; }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; flex-basis:100%; }
+
+  .divider { width:1px; align-self:stretch; background:var(--line); margin:0 2px; }
+
+  .mode-group, .scope-group { display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .mode-btn, .scope-btn { background:#fff; color:var(--ink); border:none; padding:9px 12px; cursor:pointer; font-size:.85rem; font-weight:600;
+              display:flex; align-items:center; gap:6px; white-space:nowrap; }
+  .mode-btn:not(:last-child), .scope-btn:not(:last-child){ border-right:1px solid var(--line); }
+  .mode-btn.active[data-mode="redact"] { background:var(--red); color:#fff; }
+  .mode-btn.active[data-mode="keep"]   { background:var(--green); color:#fff; }
+  .scope-btn.active { background:var(--blue); color:#fff; }
+  .scope-group { display:none; }
+  .scope-group.visible { display:flex; }
+
+  button.action { background:#fff; color:var(--ink); border:1px solid var(--line); padding:9px 12px; border-radius:8px;
+                  cursor:pointer; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+  button.action:hover { background:#f1f3f4; }
+  button.action:disabled { opacity:.45; cursor:not-allowed; }
+
+  .search-box { display:flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:8px; padding:2px; }
+  .search-box input { border:none; outline:none; padding:7px 8px; font-size:.85rem; width:170px; }
+  .search-box button { background:var(--blue); color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:.8rem; font-weight:700; }
+  .search-box button:hover { background:#1558b0; }
+
+  .zoom-box { display:flex; align-items:center; gap:8px; font-size:.8rem; color:var(--muted); }
+  .zoom-box input[type=range] { width:120px; }
+
+  #downloadBtn { background:var(--red); color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer;
+                 font-weight:700; display:none; margin-left:auto; }
+  #downloadBtn:hover { background:var(--red-dark); }
+  #filename { display:none; border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:.85rem; width:180px; }
+
+  #pdf-container { display:flex; flex-direction:column; align-items:center; gap:26px; }
+  .page-block { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .page-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .page-toolbar button { background:#fff; border:1px solid var(--line); border-radius:6px; padding:5px 9px; font-size:.75rem;
+                          cursor:pointer; color:var(--muted); font-weight:600; }
+  .page-toolbar button:hover { background:#f1f3f4; color:var(--ink); }
+  .page-label { font-size:.75rem; color:var(--muted); font-weight:600; }
+  .page-count { font-size:.72rem; color:#8a8f94; }
+
+  .page-wrapper { position:relative; box-shadow:0 4px 10px rgba(0,0,0,.18); background:#fff; }
+  .pdf-canvas { display:block; }
+  .draw-canvas { position:absolute; top:0; left:0; cursor:crosshair; z-index:10; touch-action:none; }
+
+  .empty-state { text-align:center; color:var(--muted); padding:60px 20px; }
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <h1>🔒 Secure Local PDF Redactor</h1>
+    <input type="file" id="upload" accept="application/pdf" />
+
+    <div class="divider"></div>
+
+    <div class="mode-group" id="modeGroup">
+      <button class="mode-btn active" data-mode="redact" title="Draw boxes over what you want to hide">⬛ Redact selected</button>
+      <button class="mode-btn" data-mode="keep" title="Draw boxes around what should stay visible">✅ Keep selected</button>
+    </div>
+
+    <div class="scope-group" id="scopeGroup">
+      <button class="scope-btn active" data-scope="perPage" title="Pages you don't mark are left untouched">Unmarked pages: leave visible</button>
+      <button class="scope-btn" data-scope="wholeDoc" title="Any page with no 'keep' box is fully blacked out">Unmarked pages: redact entirely</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="action" id="undoBtn" title="Undo last box (Ctrl+Z)">↩ Undo</button>
+    <button class="action" id="clearAllBtn" title="Remove all boxes from every page">🗑 Clear all</button>
+
+    <input type="text" id="filename" value="redacted-document.pdf" />
+    <button id="downloadBtn">⬇ Download Redacted PDF</button>
+
+    <div class="row">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Find text to auto-redact…" />
+        <button id="searchBtn">🔍 Find &amp; mark</button>
+      </div>
+      <div class="zoom-box">
+        🔎 Zoom <input type="range" id="zoomSlider" min="50" max="200" step="10" value="100"> <span id="zoomLabel">100%</span>
+      </div>
+    </div>
+
+    <div class="instructions">
+      1. Select a PDF → 2. Choose a mode → 3. Click &amp; drag on the page(s), or use text search → 4. Download.
+      <strong>Redact selected</strong> blacks out the boxes you draw. <strong>Keep selected</strong> blacks out everything on a page
+      <em>except</em> the boxes you draw — use the "Unmarked pages" toggle to decide whether pages you never touched stay visible or get fully redacted too.
+      Right-click a box to delete it.
+    </div>
+    <div class="note">
+      All processing happens in your browser — nothing is uploaded. The download is flattened to an image per page, so redacted content is permanently destroyed, not just covered.
+      Text search is approximate and only works on pages with a real text layer (not scanned images) — always visually confirm matches before downloading.
+    </div>
+  </div>
+
+  <div id="pdf-container">
+    <div class="empty-state" id="emptyState">Select a PDF above to get started.</div>
+  </div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+const RENDER_SCALE = 2;
+const MIN_BOX_SIZE = 3;
+const JPEG_QUALITY = 0.95;
+
+let pdfDoc = null;
+let pagesData = [];
+let currentMode = 'redact';
+let keepScope = 'perPage';
+let undoStack = [];
+
+document.getElementById('modeGroup').addEventListener('click', (e) => {
+  const btn = e.target.closest('.mode-btn');
+  if (!btn) return;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = btn.dataset.mode;
+  document.getElementById('scopeGroup').classList.toggle('visible', currentMode === 'keep');
+});
+
+document.getElementById('scopeGroup').addEventListener('click', (e) => {
+  const btn = e.target.closest('.scope-btn');
+  if (!btn) return;
+  document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  keepScope = btn.dataset.scope;
+});
+
+document.getElementById('zoomSlider').addEventListener('input', (e) => {
+  const pct = e.target.value;
+  document.getElementById('zoomLabel').textContent = pct + '%';
+  applyZoom(pct);
+});
+
+document.getElementById('upload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    alert('Please upload a valid PDF file.');
+    return;
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+
+  document.getElementById('downloadBtn').style.display = 'inline-flex';
+  document.getElementById('filename').style.display = 'inline-block';
+  undoStack = [];
+  await renderPDF();
+});
+
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (!pagesData.length) return;
+  if (!confirm('Remove every redaction/keep box from all pages?')) return;
+  pagesData.forEach(p => { p.redactions = []; redrawPage(p); });
+  undoStack = [];
+});
+
+document.getElementById('undoBtn').addEventListener('click', globalUndo);
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    e.preventDefault();
+    globalUndo();
+  }
+});
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') runSearchRedact();
+});
+document.getElementById('searchBtn').addEventListener('click', runSearchRedact);
+
+function globalUndo() {
+  const last = undoStack.pop();
+  if (!last) return;
+  const p = pagesData[last.pageIndex];
+  const idx = p.redactions.lastIndexOf(last.box);
+  if (idx !== -1) p.redactions.splice(idx, 1);
+  redrawPage(p);
+}
+
+async function renderPDF() {
+  const container = document.getElementById('pdf-container');
+  container.innerHTML = '';
+  pagesData = [];
+
+  for (let num = 1; num <= pdfDoc.numPages; num++) {
+    const page = await pdfDoc.getPage(num);
+    const viewport = page.getViewport({ scale: RENDER_SCALE });
+
+    const block = document.createElement('div');
+    block.className = 'page-block';
+
+    const pageToolbar = document.createElement('div');
+    pageToolbar.className = 'page-toolbar';
+    pageToolbar.innerHTML = `
+      <span class="page-label">Page ${num} of ${pdfDoc.numPages}</span>
+      <span class="page-count" data-count></span>
+      <button data-action="undo">↩ Undo</button>
+      <button data-action="clear">🗑 Clear page</button>
+      <button data-action="fullRedact">⬛ Redact entire page</button>
+      <button data-action="fullKeep">✅ Keep entire page</button>
+    `;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'page-wrapper';
+    wrapper.style.width = viewport.width + 'px';
+    wrapper.style.height = viewport.height + 'px';
+
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.className = 'pdf-canvas';
+    bgCanvas.width = viewport.width;
+    bgCanvas.height = viewport.height;
+    const bgCtx = bgCanvas.getContext('2d');
+    await page.render({ canvasContext: bgCtx, viewport }).promise;
+
+    const drawCanvas = document.createElement('canvas');
+    drawCanvas.className = 'draw-canvas';
+    drawCanvas.width = viewport.width;
+    drawCanvas.height = viewport.height;
+    const drawCtx = drawCanvas.getContext('2d');
+
+    wrapper.appendChild(bgCanvas);
+    wrapper.appendChild(drawCanvas);
+    block.appendChild(pageToolbar);
+    block.appendChild(wrapper);
+    container.appendChild(block);
+
+    const pageData = {
+      wrapper, bgCanvas, drawCanvas, drawCtx,
+      countEl: pageToolbar.querySelector('[data-count]'),
+      redactions: [],
+      width: viewport.width,
+      height: viewport.height
+    };
+    pagesData.push(pageData);
+    const pageIndex = pagesData.length - 1;
+
+    attachDrawingHandlers(pageData, pageIndex);
+    updateCount(pageData);
+
+    pageToolbar.addEventListener('click', (e) => {
+      const action = e.target.dataset.action;
+      if (!action) return;
+      if (action === 'undo') {
+        for (let i = undoStack.length - 1; i >= 0; i--) {
+          if (undoStack[i].pageIndex === pageIndex) {
+            const [removed] = undoStack.splice(i, 1);
+            const idx = pageData.redactions.lastIndexOf(removed.box);
+            if (idx !== -1) pageData.redactions.splice(idx, 1);
+            break;
+          }
+        }
+        redrawPage(pageData);
+      } else if (action === 'clear') {
+        pageData.redactions = [];
+        undoStack = undoStack.filter(u => u.pageIndex !== pageIndex);
+        redrawPage(pageData);
+      } else if (action === 'fullRedact') {
+        const box = { x: 0, y: 0, w: pageData.width, h: pageData.height, mode: 'redact' };
+        pageData.redactions.push(box);
+        undoStack.push({ pageIndex, box });
+        redrawPage(pageData);
+      } else if (action === 'fullKeep') {
+        const box = { x: 0, y: 0, w: pageData.width, h: pageData.height, mode: 'keep' };
+        pageData.redactions.push(box);
+        undoStack.push({ pageIndex, box });
+        redrawPage(pageData);
+      }
+    });
+  }
+
+  applyZoom(document.getElementById('zoomSlider').value);
+}
+
+function applyZoom(pct) {
+  const scale = pct / 100;
+  pagesData.forEach(p => {
+    const w = Math.round(p.width * scale) + 'px';
+    const h = Math.round(p.height * scale) + 'px';
+    p.wrapper.style.width = w;
+    p.wrapper.style.height = h;
+    p.bgCanvas.style.width = w;
+    p.bgCanvas.style.height = h;
+    p.drawCanvas.style.width = w;
+    p.drawCanvas.style.height = h;
+  });
+}
+
+function updateCount(pageData) {
+  const redactN = pageData.redactions.filter(r => r.mode === 'redact').length;
+  const keepN = pageData.redactions.filter(r => r.mode === 'keep').length;
+  const parts = [];
+  if (redactN) parts.push(`${redactN} redact`);
+  if (keepN) parts.push(`${keepN} keep`);
+  pageData.countEl.textContent = parts.length ? parts.join(' · ') : 'no marks';
+}
+
+function attachDrawingHandlers(pageData, pageIndex) {
+  const { drawCanvas, drawCtx } = pageData;
+  let isDrawing = false;
+  let startX, startY;
+
+  const clamp = (v, max) => Math.max(0, Math.min(max, v));
+
+  drawCanvas.addEventListener('pointerdown', (e) => {
+    isDrawing = true;
+    drawCanvas.setPointerCapture(e.pointerId);
+    const rect = drawCanvas.getBoundingClientRect();
+    const scaleX = drawCanvas.width / rect.width;
+    const scaleY = drawCanvas.height / rect.height;
+    startX = clamp((e.clientX - rect.left) * scaleX, drawCanvas.width);
+    startY = clamp((e.clientY - rect.top) * scaleY, drawCanvas.height);
+  });
+
+  drawCanvas.addEventListener('pointermove', (e) => {
+    if (!isDrawing) return;
+    const rect = drawCanvas.getBoundingClientRect();
+    const scaleX = drawCanvas.width / rect.width;
+    const scaleY = drawCanvas.height / rect.height;
+    const currentX = clamp((e.clientX - rect.left) * scaleX, drawCanvas.width);
+    const currentY = clamp((e.clientY - rect.top) * scaleY, drawCanvas.height);
+
+    redrawPage(pageData);
+    drawBox(drawCtx, Math.min(startX, currentX), Math.min(startY, currentY),
+            Math.abs(currentX - startX), Math.abs(currentY - startY), currentMode);
+  });
+
+  const finishDrawing = (e) => {
+    if (!isDrawing) return;
+    isDrawing = false;
+    try { drawCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+
+    const rect = drawCanvas.getBoundingClientRect();
+    const scaleX = drawCanvas.width / rect.width;
+    const scaleY = drawCanvas.height / rect.height;
+    const endX = clamp((e.clientX - rect.left) * scaleX, drawCanvas.width);
+    const endY = clamp((e.clientY - rect.top) * scaleY, drawCanvas.height);
+
+    const box = {
+      x: Math.min(startX, endX),
+      y: Math.min(startY, endY),
+      w: Math.abs(endX - startX),
+      h: Math.abs(endY - startY),
+      mode: currentMode
+    };
+
+    if (box.w >= MIN_BOX_SIZE && box.h >= MIN_BOX_SIZE) {
+      pageData.redactions.push(box);
+      undoStack.push({ pageIndex, box });
+    }
+    redrawPage(pageData);
+  };
+
+  drawCanvas.addEventListener('pointerup', finishDrawing);
+  drawCanvas.addEventListener('pointercancel', finishDrawing);
+
+  drawCanvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const rect = drawCanvas.getBoundingClientRect();
+    const scaleX = drawCanvas.width / rect.width;
+    const scaleY = drawCanvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    for (let i = pageData.redactions.length - 1; i >= 0; i--) {
+      const r = pageData.redactions[i];
+      if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+        pageData.redactions.splice(i, 1);
+        undoStack = undoStack.filter(u => u.box !== r);
+        redrawPage(pageData);
+        break;
+      }
+    }
+  });
+}
+
+function drawBox(ctx, x, y, w, h, mode) {
+  if (mode === 'keep') {
+    ctx.fillStyle = 'rgba(24,128,56,0.28)';
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = '#188038';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(x, y, w, h);
+    ctx.setLineDash([]);
+  } else {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x, y, w, h);
+  }
+}
+
+function redrawPage(pageData) {
+  const { drawCtx, drawCanvas, redactions } = pageData;
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  redactions.forEach(r => drawBox(drawCtx, r.x, r.y, r.w, r.h, r.mode));
+  updateCount(pageData);
+}
+
+async function runSearchRedact() {
+  const term = document.getElementById('searchInput').value.trim();
+  if (!term || !pdfDoc) return;
+  const lowerTerm = term.toLowerCase();
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+
+  let totalMatches = 0;
+  try {
+    for (let i = 0; i < pagesData.length; i++) {
+      const pageData = pagesData[i];
+      const page = await pdfDoc.getPage(i + 1);
+      const viewport = page.getViewport({ scale: RENDER_SCALE });
+      const textContent = await page.getTextContent();
+
+      textContent.items.forEach(item => {
+        const str = item.str;
+        if (!str || !str.trim()) return;
+        const lowerStr = str.toLowerCase();
+        let searchStart = 0, idx;
+        while ((idx = lowerStr.indexOf(lowerTerm, searchStart)) !== -1) {
+          const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+          const originX = tx[4];
+          const originY = tx[5];
+          const estWidthPx = (item.width || 0) * RENDER_SCALE;
+          const estHeightPx = Math.abs(item.transform[3] || item.transform[0] || 10) * RENDER_SCALE;
+          const charW = str.length ? estWidthPx / str.length : 0;
+          const padX = charW * 0.35, padY = estHeightPx * 0.3;
+
+          const box = {
+            x: Math.max(0, originX + charW * idx - padX),
+            y: Math.max(0, originY - estHeightPx - padY),
+            w: charW * term.length + padX * 2,
+            h: estHeightPx + padY * 2,
+            mode: 'redact'
+          };
+          pageData.redactions.push(box);
+          undoStack.push({ pageIndex: i, box });
+          totalMatches++;
+          searchStart = idx + term.length;
+        }
+      });
+      redrawPage(pageData);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Search failed on this document. You can still redact manually.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔍 Find & mark';
+
+  if (totalMatches === 0) {
+    alert(`No matches found for "${term}". Note: this only searches real text — scanned/image-only pages have no searchable text.`);
+  } else {
+    alert(`Marked ${totalMatches} match(es) for "${term}". Text-position matching is approximate — please scroll through and confirm each highlighted box before downloading.`);
+  }
+}
+
+function renderFinalPageCanvas(pageData) {
+  const merged = document.createElement('canvas');
+  merged.width = pageData.width;
+  merged.height = pageData.height;
+  const ctx = merged.getContext('2d');
+
+  const keepBoxes = pageData.redactions.filter(r => r.mode === 'keep');
+  const redactBoxes = pageData.redactions.filter(r => r.mode === 'redact');
+  const docHasKeepBoxes = pagesData.some(p => p.redactions.some(r => r.mode === 'keep'));
+
+  if (keepBoxes.length > 0) {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, merged.width, merged.height);
+    ctx.save();
+    ctx.beginPath();
+    keepBoxes.forEach(r => ctx.rect(r.x, r.y, r.w, r.h));
+    ctx.clip();
+    ctx.drawImage(pageData.bgCanvas, 0, 0);
+    ctx.restore();
+    ctx.fillStyle = '#000000';
+    redactBoxes.forEach(r => ctx.fillRect(r.x, r.y, r.w, r.h));
+  } else if (docHasKeepBoxes && keepScope === 'wholeDoc') {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, merged.width, merged.height);
+  } else {
+    ctx.drawImage(pageData.bgCanvas, 0, 0);
+    ctx.fillStyle = '#000000';
+    redactBoxes.forEach(r => ctx.fillRect(r.x, r.y, r.w, r.h));
+  }
+
+  return merged;
+}
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if (!pagesData.length) return;
+  const { jsPDF } = window.jspdf;
+  const btn = document.getElementById('downloadBtn');
+  const originalText = btn.innerText;
+  btn.innerText = 'Processing…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    let pdf;
+    pagesData.forEach((data, index) => {
+      const pageWidthPt = data.width / RENDER_SCALE;
+      const pageHeightPt = data.height / RENDER_SCALE;
+      const orientation = pageWidthPt > pageHeightPt ? 'l' : 'p';
+
+      if (index === 0) {
+        pdf = new jsPDF({ orientation, unit: 'pt', format: [pageWidthPt, pageHeightPt] });
+      } else {
+        pdf.addPage([pageWidthPt, pageHeightPt], orientation);
+      }
+
+      const merged = renderFinalPageCanvas(data);
+      const imgData = merged.toDataURL('image/jpeg', JPEG_QUALITY);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthPt, pageHeightPt);
+    });
+
+    let filename = document.getElementById('filename').value.trim() || 'redacted-document.pdf';
+    if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
+    pdf.save(filename);
+
+    btn.innerText = originalText;
+    btn.disabled = false;
+  }, 50);
+});
+</script>
+</body>
+</html>

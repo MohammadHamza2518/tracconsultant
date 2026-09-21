@@ -29,7 +29,7 @@ export interface ServiceConfig {
 }
 
 export const TOOLS_LIST: ToolConfig[] = [
-  // 3 FREE TOOLS
+  // 8 FREE & BASIC TOOLS
   {
     id: 'hra-calculator',
     name: 'HRA Exemption Calculator',
@@ -69,72 +69,124 @@ export const TOOLS_LIST: ToolConfig[] = [
     tags: ['Income Tax', 'Budget 2024-25', 'Regime Comparison'],
     features: ['Side-by-side comparison', 'Updated ₹75,000 standard deduction', 'Rebate u/s 87A up to ₹7.75 Lakhs', 'Instant PDF tax summary']
   },
-
-  // 5 PAID TOOLS
   {
     id: 'pdf-redactor',
     name: 'PDF Redact & Sensitive Data Masking Tool',
     slug: 'pdf-redactor',
-    category: 'paid',
-    price: 199,
-    badge: 'High Security',
+    category: 'free',
+    price: 0,
+    badge: 'Basic',
     shortDesc: 'Mask PAN, Aadhaar (first 8 digits), bank account numbers & signatures before sharing tax PDFs.',
     description: 'Compliant with DPDP Act 2023. Client-side privacy tool enabling CA firms, businesses, and individuals to safely sanitize Form 16, Bank Statements, and ITR acknowledgments.',
     icon: 'EyeOff',
-    tags: ['Data Privacy', 'DPDP Act', 'PDF Masking'],
-    features: ['Auto-detects PAN & Aadhaar numbers', 'Custom coordinate box redaction', 'Irreversible data masking (no leak)', 'Watermark protection']
+    tags: ['Basic', 'Data Privacy', 'DPDP Act', 'PDF Masking'],
+    features: ['Auto-detects PAN & Aadhaar numbers', 'Preset Form 16 & Bank templates', 'Irreversible data masking (no leak)', 'Watermark protection']
   },
   {
     id: 'tb-to-balancesheet',
     name: 'Trial Balance to Balance Sheet & P&L Formatter',
     slug: 'tb-to-balancesheet',
-    category: 'paid',
-    price: 299,
-    badge: 'CA Essential',
+    category: 'free',
+    price: 0,
+    badge: 'Basic',
     shortDesc: 'Convert raw Trial Balance ledger Excel/CSV directly into Schedule III Balance Sheet and P&L.',
     description: 'Automated grouping engine that maps ledgers into Current/Non-Current Assets, Liabilities, Revenue from Operations, and Depreciation with balanced accounting controls.',
     icon: 'FileSpreadsheet',
-    tags: ['Schedule III', 'Accounting', 'Balance Sheet'],
+    tags: ['Basic', 'Schedule III', 'Accounting', 'Balance Sheet'],
     features: ['Excel/CSV drag-and-drop', 'Automatic Schedule III grouping', 'Variance & Balance verification', 'Downloadable formatted Excel & PDF']
   },
   {
     id: 'gstr2a-reconciliation',
     name: 'GSTR-2A vs Books Reconciliation Engine',
     slug: 'gstr2a-reconciliation',
-    category: 'paid',
-    price: 299,
-    badge: 'Auditor Choice',
+    category: 'free',
+    price: 0,
+    badge: 'Basic',
     shortDesc: '4-way automated matching of Books Purchase Register with GST Portal 2A/2B records.',
     description: 'Eliminate ITC leakage. Identifies exact matches, invoice number/date mismatches, missing in 2A (supplier defaulting), and excess claims with an audit-ready summary.',
     icon: 'GitCompare',
-    tags: ['GST Audit', 'ITC Leakage', 'Rule 36(4)'],
+    tags: ['Basic', 'GST Audit', 'ITC Leakage', 'Rule 36(4)'],
     features: ['Matches JSON & Excel files', 'Flags defaulting vendors missing in 2A', 'Tax amount discrepancy detection', 'Audit reconciliation report download']
   },
   {
     id: 'json-to-computation',
     name: 'Upload JSON & Get Tax Computation Sheet',
     slug: 'json-to-computation',
-    category: 'paid',
-    price: 199,
-    badge: 'Instant Tax Sheet',
+    category: 'free',
+    price: 0,
+    badge: 'Basic',
     shortDesc: 'Extract and format official ITR JSON utility files into a clean executive computation report.',
     description: 'Upload your government utility JSON file and instantly receive an executive Tax Computation Sheet with income heads, deductions, TDS verification, and refund calculation.',
     icon: 'FileCode2',
-    tags: ['ITR JSON', 'Computation Sheet', 'Tax Audit'],
+    tags: ['Basic', 'ITR JSON', 'Computation Sheet', 'Tax Audit'],
     features: ['Parses ITR-1, 2, 3, 4 JSON', 'Clean client-facing layout', 'TDS & 26AS matching breakdown', 'Printable & exportable computation']
   },
   {
     id: 'gstr2a-cleaner',
     name: 'Clean GSTR-2A & Supplier-Wise Summary',
     slug: 'gstr2a-cleaner',
-    category: 'paid',
-    price: 199,
-    badge: 'Time Saver',
+    category: 'free',
+    price: 0,
+    badge: 'Basic',
     shortDesc: 'Filter duplicates, organize messy 2A records, and build consolidated supplier ITC sheets.',
     description: 'Transforms multi-sheet, clunky government portal files into clean, supplier-wise aggregated summaries showing GSTIN, trade name, eligible tax, and filing status.',
     icon: 'Sparkles',
-    tags: ['GSTR-2A', 'Supplier Summary', 'Excel Automation'],
+    tags: ['Basic', 'GSTR-2A', 'Supplier Summary', 'Excel Automation'],
     features: ['Removes duplicate & cancelled records', 'Aggregates by Vendor GSTIN', 'Calculates eligible vs ineligible ITC', 'Export clean single-sheet Excel']
+  },
+
+  // 4 NEW PAID / ADVANCE / PRO TOOLS
+  {
+    id: 'advanced-pdf-redactor',
+    name: 'PDF Redactor Studio (Advance)',
+    slug: 'advanced-pdf-redactor',
+    category: 'paid',
+    price: 299,
+    badge: 'Advance',
+    shortDesc: 'Advanced local PDF redactor with "Redact Selected" & "Keep Selected" modes, auto-search text, and page batching.',
+    description: 'Professional browser-based redaction workstation. Supports inverse redaction (black out everything except kept boxes), keyword search & auto-mark, per-page controls, zoom, and vector flattening.',
+    icon: 'EyeOff',
+    tags: ['Advance', 'DPDP Act', 'Keep & Redact', 'PDF Security'],
+    features: ['Redact Selected & Keep Selected modes', 'Auto-search & highlight sensitive text', 'Per-page undo & clear controls', 'Permanent rasterized vector flattening']
+  },
+  {
+    id: 'advanced-computation-generator',
+    name: 'Computation of Income Generator (Advance)',
+    slug: 'advanced-computation-generator',
+    category: 'paid',
+    price: 299,
+    badge: 'Advance',
+    shortDesc: 'Bank / Visa / Loan submission computation sheet generator with deep ITR 1-7 JSON parser.',
+    description: 'Executive Tax Computation Sheet generator with deep JSON scanning for ITR-1 through ITR-7, head-wise deduction breakdown, Chapter VI-A verification, and audit-ready vector PDF export.',
+    icon: 'FileCode2',
+    tags: ['Advance', 'ITR 1-7', 'Loan Proof', 'Tax Computation'],
+    features: ['Full ITR 1 to 7 JSON deep scanning', 'All 5 heads with deduction sub-tables', 'Vector PDF download with auto-tables', 'Save & load draft configurations']
+  },
+  {
+    id: 'file-compressor',
+    name: 'Smart PDF & Image Compressor',
+    slug: 'file-compressor',
+    category: 'paid',
+    price: 199,
+    badge: 'Pro',
+    shortDesc: 'Local compression bench for PDF, JPEG, PNG, WebP with in-place embedded photo downscale.',
+    description: 'Compress large tax documents and scans to meet government portal upload limits. In-place re-encoding of embedded images in PDFs, multi-threaded Web Workers, and bulk ZIP download.',
+    icon: 'FileArchive',
+    tags: ['Pro', 'PDF Compressor', 'Image Bench', 'Portal Ready'],
+    features: ['In-place PDF photo downscaling', 'Lossless WebP & JPEG image optimizer', 'Batch queue with live savings gauge', 'Bulk ZIP archive export']
+  },
+  {
+    id: 'gst-invoice-generator',
+    name: 'GST Tax Invoice & E-Way Generator',
+    slug: 'gst-invoice-generator',
+    category: 'paid',
+    price: 299,
+    badge: 'Pro',
+    shortDesc: 'Professional Indian GST Invoice Generator with automated CGST/SGST/IGST inter/intra-state engine.',
+    description: 'Complete Indian GST compliant billing software with HSN/SAC summary, reverse charge support, client/product directory, round-off calculation, and crisp A4 PDF generation.',
+    icon: 'Receipt',
+    tags: ['Pro', 'GST Compliance', 'E-Way Ready', 'Tax Invoice'],
+    features: ['Auto Inter-State (IGST) vs Intra-State (CGST+SGST)', 'HSN summary & Indian number-to-words', 'Client & product master directory in browser', 'Instant A4 vector print & PDF export']
   }
 ];
 

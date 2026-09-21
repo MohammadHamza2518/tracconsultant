@@ -320,17 +320,21 @@ export function saveUsers(users: User[]): void {
 }
 
 export const ALL_PRO_TOOLS = [
-  'pdf-redactor', 
-  'tb-to-balancesheet', 
-  'gstr2a-reconciliation', 
-  'json-to-computation', 
-  'gstr2a-cleaner'
+  'advanced-pdf-redactor', 
+  'advanced-computation-generator', 
+  'file-compressor', 
+  'gst-invoice-generator'
 ];
 
 export const FREE_TOOLS = [
   'hra-calculator', 
   'advance-tax-calculator', 
-  'tax-calculator'
+  'tax-calculator',
+  'pdf-redactor', 
+  'tb-to-balancesheet', 
+  'gstr2a-reconciliation', 
+  'json-to-computation', 
+  'gstr2a-cleaner'
 ];
 
 export function findUserByEmail(email: string): User | undefined {
@@ -651,5 +655,63 @@ export function syncUserPurchasedTools(user: User): User {
   }
 
   return user;
+}
+
+// ----------------------------------------------------
+// Unified Client Portal Data Aggregator
+// ----------------------------------------------------
+export function getUserPortalData(userIdOrEmail: string) {
+  if (!userIdOrEmail) return null;
+  const user = findUserById(userIdOrEmail) || findUserByEmail(userIdOrEmail);
+
+  if (!user) {
+    return null;
+  }
+
+  // Always reconcile tools first
+  const syncedUser = syncUserPurchasedTools(user);
+
+  // Filings matching user id, email, or mobile
+  const allFilings = getFilings();
+  const userFilings = allFilings.filter(f =>
+    (f.userId && f.userId === syncedUser.id) ||
+    (f.email && syncedUser.email && f.email.toLowerCase() === syncedUser.email.toLowerCase()) ||
+    (f.mobile && syncedUser.phone && f.mobile.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
+  );
+
+  // Tool purchases matching user id, email, or phone
+  const allPurchases = getToolPurchases();
+  const userPurchases = allPurchases.filter(p =>
+    p.status === 'active' && (
+      (p.userId && p.userId === syncedUser.id) ||
+      (p.userEmail && syncedUser.email && p.userEmail.toLowerCase() === syncedUser.email.toLowerCase()) ||
+      (p.userPhone && syncedUser.phone && p.userPhone.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
+    )
+  );
+
+  // Payments matching user id, email, or phone
+  const allPayments = getPayments();
+  const userPayments = allPayments.filter(p =>
+    (p.status === 'paid' || p.status === 'created') && (
+      (p.notes?.userId && p.notes.userId === syncedUser.id) ||
+      (p.payerEmail && syncedUser.email && p.payerEmail.toLowerCase() === syncedUser.email.toLowerCase()) ||
+      (p.payerPhone && syncedUser.phone && p.payerPhone.replace(/\D/g, '') === syncedUser.phone.replace(/\D/g, ''))
+    )
+  );
+
+  const { password: _, ...safeUser } = syncedUser as any;
+
+  return {
+    user: safeUser,
+    filings: userFilings,
+    toolPurchases: userPurchases,
+    payments: userPayments,
+    stats: {
+      activeFilings: userFilings.filter(f => f.status !== 'completed' && f.status !== 'rejected').length,
+      completedFilings: userFilings.filter(f => f.status === 'completed').length,
+      unlockedPaidTools: safeUser.unlockedTools.filter((t: string) => ALL_PRO_TOOLS.includes(t) || t === 'all-access-pass' || t === 'all-access').length,
+      verifiedPayments: userPayments.filter(p => p.status === 'paid').length
+    }
+  };
 }
 

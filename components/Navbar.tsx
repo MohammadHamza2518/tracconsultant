@@ -47,7 +47,8 @@ import {
   Calendar,
   EyeOff,
   GitCompare,
-  FileCode2
+  FileCode2,
+  FileArchive
 } from 'lucide-react';
 import { TOOLS_LIST } from '@/lib/data';
 
@@ -758,13 +759,13 @@ export default function Navbar() {
                 <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span className="whitespace-nowrap">Compliance Suite</span>
                 <span className="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2 py-0.5 rounded-full shrink-0">
-                  8
+                  {TOOLS_LIST.length}
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${toolsOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} />
               </button>
 
               {toolsOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/3 xl:-translate-x-1/4 mt-2 w-[820px] max-w-[calc(100vw-2rem)] bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                <div className="absolute top-full left-1/2 -translate-x-1/3 xl:-translate-x-1/4 mt-2 w-[850px] max-w-[calc(100vw-2rem)] bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 animate-in fade-in slide-in-from-top-2 duration-150 z-50">
                   {/* Suite Header Strip */}
                   <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
                     <div className="flex items-center gap-3">
@@ -773,10 +774,10 @@ export default function Navbar() {
                       </div>
                       <div>
                         <h3 className="text-sm font-black text-slate-900 leading-tight">
-                          Tax & Compliance Software Suite
+                          Tax &amp; Compliance Software Suite
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          High-accuracy Union Budget tax calculators & automated audit SaaS engines
+                          8 Free &amp; Basic calculators and 4 Advance &amp; Pro compliance modules
                         </p>
                       </div>
                     </div>
@@ -786,23 +787,28 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  {/* 2-Column Suite Layout: Free Calculators vs Pro SaaS Utilities */}
+                  {/* 2-Column Suite Layout: Free/Basic vs Advance/Pro */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Column 1: Free Public Calculators */}
+                    {/* Column 1: Free & Basic Tools */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
-                          <Calculator className="w-3 h-3" /> Free Tax Calculators (3)
+                          <Calculator className="w-3 h-3" /> Free &amp; Basic Tools ({freeTools.length})
                         </span>
-                        <span className="text-xs font-bold text-emerald-600">Zero Paywall</span>
+                        <span className="text-xs font-bold text-emerald-600">100% Free</span>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
                         {freeTools.map(t => {
                           const iconMap: Record<string, any> = {
                             'hra-calculator': Calculator,
                             'advance-tax-calculator': Calendar,
-                            'tax-calculator': TrendingUp
+                            'tax-calculator': TrendingUp,
+                            'pdf-redactor': EyeOff,
+                            'tb-to-balancesheet': FileSpreadsheet,
+                            'gstr2a-reconciliation': GitCompare,
+                            'json-to-computation': FileCode2,
+                            'gstr2a-cleaner': Sparkles
                           };
                           const IconComp = iconMap[t.id] || Calculator;
                           return (
@@ -810,9 +816,9 @@ export default function Navbar() {
                               key={t.id}
                               href={`/tools/${t.slug}`}
                               onClick={() => setToolsOpen(false)}
-                              className="group flex items-start gap-3 p-2.5 rounded-2xl border border-slate-100 hover:border-emerald-300 bg-slate-50/50 hover:bg-emerald-50/40 transition-all"
+                              className="group flex items-start gap-3 p-2 rounded-2xl border border-slate-100 hover:border-emerald-300 bg-slate-50/50 hover:bg-emerald-50/40 transition-all"
                             >
-                              <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-2xs">
+                              <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-2xs">
                                 <IconComp className="w-4 h-4" />
                               </div>
                               <div className="min-w-0 flex-1">
@@ -820,11 +826,11 @@ export default function Navbar() {
                                   <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 truncate">
                                     {t.name}
                                   </span>
-                                  <span className="text-xs font-extrabold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded shrink-0">
-                                    FREE
+                                  <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded shrink-0">
+                                    {t.badge || 'FREE'}
                                   </span>
                                 </div>
-                                <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
+                                <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
                                   {t.shortDesc}
                                 </p>
                               </div>
@@ -832,30 +838,24 @@ export default function Navbar() {
                           );
                         })}
                       </div>
-
-                      <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs text-emerald-800 flex items-center gap-2">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>All 3 calculators are updated to Union Budget FY 2024-25 / 2025-26 rules.</span>
-                      </div>
                     </div>
 
-                    {/* Column 2: Pro Audit & Compliance Utilities */}
+                    {/* Column 2: Advance & Pro Modules */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
-                          <Sparkles className="w-3 h-3" /> Pro Audit & SaaS Utilities (5)
+                          <Sparkles className="w-3 h-3" /> Advance &amp; Pro Utilities ({paidTools.length})
                         </span>
                         <span className="text-xs font-bold text-indigo-600">₹199 - ₹299</span>
                       </div>
 
-                      <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
+                      <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
                         {paidTools.map(t => {
                           const iconMap: Record<string, any> = {
-                            'pdf-redactor': EyeOff,
-                            'tb-to-balancesheet': FileSpreadsheet,
-                            'gstr2b-reconciler': GitCompare,
-                            'json-to-computation': FileCode2,
-                            'gstr2a-cleaner': Sparkles
+                            'advanced-pdf-redactor': EyeOff,
+                            'advanced-computation-generator': FileCode2,
+                            'file-compressor': FileArchive,
+                            'gst-invoice-generator': Receipt
                           };
                           const IconComp = iconMap[t.id] || Sparkles;
                           return (
@@ -863,24 +863,31 @@ export default function Navbar() {
                               key={t.id}
                               href={`/tools/${t.slug}`}
                               onClick={() => setToolsOpen(false)}
-                              className="group flex items-center justify-between p-2 rounded-xl border border-slate-100 hover:border-indigo-300 bg-slate-50/50 hover:bg-indigo-50/40 transition-all"
+                              className="group flex items-center justify-between p-2.5 rounded-2xl border border-slate-100 hover:border-indigo-300 bg-slate-50/50 hover:bg-indigo-50/40 transition-all"
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                   <IconComp className="w-4 h-4" />
                                 </div>
                                 <div className="min-w-0">
-                                  <div className="text-xs font-bold text-slate-800 group-hover:text-indigo-700 truncate leading-tight">
-                                    {t.name}
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-700 truncate leading-tight">
+                                      {t.name}
+                                    </span>
+                                    {t.badge && (
+                                      <span className="text-[10px] font-black bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
+                                        {t.badge}
+                                      </span>
+                                    )}
                                   </div>
-                                  <div className="text-xs text-slate-400 truncate leading-none mt-0.5">
+                                  <div className="text-[11px] text-slate-400 truncate leading-none mt-1">
                                     {t.shortDesc}
                                   </div>
                                 </div>
                               </div>
                               <div className="text-right shrink-0 pl-2">
                                 <span className="text-xs font-extrabold text-indigo-700 block leading-none">₹{getToolPrice(t.id, t.price)}</span>
-                                <span className="text-xs text-slate-400 uppercase font-semibold">Instant Access</span>
+                                <span className="text-[10px] text-slate-400 uppercase font-semibold">One-time</span>
                               </div>
                             </Link>
                           );
@@ -924,6 +931,15 @@ export default function Navbar() {
               className="px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-emerald-600 hover:bg-slate-50 whitespace-nowrap shrink-0 transition-colors"
             >
               Pay Online
+            </Link>
+
+            {/* Dedicated Client Portal */}
+            <Link
+              href="/dashboard"
+              className="px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/60 whitespace-nowrap shrink-0 transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Client Portal</span>
             </Link>
           </div>
 
@@ -1262,15 +1278,26 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* 3. Quick Links: Track & Pay */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* 3. Quick Links: Portal, Track & Pay */}
+            <div className="grid grid-cols-3 gap-2">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-xl text-center transition-colors"
+              >
+                <div className="text-xs font-bold text-emerald-800 flex items-center justify-center gap-1">
+                  <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Portal</span>
+                </div>
+                <div className="text-[10px] text-emerald-600 font-medium">Client Panel</div>
+              </Link>
               <Link
                 href="/track"
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-center transition-colors"
               >
-                <div className="text-xs font-bold text-slate-900">Track Filing</div>
-                <div className="text-xs text-slate-500">Live Status & ARN</div>
+                <div className="text-xs font-bold text-slate-900">Track</div>
+                <div className="text-[10px] text-slate-500">Live Status</div>
               </Link>
               <Link
                 href="/pay"
@@ -1278,7 +1305,7 @@ export default function Navbar() {
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-center transition-colors"
               >
                 <div className="text-xs font-bold text-slate-900">Pay Online</div>
-                <div className="text-xs text-slate-500">Instant UPI & Cards</div>
+                <div className="text-[10px] text-slate-500">UPI & Cards</div>
               </Link>
             </div>
 

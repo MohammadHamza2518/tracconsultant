@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computation of Income Generator | ITR 1-7 (Advance)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --navy:#12233f; --navy-light:#1c3357; --gold:#a9812c; --paper:#ffffff;
+    --bg:#eef1f6; --ink:#1a2233; --muted:#5b6675; --line:#d7dce4;
+    --accent:#0f6e5c; --danger:#b3432b; --panel:#f7f9fc;
+    --less:#4a5568; --warn:#8a5a00; --warn-bg:#fff8e8; --warn-border:#f0d99a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;background:var(--bg);color:var(--ink);}
+  header.app{background:var(--navy);color:#fff;padding:22px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  header.app h1{margin:0;font-size:20px;font-weight:600;letter-spacing:.2px;}
+  header.app p{margin:2px 0 0;font-size:12.5px;color:#c9d3e4;}
+  .layout{display:grid;grid-template-columns:minmax(480px,720px) 1fr;gap:0;min-height:calc(100vh - 76px);}
+  .form-pane{padding:26px 30px;overflow-y:auto;max-height:calc(100vh - 76px);}
+  .preview-pane{padding:24px;background:#dde3ec;overflow-y:auto;max-height:calc(100vh - 76px);}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .card h2{font-size:14.5px;margin:0 0 14px;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--gold);padding-bottom:9px;}
+  .card h3{font-size:12.5px;margin:16px 0 8px;color:var(--navy-light);text-transform:uppercase;letter-spacing:.3px;}
+  .card h4{font-size:11.5px;margin:10px 0 6px;color:var(--muted);font-weight:700;}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:6px;font-size:14px;
+    background:#fcfdfe;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:50px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .field{margin-bottom:13px;}
+  .row-table{width:100%;border-collapse:collapse;margin-top:4px;table-layout:fixed;}
+  .row-table th{font-size:10.5px;color:var(--muted);text-align:left;padding:4px 5px;border-bottom:1px solid var(--line);text-transform:uppercase;}
+  .row-table td{padding:4px 5px;vertical-align:middle;}
+  .row-table td input,.row-table td select{padding:7px 8px;font-size:13px;}
+  .row-table col.col-section{width:19%;}
+  .row-table col.col-desc{width:50%;}
+  .row-table col.col-amt{width:24%;}
+  .row-table col.col-del{width:7%;}
+  .amt-cell input{text-align:right;}
+  .btn{cursor:pointer;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;}
+  .btn-add{background:var(--panel);color:var(--navy);border:1px dashed var(--gold);width:100%;margin-top:6px;}
+  .btn-add:hover{background:#f0e9d8;}
+  .btn-add.small{width:auto;padding:6px 12px;font-size:12px;}
+  .btn-del{background:transparent;color:var(--danger);font-size:16px;padding:2px 8px;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-light);}
+  .btn-gold{background:var(--gold);color:#2a1e05;}
+  .btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--line);}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;}
+  .type-note{background:#fff8e8;border:1px solid #f0d99a;color:#6b4e0a;font-size:12px;padding:9px 11px;border-radius:6px;margin-bottom:10px;}
+  select#itrType{font-weight:700;}
+  .head-block{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px;background:#fbfcfe;}
+  .head-block .head-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .subhead{display:flex;justify-content:space-between;align-items:center;}
+  .subhead .tag{font-size:10px;background:var(--panel);color:var(--navy-light);padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:.3px;}
+  .subhead.exempt .tag{background:#fff;color:var(--navy-light);border:1px solid var(--navy-light);}
+  .net-line{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--accent);border-top:1px dashed var(--line);margin-top:8px;padding-top:6px;}
+
+  #docWrap{background:#dde3ec;display:flex;justify-content:center;}
+  .sheet{background:#fff;width:794px;min-height:1123px;padding:46px 52px;box-shadow:0 2px 14px rgba(20,30,60,.18);position:relative;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;color:#17203a;}
+  .sheet + .sheet{margin-top:22px;}
+  .doc-topband{height:6px;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:2px;margin-bottom:18px;}
+  .doc-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--navy);padding-bottom:10px;margin-bottom:14px;}
+  .doc-header .brand{font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .doc-title{text-align:center;margin:6px 0 18px;}
+  .doc-title h1{font-size:19px;margin:0;letter-spacing:.5px;color:var(--navy);}
+  .doc-title p{margin:3px 0 0;font-size:11.5px;color:var(--muted);font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;}
+  .assessee-box{border:1px solid #b9c2d1;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:12.5px;}
+  .assessee-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;}
+  .assessee-grid .l{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:1px;}
+  .assessee-grid .kv{display:flex;flex-direction:column;border-bottom:1px dotted #dfe4ec;padding:3px 0;font-weight:600;}
+  .doc-section-title{background:var(--navy);color:#fff;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;padding:6px 10px;margin:16px 0 0;border-radius:3px 3px 0 0;}
+  table.doc-table{width:100%;border-collapse:collapse;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:12px;margin-bottom:4px;}
+  table.doc-table td, table.doc-table th{border:1px solid #d3d9e2;padding:5px 9px;}
+  table.doc-table th{background:#f3f5f9;font-size:10px;text-transform:uppercase;color:var(--muted);text-align:left;}
+  table.doc-table td.sec{color:var(--muted);font-size:11px;white-space:nowrap;}
+  table.doc-table td.amt, table.doc-table th.amt{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.doc-table tr.subrow td{color:#3b4456;}
+  table.doc-table tr.subrow.less td{color:var(--less);font-style:italic;}
+  table.doc-table tr.subtotal td{font-weight:700;background:#f7f9fc;border-top:1px solid #c7cede;}
+  table.doc-table tr.total td{font-weight:700;background:#f7f9fc;border-top:2px solid var(--navy);}
+  table.doc-table tr.grand td{font-weight:700;background:#eef3ee;border-top:2px solid var(--accent);color:var(--accent);}
+  table.doc-table tr.negative td{background:#fdf6e8;}
+  table.doc-table tr.negative td.amt{color:var(--warn);}
+  table.doc-table tr.headrow td{background:#eef1f6;font-weight:700;color:var(--navy);border-top:2px solid #c7cede;}
+  .doc-footer-note{font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:10px;color:var(--muted);margin-top:14px;line-height:1.5;}
+  .sign-block{display:flex;justify-content:space-between;margin-top:44px;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:12px;}
+  .sign-block .col{width:46%;}
+  .sign-line{border-top:1px solid #333;margin-top:38px;padding-top:4px;}
+  .declaration{font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:11px;color:#3b4456;margin-top:16px;line-height:1.55;text-align:justify;}
+  .page-num{position:absolute;bottom:20px;right:52px;font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;font-size:9.5px;color:var(--muted);}
+  .empty-msg{font-family:'Candara','Segoe UI',Calibri,Optima,'Century Gothic',sans-serif;color:var(--muted);font-size:12.5px;text-align:center;padding:60px 20px;}
+
+  @media print{
+    body{background:#fff;}
+    header.app,.form-pane,.toolbar{display:none !important;}
+    .layout{display:block;}
+    .preview-pane{background:#fff;padding:0;max-height:none;}
+    #docWrap{display:block;}
+    .sheet{box-shadow:none;margin:0;width:auto;min-height:0;page-break-after:always;}
+  }
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div>
+    <h1>Computation of Income — Generator (Advance)</h1>
+    <p>Bank / Visa / Loan submission summary — restates figures from your filed ITR, including every exemption &amp; deduction claimed.</p>
+  </div>
+  <div class="toolbar" style="margin:0;">
+    <button class="btn btn-gold" onclick="saveDraft()">💾 Save Draft</button>
+    <label class="btn btn-ghost" style="cursor:pointer;margin:0;">📂 Load Draft<input type="file" accept="application/json" onchange="loadDraft(event)" style="display:none;"></label>
+    <button class="btn btn-ghost" onclick="resetAll()">🗑 Clear Form</button>
+  </div>
+</header>
+
+<datalist id="dl-salary">
+  <option value="17(1) - Salary">17(1) - Salary as per Section 17(1)</option>
+  <option value="17(2) - Perquisites">17(2) - Value of Perquisites</option>
+  <option value="17(3) - Profit in lieu">17(3) - Profit in Lieu of Salary</option>
+</datalist>
+<datalist id="dl-salary-exempt">
+  <option value="10(5)">10(5) - Leave Travel Allowance (LTA)</option>
+  <option value="10(10)">10(10) - Gratuity</option>
+  <option value="10(10A)">10(10A) - Commuted Pension</option>
+  <option value="10(10AA)">10(10AA) - Leave Encashment</option>
+  <option value="10(10C)">10(10C) - VRS Compensation</option>
+  <option value="10(13A)">10(13A) - House Rent Allowance (HRA)</option>
+  <option value="10(14)(i)">10(14)(i) - Allowance for Official Duty (Rule 2BB(1))</option>
+  <option value="10(14)(ii)">10(14)(ii) - Personal Allowance (Children Education/Hostel etc.)</option>
+  <option value="16(ia)">16(ia) - Standard Deduction</option>
+  <option value="16(ii)">16(ii) - Entertainment Allowance</option>
+  <option value="16(iii)">16(iii) - Professional Tax</option>
+  <option value="89">89 - Relief for Salary Arrears/Advance (Form 10E)</option>
+</datalist>
+<datalist id="dl-hp-exempt">
+  <option value="23">23 - Municipal Taxes Deducted (Determination of Annual Value)</option>
+  <option value="24(a)">24(a) - Standard Deduction (30% of NAV)</option>
+  <option value="24(b)">24(b) - Interest on Housing Loan</option>
+  <option value="25">25 - Interest on Loan Payable Outside India (TDS not deducted)</option>
+</datalist>
+<datalist id="dl-capgains-income">
+  <option value="45">45 - Capital Gains (Basic Charging Section)</option>
+  <option value="50">50 - Capital Gains on Depreciable Assets (Block of Assets)</option>
+  <option value="50C">50C - Deemed Consideration (Stamp Duty Value) for Land/Building</option>
+  <option value="111A">111A - Short Term Capital Gains on STT-Paid Equity/Equity MF (20%)</option>
+  <option value="112">112 - Long Term Capital Gains (Other than 112A)</option>
+  <option value="112A">112A - Long Term Capital Gains on Equity Shares/Equity MF (12.5%)</option>
+</datalist>
+<datalist id="dl-business-exempt">
+  <option value="32">32 - Depreciation</option>
+  <option value="35">35 - Scientific Research Expenditure</option>
+  <option value="35AD">35AD - Capital Expenditure on Specified Business</option>
+  <option value="36">36 - Other Allowable Deductions</option>
+  <option value="37(1)">37(1) - General Business Expenditure</option>
+  <option value="40(b)">40(b) - Remuneration/Interest to Partners (as per deed, within limits)</option>
+  <option value="40A(3)">40A(3) - Disallowance of Cash Payments Exceeding ₹10,000</option>
+  <option value="41">41 - Deemed Profits (Balancing Charge/Recovery)</option>
+  <option value="43B">43B - Deductions Allowed on Payment Basis</option>
+  <option value="43CA">43CA - Deemed Consideration (Stamp Duty Value) for Stock-in-Trade</option>
+  <option value="44AD">44AD - Presumptive Income Adjustment (8%/6%)</option>
+  <option value="44ADA">44ADA - Presumptive Professional Income Adjustment (50%)</option>
+  <option value="44AE">44AE - Presumptive Income for Goods Carriages</option>
+</datalist>
+<datalist id="dl-capgains-exempt">
+  <option value="54">54 - Investment in Residential House (against LTCG - Residential Property)</option>
+  <option value="54B">54B - Transfer of Agricultural Land</option>
+  <option value="54D">54D - Compulsory Acquisition of Industrial Land/Building</option>
+  <option value="54EC">54EC - Investment in Specified Bonds (NHAI/REC/PFC)</option>
+  <option value="54F">54F - Investment in Residential House (against LTCG - Other Assets)</option>
+  <option value="54G">54G - Shifting of Industrial Undertaking from Urban Area</option>
+  <option value="54GB">54GB - Investment in Eligible Start-up</option>
+  <option value="112A">112A - LTCG on Equity Shares/Equity MF exempt up to ₹1.25L</option>
+</datalist>
+<datalist id="dl-other-exempt">
+  <option value="57(iia)">57(iia) - Family Pension Deduction</option>
+  <option value="57">57 - Other Expenditure against Other Income</option>
+  <option value="58">58 - Amounts Not Deductible</option>
+  <option value="80TTA">80TTA - Interest on Savings Account (up to ₹10,000)</option>
+  <option value="80TTB">80TTB - Interest Income for Senior Citizens (up to ₹50,000)</option>
+</datalist>
+<datalist id="dl-chapter6a">
+  <option value="80C">80C - LIC, PF, ELSS, Tuition Fees etc. (up to ₹1.5L)</option>
+  <option value="80CCC">80CCC - Pension Fund Contribution</option>
+  <option value="80CCD(1)">80CCD(1) - NPS Contribution (Employee)</option>
+  <option value="80CCD(1B)">80CCD(1B) - Additional NPS Contribution (up to ₹50,000)</option>
+  <option value="80CCD(2)">80CCD(2) - NPS Contribution (Employer)</option>
+  <option value="80D">80D - Health Insurance Premium</option>
+  <option value="80DD">80DD - Maintenance of Disabled Dependent</option>
+  <option value="80DDB">80DDB - Medical Treatment of Specified Disease</option>
+  <option value="80E">80E - Interest on Education Loan</option>
+  <option value="80EE">80EE - Interest on Home Loan (First-Time Buyers)</option>
+  <option value="80EEA">80EEA - Interest on Home Loan (Affordable Housing)</option>
+  <option value="80EEB">80EEB - Interest on Electric Vehicle Loan</option>
+  <option value="80G">80G - Donations to Charitable Institutions</option>
+  <option value="80GG">80GG - Rent Paid (No HRA)</option>
+  <option value="80GGA">80GGA - Donations for Scientific Research/Rural Development</option>
+  <option value="80GGC">80GGC - Donation to Political Party</option>
+  <option value="80TTA">80TTA - Interest on Savings Account</option>
+  <option value="80TTB">80TTB - Interest Income (Senior Citizens)</option>
+  <option value="80U">80U - Person with Disability</option>
+  <option value="80CCH">80CCH - Contribution to Agnipath Scheme</option>
+</datalist>
+<datalist id="dl-exempt-income">
+  <option value="10(1)">10(1) - Agricultural Income</option>
+  <option value="10(2)">10(2) - Income of HUF Member</option>
+  <option value="10(10D)">10(10D) - Life Insurance Policy Maturity/Death Proceeds</option>
+  <option value="10(11)">10(11) - Statutory Provident Fund Receipt</option>
+  <option value="10(12)">10(12) - Recognised Provident Fund Receipt (incl. PPF interest)</option>
+  <option value="10(15)">10(15) - Interest on Notified Bonds/Securities</option>
+  <option value="10(16)">10(16) - Scholarship for Education</option>
+  <option value="10(34A)">10(34A) - Income from Buy-back of Shares</option>
+  <option value="10(35)">10(35) - Income from Units of Mutual Fund</option>
+  <option value="10(37)">10(37) - Compensation on Compulsory Acquisition of Agricultural Land (Urban)</option>
+  <option value="56(2)(x)">56(2)(x) - Gifts (Exempt Portion)</option>
+</datalist>
+
+<div class="layout">
+  <!-- ================= FORM PANE ================= -->
+  <div class="form-pane">
+
+    <div class="card">
+      <h2>1. Select ITR Type &amp; Import</h2>
+      <div class="field">
+        <label>ITR Form Filed</label>
+        <select id="itrType" onchange="onTypeChange()">
+          <option value="1">ITR-1 (Sahaj) — Resident individual, salary/1 house property/other sources, income ≤ ₹50L</option>
+          <option value="2">ITR-2 — Individuals/HUF, no business income, capital gains, multiple properties</option>
+          <option value="3">ITR-3 — Individuals/HUF with income from business or profession</option>
+          <option value="4">ITR-4 (Sugam) — Presumptive business/profession income (44AD/44ADA/44AE), income ≤ ₹50L</option>
+          <option value="5">ITR-5 — Firms, LLPs, AOPs, BOIs</option>
+          <option value="6">ITR-6 — Companies (other than claiming exemption u/s 11)</option>
+          <option value="7">ITR-7 — Trusts, political parties, institutions (u/s 139(4A)-(4D))</option>
+        </select>
+      </div>
+      <div class="type-note" id="typeNote"></div>
+      <div class="field">
+        <label>Upload ITR JSON (auto-fill via deep field scan — works across ITR-1 to ITR-7)</label>
+        <input type="file" id="jsonFile" accept="application/json" onchange="handleJsonUpload(event)">
+        <p class="hint">Upload your official JSON utility file to extract numbers directly into the computation sheet.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2. Assessee Details</h2>
+      <div class="grid2">
+        <div class="field"><label>Name of Assessee / Entity</label><input type="text" id="f_name"></div>
+        <div class="field"><label>PAN</label><input type="text" id="f_pan" style="text-transform:uppercase"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Status</label>
+          <select id="f_status">
+            <option>Individual</option><option>HUF</option><option>Firm</option><option>LLP</option>
+            <option>Association of Persons (AOP)</option><option>Body of Individuals (BOI)</option>
+            <option>Company</option><option>Trust</option><option>Local Authority</option>
+          </select>
+        </div>
+        <div class="field"><label>Residential Status</label>
+          <select id="f_residential"><option>Resident</option><option>Resident but Not Ordinarily Resident</option><option>Non-Resident</option></select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Tax Regime Opted</label>
+          <select id="f_regime" onchange="renderDoc()">
+            <option value="new">New Regime (Default) — Sec 115BAC</option>
+            <option value="old">Old Regime (Opted Out) — Sec 115BAC(6)</option>
+          </select>
+        </div>
+        <div class="field"><label>&nbsp;</label></div>
+      </div>
+      <div class="field"><label>Address</label><textarea id="f_address"></textarea></div>
+      <div class="grid2">
+        <div class="field"><label>Date of Birth / Incorporation</label><input type="date" id="f_dob"></div>
+        <div class="field"><label>Mobile</label><input type="text" id="f_mobile"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Email</label><input type="text" id="f_email"></div>
+        <div class="field"><label>Date of Filing</label><input type="date" id="f_filingdate"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Financial Year</label><input type="text" id="f_fy" placeholder="2025-26"></div>
+        <div class="field"><label>Assessment Year</label><input type="text" id="f_ay" placeholder="2026-27"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Acknowledgement No.</label><input type="text" id="f_ack"></div>
+        <div class="field"><label>Filed u/s</label><input type="text" id="f_filedus" placeholder="139(1) - On or before due date"></div>
+      </div>
+      <div class="field"><label>Bank Account (for refund)</label><input type="text" id="f_bank" placeholder="Bank name, A/c No., IFSC code"></div>
+      <div class="field"><label>Employer / Business Name (if any)</label><input type="text" id="f_employer"></div>
+    </div>
+
+    <div class="card">
+      <h2>3. Income Details (Head-wise, with Exemptions &amp; Deductions)</h2>
+      <div id="incomeHeadsContainer"></div>
+    </div>
+
+    <div class="card">
+      <h2>4. Exempt Income</h2>
+      <table class="row-table" id="exemptTable">
+        <colgroup><col class="col-section"><col class="col-desc"><col class="col-amt"><col class="col-del"></colgroup>
+        <thead><tr><th>Section</th><th>Description</th><th class="amt-cell">Amount (₹)</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-add" onclick="addRow('exemptTable','','','','dl-exempt-income')">+ Add Exempt Income Row</button>
+    </div>
+
+    <div class="card">
+      <h2>5. Deductions under Chapter VI-A</h2>
+      <table class="row-table" id="deductionTable">
+        <colgroup><col class="col-section"><col class="col-desc"><col class="col-amt"><col class="col-del"></colgroup>
+        <thead><tr><th>Section</th><th>Description</th><th class="amt-cell">Amount (₹)</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-add" onclick="addRow('deductionTable','','','','dl-chapter6a')">+ Add Deduction Row</button>
+    </div>
+
+    <div class="card">
+      <h2>6. Tax &amp; Payment Summary</h2>
+      <div class="grid2">
+        <div class="field"><label>Tax Payable on Total Income</label><input type="number" id="t_taxpayable" value="0"></div>
+        <div class="field"><label>Rebate u/s 87A</label><input type="number" id="t_rebate" value="0"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Surcharge</label><input type="number" id="t_surcharge" value="0"></div>
+        <div class="field"><label>Health &amp; Education Cess (4%)</label><input type="number" id="t_cess" value="0"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Relief u/s 89 / 90 / 91</label><input type="number" id="t_relief" value="0"></div>
+        <div class="field"><label>Interest u/s 234A/B/C &amp; Fee u/s 234F</label><input type="number" id="t_interest" value="0"></div>
+      </div>
+      <h3>Taxes Paid</h3>
+      <div class="grid2">
+        <div class="field"><label>TDS (Tax Deducted at Source)</label><input type="number" id="t_tds" value="0"></div>
+        <div class="field"><label>TCS (Tax Collected at Source)</label><input type="number" id="t_tcs" value="0"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Advance Tax</label><input type="number" id="t_advance" value="0"></div>
+        <div class="field"><label>Self-Assessment Tax</label><input type="number" id="t_sat" value="0"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>7. Preparer / Certification</h2>
+      <div class="grid2">
+        <div class="field"><label>Prepared By (CA / Firm Name)</label><input type="text" id="p_name"></div>
+        <div class="field"><label>Membership No. / FRN</label><input type="text" id="p_membership"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Place</label><input type="text" id="p_place"></div>
+        <div class="field"><label>Date</label><input type="date" id="p_date"></div>
+      </div>
+      <div class="field"><label>Purpose of Issue</label><input type="text" id="p_purpose" placeholder="e.g. Submission to Bank for Home Loan Application"></div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="renderDoc()">↻ Update Preview</button>
+      <button class="btn btn-gold" onclick="downloadPdf()">⬇ Download Vector PDF</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-ghost" onclick="validateAgainstJson()">✓ Validate vs Uploaded JSON</button>
+    </div>
+  </div>
+
+  <!-- ================= PREVIEW PANE ================= -->
+  <div class="preview-pane">
+    <div id="docWrap"></div>
+  </div>
+</div>
+
+<script>
+const HEADS = [
+  {key:'salary', label:'A. Income from Salary', exemptLabel:'Exemptions &amp; Deductions claimed (Sec 10 / Sec 16)', incomeDatalist:'dl-salary', exemptDatalist:'dl-salary-exempt'},
+  {key:'houseprop', label:'B. Income from House Property', exemptLabel:'Deductions claimed (Sec 24)', incomeDatalist:'', exemptDatalist:'dl-hp-exempt'},
+  {key:'business', label:'C. Profits &amp; Gains of Business or Profession', exemptLabel:'Deductions / adjustments claimed', incomeDatalist:'', exemptDatalist:'dl-business-exempt'},
+  {key:'capgains', label:'D. Capital Gains', exemptLabel:'Exemptions claimed (Sec 54 series)', incomeDatalist:'dl-capgains-income', exemptDatalist:'dl-capgains-exempt'},
+  {key:'other', label:'E. Income from Other Sources', exemptLabel:'Deductions claimed (Sec 57 / 80TTA / 80TTB)', incomeDatalist:'', exemptDatalist:'dl-other-exempt'}
+];
+
+const TYPE_NOTES = {
+  '1':'ITR-1 (Sahaj): resident individuals, salary + one house property + other sources, total income up to ₹50 lakh.',
+  '2':'ITR-2: individuals/HUF without business income — salary, multiple house properties, and capital gains.',
+  '3':'ITR-3: individuals/HUF with business or professional income (books of account).',
+  '4':'ITR-4 (Sugam): presumptive taxation u/s 44AD/44ADA/44AE, total income up to ₹50 lakh.',
+  '5':'ITR-5: firms, LLPs, AOPs, BOIs.',
+  '6':'ITR-6: companies.',
+  '7':'ITR-7: trusts, political parties, institutions filing u/s 139(4A)-(4D).'
+};
+
+const DEFAULTS = {
+  '1': {
+    salary:{income:[['17(1)','Gross Salary (as per Form 16)',0]], exempt:[['10(13A)','House Rent Allowance (HRA) Exemption',0],['10(14)','Special Allowance Exemption',0],['16(ia)','Standard Deduction',75000]]},
+    houseprop:{income:[['','Net Annual Value / Rent Received',0]], exempt:[['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[], exempt:[]},
+    capgains:{income:[], exempt:[]},
+    other:{income:[['','Interest from Savings Account',0],['','Interest from Fixed/Recurring Deposits',0]], exempt:[['80TTA','Interest on Savings Account',0]]}
+  },
+  '2': {
+    salary:{income:[['17(1)','Gross Salary',0]], exempt:[['10(13A)','HRA Exemption',0],['16(ia)','Standard Deduction',75000]]},
+    houseprop:{income:[['','Net Annual Value - Property 1',0]], exempt:[['24(a)','Standard Deduction (30% of NAV)',0],['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[], exempt:[]},
+    capgains:{income:[['111A','Short Term Capital Gains (STT-Paid Equity)',0],['112A','Long Term Capital Gains (Equity/Equity MF)',0]], exempt:[['54EC','Investment in Specified Bonds',0]]},
+    other:{income:[['','Interest Income',0],['','Dividend Income',0]], exempt:[['80TTA','Interest on Savings Account',0]]}
+  },
+  '3': {
+    salary:{income:[['17(1)','Gross Salary',0]], exempt:[['16(ia)','Standard Deduction',75000]]},
+    houseprop:{income:[['','Net Annual Value',0]], exempt:[['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[['','Net Profit as per Profit & Loss Account',0]], exempt:[['32','Depreciation',0]]},
+    capgains:{income:[['111A','Short Term Capital Gains (STT-Paid Equity)',0],['112A','Long Term Capital Gains (Equity/Equity MF)',0]], exempt:[]},
+    other:{income:[['','Interest Income',0]], exempt:[]}
+  },
+  '4': {
+    salary:{income:[['17(1)','Gross Salary',0]], exempt:[['16(ia)','Standard Deduction',75000]]},
+    houseprop:{income:[['','Net Annual Value',0]], exempt:[['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[['44AD','Presumptive Business Income (8%/6% of turnover)',0],['44ADA','Presumptive Professional Income (50% of receipts)',0]], exempt:[]},
+    capgains:{income:[], exempt:[]},
+    other:{income:[['','Interest Income',0]], exempt:[]}
+  },
+  '5': {
+    salary:{income:[], exempt:[]},
+    houseprop:{income:[['','Net Annual Value',0]], exempt:[['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[['','Net Profit as per Profit & Loss Account',0]], exempt:[['32','Depreciation',0],['40(b)','Remuneration/Interest to Partners',0]]},
+    capgains:{income:[['111A','Short Term Capital Gains',0],['112A','Long Term Capital Gains',0]], exempt:[]},
+    other:{income:[['','Interest / Other Income',0]], exempt:[]}
+  },
+  '6': {
+    salary:{income:[], exempt:[]},
+    houseprop:{income:[['','Net Annual Value',0]], exempt:[['24(b)','Interest on Housing Loan',0]]},
+    business:{income:[['28','Profit as per Profit & Loss Account',0]], exempt:[['32','Depreciation',0]]},
+    capgains:{income:[['111A','Short Term Capital Gains',0],['112A','Long Term Capital Gains',0]], exempt:[]},
+    other:{income:[['','Other Income',0]], exempt:[]}
+  },
+  '7': {
+    salary:{income:[], exempt:[]},
+    houseprop:{income:[['','Income from House Property held under Trust',0]], exempt:[]},
+    business:{income:[], exempt:[]},
+    capgains:{income:[], exempt:[]},
+    other:{income:[['','Voluntary Contributions / Donations (Taxable Portion)',0],['','Income from Other Sources',0]], exempt:[['11','Application of Income for Charitable/Religious Purposes',0]]}
+  }
+};
+
+function fmtINR(n){
+  n = Number(n)||0;
+  const neg = n<0; n = Math.abs(n);
+  let s = n.toFixed(0);
+  let lastThree = s.substring(s.length-3);
+  let other = s.substring(0,s.length-3);
+  if(other!=='') lastThree = ','+lastThree;
+  let formatted = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+  return (neg?'-':'') + '₹' + formatted;
+}
+
+function rowTableSkeleton(id, headerLabel){
+  return `
+    <table class="row-table" id="${id}">
+      <colgroup><col class="col-section"><col class="col-desc"><col class="col-amt"><col class="col-del"></colgroup>
+      <thead><tr><th>Section</th><th>${headerLabel}</th><th class="amt-cell">Amount (₹)</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>`;
+}
+
+function buildIncomeHeads(){
+  const container = document.getElementById('incomeHeadsContainer');
+  container.innerHTML = '';
+  HEADS.forEach(h=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'head-block';
+    wrap.innerHTML = `
+      <div class="head-title">${h.label}</div>
+
+      <div class="subhead"><h4 style="margin:8px 0 4px;">Gross Income / Receipts</h4><span class="tag">ADD</span></div>
+      ${rowTableSkeleton('head_'+h.key+'_income','Description')}
+      <button class="btn btn-add small" onclick="addRow('head_${h.key}_income','','','','${h.incomeDatalist}')">+ Add income row</button>
+
+      <div class="subhead exempt"><h4 style="margin:12px 0 4px;">${h.exemptLabel}</h4><span class="tag">LESS</span></div>
+      ${rowTableSkeleton('head_'+h.key+'_exempt','Description')}
+      <button class="btn btn-add small" onclick="addRow('head_${h.key}_exempt','','','','${h.exemptDatalist}')">+ Add exemption/deduction row</button>
+
+      <div class="net-line"><span>Net Income under this Head</span><span id="net_${h.key}">₹0</span></div>
+    `;
+    container.appendChild(wrap);
+  });
+}
+
+function addRow(tableId, section='', desc='', amount='', datalistId=''){
+  const tbody = document.querySelector('#'+tableId+' tbody');
+  const tr = document.createElement('tr');
+  const dl = datalistId ? ` list="${datalistId}"` : '';
+  tr.innerHTML = `
+    <td><input type="text" value="${escapeAttr(section)}" placeholder="Section"${dl}></td>
+    <td><input type="text" value="${escapeAttr(desc)}" placeholder="Description"></td>
+    <td class="amt-cell"><input type="number" value="${amount||0}" oninput="renderDoc()"></td>
+    <td><button class="btn btn-del" onclick="this.closest('tr').remove();renderDoc()">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function clearTableBody(tableId){
+  const el = document.querySelector('#'+tableId+' tbody');
+  if(el) el.innerHTML = '';
+}
+
+function onTypeChange(){
+  const type = document.getElementById('itrType').value;
+  document.getElementById('typeNote').textContent = TYPE_NOTES[type];
+  buildIncomeHeads();
+  const defs = DEFAULTS[type];
+  HEADS.forEach(h=>{
+    const d = defs[h.key] || {income:[],exempt:[]};
+    (d.income||[]).forEach(r=>addRow('head_'+h.key+'_income', r[0], r[1], r[2], h.incomeDatalist));
+    (d.exempt||[]).forEach(r=>addRow('head_'+h.key+'_exempt', r[0], r[1], r[2], h.exemptDatalist));
+  });
+  clearTableBody('deductionTable');
+  clearTableBody('exemptTable');
+  renderDoc();
+}
+
+function deepFind(obj, key, seen){
+  seen = seen || new Set();
+  if(!obj || typeof obj !== 'object' || seen.has(obj)) return undefined;
+  seen.add(obj);
+  if(Object.prototype.hasOwnProperty.call(obj, key)) return obj[key];
+  for(const k of Object.keys(obj)){
+    const v = obj[k];
+    if(v && typeof v === 'object'){
+      const found = deepFind(v, key, seen);
+      if(found !== undefined) return found;
+    }
+  }
+  return undefined;
+}
+
+function deepFindAll(obj, key, out, seen){
+  out = out || [];
+  seen = seen || new Set();
+  if(!obj || typeof obj !== 'object' || seen.has(obj)) return out;
+  seen.add(obj);
+  if(Object.prototype.hasOwnProperty.call(obj, key)) out.push(obj[key]);
+  for(const k of Object.keys(obj)){
+    const v = obj[k];
+    if(v && typeof v === 'object') deepFindAll(v, key, out, seen);
+  }
+  return out;
+}
+
+function deepFindByRegex(obj, regex, seen){
+  seen = seen || new Set();
+  if(!obj || typeof obj !== 'object' || seen.has(obj)) return undefined;
+  seen.add(obj);
+  for(const k of Object.keys(obj)){
+    if(regex.test(k)) return {key:k, value:obj[k]};
+  }
+  for(const k of Object.keys(obj)){
+    const v = obj[k];
+    if(v && typeof v === 'object'){
+      const found = deepFindByRegex(v, regex, seen);
+      if(found !== undefined) return found;
+    }
+  }
+  return undefined;
+}
+
+function firstDeepFind(obj, keys){
+  for(const k of keys){
+    const v = deepFind(obj, k);
+    if(v !== undefined) return v;
+  }
+  return undefined;
+}
+
+function num(v){ return (typeof v === 'number') ? v : (Number(v)||0); }
+
+const OS_CODE_LABELS = {
+  SAV:'Interest from Savings Account', IFD:'Interest from Deposit (Bank/Post Office/Co-operative Society)',
+  TAX:'Interest from Income Tax Refund', UGI:'Interest on Enhanced Compensation', DIV:'Dividend',
+  PEN:'Family Pension', GIFT:'Income from Gift', RENT:'Rent from Machinery/Plant/Building', OTH:'Other Income'
+};
+
+const STATUS_MAP = {I:'Individual', H:'HUF', F:'Firm', C:'Company', A:'Association of Persons (AOP)', B:'Body of Individuals (BOI)', L:'Local Authority', T:'Trust', G:'Company', P:'AOP'};
+const RESSTATUS_MAP = {RES:'Resident', RNOR:'Resident but Not Ordinarily Resident', NRI:'Non-Resident', NR:'Non-Resident'};
+const FILEDUS_MAP = {11:'139(1) - On or before due date', 12:'139(4) - Belated Return', 13:'139(5) - Revised Return', 17:'139(4A)', 18:'139(4B)', 19:'139(4C)', 20:'139(4D)', 92:'92CD - Modified Return', 139:'139(9) - Defective Return'};
+
+function clearFormForNewImport(){
+  ['f_name','f_pan','f_dob','f_address','f_email','f_mobile','f_fy','f_ay','f_filingdate','f_ack','f_filedus','f_bank','f_employer'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f_status').value = 'Individual';
+  document.getElementById('f_residential').value = 'Resident';
+  document.getElementById('f_regime').value = 'new';
+  ['t_taxpayable','t_rebate','t_surcharge','t_cess','t_relief','t_interest','t_tds','t_tcs','t_advance','t_sat'].forEach(id=>{
+    document.getElementById(id).value = 0;
+  });
+  window.jsonReportedTotals = null;
+}
+
+function handleJsonUpload(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    let data;
+    try{ data = JSON.parse(e.target.result); }
+    catch(err){ alert('This file could not be read as valid JSON.'); return; }
+    document.getElementById('itrType').value = '1';
+    onTypeChange();
+    clearFormForNewImport();
+    window.lastUploadedJson = data;
+    const report = tryAutofillFromJson(data);
+    window.jsonReportedTotals = report.reported;
+    renderDoc();
+    alert(`Successfully processed JSON with ${report.filledFields.length} field groups mapped.`);
+  };
+  reader.readAsText(file);
+}
+
+function tryAutofillFromJson(data){
+  const filledFields = [];
+  const warnings = [];
+  const root = data.ITR || data;
+  let form = null;
+  for(const k of Object.keys(root)){
+    if(/^ITR[1-7]$/i.test(k)){ form = root[k]; break; }
+  }
+  if(!form) form = root;
+
+  const formNameHit = deepFindByRegex(form, /^Form_ITR[1-7]$/);
+  if(formNameHit && formNameHit.value && formNameHit.value.FormName){
+    const m = /ITR-?([1-7])/i.exec(formNameHit.value.FormName);
+    if(m){
+      document.getElementById('itrType').value = m[1];
+      onTypeChange();
+    }
+  }
+
+  const nameObj = deepFind(form, 'AssesseeName');
+  if(nameObj){
+    const full = [nameObj.FirstName, nameObj.MiddleName, nameObj.SurNameOrOrgName].filter(Boolean).join(' ');
+    if(full){ document.getElementById('f_name').value = full; filledFields.push('name'); }
+  }
+  const pan = deepFind(form, 'PAN');
+  if(pan){ document.getElementById('f_pan').value = pan; filledFields.push('PAN'); }
+  const dob = deepFind(form, 'DOB');
+  if(dob){ document.getElementById('f_dob').value = dob; filledFields.push('date of birth'); }
+  const statusCode = deepFind(form, 'Status');
+  if(statusCode && STATUS_MAP[statusCode]){ document.getElementById('f_status').value = STATUS_MAP[statusCode]; }
+  const resStatus = deepFind(form, 'ResidentialStatus');
+  if(resStatus && RESSTATUS_MAP[resStatus]){ document.getElementById('f_residential').value = RESSTATUS_MAP[resStatus]; }
+
+  const optOut = firstDeepFind(form, ['OptOutNewTaxRegime','OptOutNewRegime']);
+  if(optOut !== undefined){
+    document.getElementById('f_regime').value = (String(optOut).toUpperCase()==='Y') ? 'old' : 'new';
+    filledFields.push('tax regime opted');
+  }
+
+  const addr = deepFind(form, 'Address');
+  if(addr && typeof addr === 'object'){
+    const parts = [addr.ResidenceName, addr.ResidenceNo, addr.RoadOrStreet, addr.LocalityOrArea, addr.CityOrTownOrDistrict, addr.PinCode].filter(Boolean);
+    if(parts.length){ document.getElementById('f_address').value = parts.join(', '); filledFields.push('address'); }
+    if(addr.EmailAddress){ document.getElementById('f_email').value = addr.EmailAddress; }
+    if(addr.MobileNo){ document.getElementById('f_mobile').value = addr.MobileNo; }
+  }
+
+  const assessmentYear = deepFind(form, 'AssessmentYear');
+  if(assessmentYear){
+    const yr = parseInt(String(assessmentYear).slice(0,4), 10);
+    if(yr){
+      document.getElementById('f_ay').value = `${yr}-${String(yr+1).slice(-2)}`;
+      document.getElementById('f_fy').value = `${yr-1}-${String(yr).slice(-2)}`;
+      filledFields.push('assessment/financial year');
+    }
+  }
+  const ackNo = deepFind(form, 'AckNo');
+  if(ackNo){ document.getElementById('f_ack').value = ackNo; filledFields.push('acknowledgement no.'); }
+
+  const filedUsCode = deepFind(form, 'ReturnFileSec');
+  if(filedUsCode !== undefined && FILEDUS_MAP[filedUsCode]){ document.getElementById('f_filedus').value = FILEDUS_MAP[filedUsCode]; }
+
+  const filingDate = deepFind(form, 'JSONCreationDate') || deepFind(form, 'Date');
+  if(filingDate && /^\d{4}-\d{2}-\d{2}$/.test(filingDate)){ document.getElementById('f_filingdate').value = filingDate; }
+
+  const bankAccounts = deepFind(form, 'AddtnlBankDetails') || deepFindAll(form,'BankAccountDtls')[0];
+  if(Array.isArray(bankAccounts) && bankAccounts.length){
+    const pref = bankAccounts.find(b=>String(b.UseForRefund).toLowerCase()==='true') || bankAccounts[0];
+    document.getElementById('f_bank').value = `${pref.BankName||''}, A/c No. ${pref.BankAccountNo||''}, IFSC ${pref.IFSCCode||''}`;
+  }
+
+  const employerName = deepFind(form, 'NameOfEmployer');
+  if(employerName){ document.getElementById('f_employer').value = employerName; }
+
+  const salariesArr = deepFind(form, 'Salaries');
+  const flatGrossSalary = firstDeepFind(form, ['GrossSalary','TotalGrossSalary']);
+  let salaryFilled = false;
+
+  if(Array.isArray(salariesArr) && salariesArr.length){
+    clearTableBody('head_salary_income');
+    salariesArr.forEach(s=>{
+      const sd = s.Salarys || s;
+      const hasComponent = sd.Salary !== undefined;
+      const amt = num(hasComponent ? sd.Salary : sd.GrossSalary);
+      const emp = s.NameOfEmployer ? ` — ${s.NameOfEmployer}` : '';
+      addRow('head_salary_income','17(1)', 'Salary'+emp, amt, 'dl-salary');
+      if(hasComponent){
+        if(num(sd.ValueOfPerquisites)) addRow('head_salary_income','17(2)','Value of Perquisites'+emp, num(sd.ValueOfPerquisites), 'dl-salary');
+        if(num(sd.ProfitsinLieuOfSalary)) addRow('head_salary_income','17(3)','Profit in Lieu of Salary'+emp, num(sd.ProfitsinLieuOfSalary), 'dl-salary');
+      }
+    });
+    salaryFilled = true;
+  } else if(flatGrossSalary !== undefined){
+    clearTableBody('head_salary_income');
+    const flatSalaryBase = firstDeepFind(form, ['Salary']);
+    const hasComponent = flatSalaryBase !== undefined;
+    addRow('head_salary_income','17(1)','Salary (as per Form 16)', num(hasComponent ? flatSalaryBase : flatGrossSalary), 'dl-salary');
+    if(hasComponent){
+      const perq = firstDeepFind(form, ['PerquisitesValue','ValueOfPerquisites']);
+      if(num(perq)) addRow('head_salary_income','17(2)','Value of Perquisites', num(perq), 'dl-salary');
+      const profLieu = firstDeepFind(form, ['ProfitsInSalary','ProfitsinLieuOfSalary']);
+      if(num(profLieu)) addRow('head_salary_income','17(3)','Profit in Lieu of Salary', num(profLieu), 'dl-salary');
+    }
+    salaryFilled = true;
+  }
+
+  if(salaryFilled){
+    filledFields.push('salary income');
+    clearTableBody('head_salary_exempt');
+    const exemptDtls = deepFind(form, 'AllwncExemptUs10Dtls');
+    if(Array.isArray(exemptDtls)){
+      exemptDtls.forEach(x=>{
+        if(num(x.SalOthAmount)) addRow('head_salary_exempt', x.SalNatureDesc||'10', 'Exempt Allowance (Sec 10)', num(x.SalOthAmount), 'dl-salary-exempt');
+      });
+    }
+    const stdDed = firstDeepFind(form, ['DeductionUnderSection16ia','DeductionUs16ia']);
+    if(num(stdDed)) addRow('head_salary_exempt','16(ia)','Standard Deduction', num(stdDed), 'dl-salary-exempt');
+    const entertainAllow = firstDeepFind(form, ['EntertainmntalwncUs16ii','EntertainmentAlw16ii']);
+    if(num(entertainAllow)) addRow('head_salary_exempt','16(ii)','Entertainment Allowance', num(entertainAllow), 'dl-salary-exempt');
+    const profTax = deepFind(form, 'ProfessionalTaxUs16iii');
+    if(num(profTax)) addRow('head_salary_exempt','16(iii)','Professional Tax', num(profTax), 'dl-salary-exempt');
+  }
+
+  const hpProperties = deepFind(form, 'PropertyDetails');
+  const hpTotal = firstDeepFind(form, ['TotalIncomeChargeableUnHP','IncomeFromHP']);
+  if(Array.isArray(hpProperties) && hpProperties.length){
+    clearTableBody('head_houseprop_income');
+    clearTableBody('head_houseprop_exempt');
+    hpProperties.forEach((p,i)=>{
+      const rd = p.Rentdetails || {};
+      addRow('head_houseprop_income','', `Net Annual Value — Property ${i+1}${p.ifLetOut==='S'?' (Self-Occupied)':p.ifLetOut==='L'?' (Let Out)':''}`, num(rd.AnnualOfPropOwned||rd.AnnualLetableValue), '');
+      if(num(rd.IntOnBorwCap)) addRow('head_houseprop_exempt','24(b)', `Interest on Housing Loan — Property ${i+1}`, num(rd.IntOnBorwCap), 'dl-hp-exempt');
+      if(num(rd.ThirtyPercentOfBalance)) addRow('head_houseprop_exempt','24(a)', `Standard Deduction (30% of NAV) — Property ${i+1}`, num(rd.ThirtyPercentOfBalance), 'dl-hp-exempt');
+    });
+    filledFields.push('house property income');
+  } else if(hpTotal !== undefined){
+    clearTableBody('head_houseprop_income');
+    addRow('head_houseprop_income','', 'Income from House Property', num(hpTotal), '');
+  }
+
+  const totalCapGains = deepFind(form, 'TotalCapGains');
+  const totalShortTerm = deepFind(form, 'TotalShortTerm');
+  const totalLongTerm = deepFind(form, 'TotalLongTerm');
+  if(totalCapGains !== undefined){
+    clearTableBody('head_capgains_income');
+    clearTableBody('head_capgains_exempt');
+    if(num(totalShortTerm)) addRow('head_capgains_income','111A/APP','Short Term Capital Gains', num(totalShortTerm), '');
+    if(num(totalLongTerm)) addRow('head_capgains_income','112A/112','Long Term Capital Gains', num(totalLongTerm), '');
+    if(!num(totalShortTerm) && !num(totalLongTerm) && num(totalCapGains)) addRow('head_capgains_income','','Capital Gains (net, as per return)', num(totalCapGains), '');
+    filledFields.push('capital gains');
+  }
+
+  const osTotal = firstDeepFind(form, ['TotOthSrcNoRaceHorse','IncomeOthSrc']);
+  if(osTotal !== undefined){
+    clearTableBody('head_other_income');
+    clearTableBody('head_other_exempt');
+    const savings = deepFind(form, 'IntrstFrmSavingBank');
+    const termDep = deepFind(form, 'IntrstFrmTermDeposit');
+    const itRefund = deepFind(form, 'IntrstFrmIncmTaxRefund');
+    const dividend = deepFind(form, 'DividendGross');
+    const family = deepFind(form, 'FamilyPension');
+    let accounted = 0;
+    if(num(savings)) { addRow('head_other_income','','Interest from Savings Account', num(savings), ''); accounted += num(savings); }
+    if(num(termDep)) { addRow('head_other_income','','Interest from Term/Fixed Deposit', num(termDep), ''); accounted += num(termDep); }
+    if(num(itRefund)) { addRow('head_other_income','','Interest from Income Tax Refund', num(itRefund), ''); accounted += num(itRefund); }
+    if(num(dividend)) { addRow('head_other_income','','Dividend Income', num(dividend), ''); accounted += num(dividend); }
+    if(num(family)) { addRow('head_other_income','','Family Pension', num(family), ''); accounted += num(family); }
+
+    const codedItems = deepFind(form, 'OthersIncDtlsOthSrc');
+    if(Array.isArray(codedItems)){
+      codedItems.forEach(x=>{
+        const amt = num(x.OthSrcOthAmount);
+        if(amt){
+          addRow('head_other_income','', OS_CODE_LABELS[x.OthSrcNatureDesc] || `Other Income (${x.OthSrcNatureDesc||'—'})`, amt, '');
+          accounted += amt;
+        }
+      });
+    }
+    if(num(osTotal) - accounted !== 0) addRow('head_other_income','','Other Income from Other Sources (balance, as per return)', num(osTotal)-accounted, '');
+    const familyPenDed = deepFind(form, 'DeductionUs57iia');
+    if(num(familyPenDed)) addRow('head_other_exempt','57(iia)','Family Pension Deduction', num(familyPenDed), 'dl-other-exempt');
+    filledFields.push('other sources income');
+  }
+
+  const presAD = deepFind(form, 'PersumptiveInc44AD');
+  const presADA = deepFind(form, 'PersumptiveInc44ADA');
+  const flatBusinessIncome = deepFind(form, 'IncomeFromBusinessProf');
+  const noBooksNetProfit = deepFind(form, 'NetProfitPrf');
+  const bpChargeable = deepFind(form, 'IncChrgUnHdProftGain');
+  let bpFilled = false;
+  if(presAD && (num(presAD.TotPersumptiveInc44AD) || presAD.TotPersumptiveInc44AD!==undefined)){
+    clearTableBody('head_business_income');
+    addRow('head_business_income','44AD','Presumptive Business Income', num(presAD.TotPersumptiveInc44AD), 'dl-business-exempt');
+    bpFilled = true;
+  }
+  if(presADA && presADA.GrsReceipt!==undefined){
+    if(!bpFilled) clearTableBody('head_business_income');
+    addRow('head_business_income','44ADA','Presumptive Professional Income', num(presADA.GrsReceipt)*0.5, 'dl-business-exempt');
+    bpFilled = true;
+  }
+  if(!bpFilled && flatBusinessIncome !== undefined && num(flatBusinessIncome)){
+    clearTableBody('head_business_income');
+    addRow('head_business_income','44AD/44ADA','Presumptive Business/Professional Income', num(flatBusinessIncome), 'dl-business-exempt');
+    bpFilled = true;
+  }
+  if(!bpFilled && noBooksNetProfit !== undefined){
+    clearTableBody('head_business_income');
+    addRow('head_business_income','','Net Profit from Business/Profession', num(noBooksNetProfit), 'dl-business-exempt');
+    bpFilled = true;
+  }
+  if(!bpFilled && bpChargeable !== undefined){
+    clearTableBody('head_business_income');
+    addRow('head_business_income','28','Income chargeable under Business/Profession', num(bpChargeable), 'dl-business-exempt');
+    bpFilled = true;
+  }
+
+  const viaDed = deepFind(form, 'DeductUndChapVIA');
+  if(viaDed && typeof viaDed === 'object'){
+    clearTableBody('deductionTable');
+    const SECTION_LABELS = {
+      Section80C:'80C', Section80CCC:'80CCC', Section80CCD1:'80CCD(1)', Section80CCD1B:'80CCD(1B)', Section80CCDEmployer:'80CCD(2)',
+      Section80D:'80D', Section80DD:'80DD', Section80DDB:'80DDB', Section80E:'80E', Section80EE:'80EE', Section80EEA:'80EEA', Section80EEB:'80EEB',
+      Section80G:'80G', Section80GG:'80GG', Section80GGA:'80GGA', Section80GGC:'80GGC', Section80TTA:'80TTA', Section80TTB:'80TTB',
+      Section80U:'80U', AnyOthSec80CCH:'80CCH'
+    };
+    Object.keys(viaDed).forEach(k=>{
+      if(/^Tot/i.test(k)) return;
+      const amt = num(viaDed[k]);
+      if(amt){
+        addRow('deductionTable', SECTION_LABELS[k]||k, 'As per Schedule VI-A', amt, 'dl-chapter6a');
+      }
+    });
+  }
+
+  const taxOnTI = firstDeepFind(form, ['TaxPayableOnTotInc','TotalTaxPayable']);
+  if(taxOnTI !== undefined){ document.getElementById('t_taxpayable').value = num(taxOnTI); }
+  const rebate = deepFind(form, 'Rebate87A');
+  if(rebate !== undefined){ document.getElementById('t_rebate').value = num(rebate); }
+  const surcharge = deepFind(form, 'TotalSurcharge');
+  if(surcharge !== undefined){ document.getElementById('t_surcharge').value = num(surcharge); }
+  const cess = deepFind(form, 'EducationCess') !== undefined ? deepFind(form,'EducationCess') : deepFind(form, 'HealthEduCess');
+  if(cess !== undefined){ document.getElementById('t_cess').value = num(cess); }
+  const interestTot = deepFind(form, 'TotalIntrstPay');
+  if(interestTot !== undefined){ document.getElementById('t_interest').value = num(interestTot); }
+
+  const taxesPaid = deepFind(form, 'TaxesPaid');
+  if(taxesPaid && typeof taxesPaid === 'object'){
+    if(taxesPaid.TDS !== undefined) document.getElementById('t_tds').value = num(taxesPaid.TDS);
+    if(taxesPaid.TCS !== undefined) document.getElementById('t_tcs').value = num(taxesPaid.TCS);
+    if(taxesPaid.AdvanceTax !== undefined) document.getElementById('t_advance').value = num(taxesPaid.AdvanceTax);
+    if(taxesPaid.SelfAssessmentTax !== undefined) document.getElementById('t_sat').value = num(taxesPaid.SelfAssessmentTax);
+  }
+
+  const reported = {
+    grossTotalIncome: firstDeepFind(form, ['GrossTotalIncome','GrossTotIncome']),
+    totalIncome: deepFind(form, 'TotalIncome'),
+    netTaxLiability: firstDeepFind(form, ['NetTaxLiability','TotalTaxPayable']),
+    refundDue: deepFind(form, 'RefundDue'),
+    balTaxPayable: deepFind(form, 'BalTaxPayable')
+  };
+
+  return {filledFields, warnings, reported};
+}
+
+function validateAgainstJson(){
+  if(!window.jsonReportedTotals){
+    alert('Upload an ITR JSON first.');
+    return;
+  }
+  const d = collectData();
+  let gti = 0;
+  HEADS.forEach(h=>{
+    const inc = d.heads[h.key].income.reduce((s,r)=>s+r.amount,0);
+    const ex = d.heads[h.key].exempt.reduce((s,r)=>s+r.amount,0);
+    gti += (inc-ex);
+  });
+  const totalDeductions = d.deductions.reduce((s,r)=>s+r.amount,0);
+  const totalIncome = gti - totalDeductions;
+  const r = window.jsonReportedTotals;
+  const lines = [];
+  if(r.grossTotalIncome !== undefined) lines.push(`Gross Total Income — entered: ${fmtINR(gti)}, JSON reported: ${fmtINR(r.grossTotalIncome)}, ${gti===num(r.grossTotalIncome)?'✓ MATCH':'⚠ DIFFERS'}`);
+  if(r.totalIncome !== undefined) lines.push(`Total Income — entered: ${fmtINR(totalIncome)}, JSON reported: ${fmtINR(r.totalIncome)}, ${totalIncome===num(r.totalIncome)?'✓ MATCH':'⚠ DIFFERS'}`);
+  alert('Validation against uploaded JSON:\n\n'+lines.join('\n\n'));
+}
+
+function readRows(tableId){
+  const rows = [];
+  document.querySelectorAll('#'+tableId+' tbody tr').forEach(tr=>{
+    const inputs = tr.querySelectorAll('input');
+    rows.push({section:inputs[0].value, desc:inputs[1].value, amount:Number(inputs[2].value)||0});
+  });
+  return rows;
+}
+
+function collectData(){
+  const d = {};
+  ['f_name','f_pan','f_status','f_residential','f_regime','f_address','f_dob','f_mobile','f_email',
+   'f_fy','f_ay','f_filingdate','f_ack','f_filedus','f_bank','f_employer',
+   'p_name','p_membership','p_place','p_date','p_purpose'].forEach(id=>{
+    d[id] = document.getElementById(id).value;
+  });
+  ['t_taxpayable','t_rebate','t_surcharge','t_cess','t_relief','t_interest','t_tds','t_tcs','t_advance','t_sat'].forEach(id=>{
+    d[id] = Number(document.getElementById(id).value)||0;
+  });
+  d.heads = {};
+  HEADS.forEach(h=>{
+    d.heads[h.key] = {
+      income: readRows('head_'+h.key+'_income'),
+      exempt: readRows('head_'+h.key+'_exempt')
+    };
+  });
+  d.exempt = readRows('exemptTable');
+  d.deductions = readRows('deductionTable');
+  d.itrType = document.getElementById('itrType').value;
+  return d;
+}
+
+function computeTotals(d){
+  const headNet = {};
+  let gti = 0;
+  HEADS.forEach(h=>{
+    const incTotal = d.heads[h.key].income.reduce((s,r)=>s+r.amount,0);
+    const exTotal = d.heads[h.key].exempt.reduce((s,r)=>s+r.amount,0);
+    const net = incTotal - exTotal;
+    headNet[h.key] = {incTotal, exTotal, net};
+    gti += net;
+  });
+  const totalDeductions = d.deductions.reduce((s,r)=>s+r.amount,0);
+  const totalIncome = gti - totalDeductions;
+  const totalExempt = d.exempt.reduce((s,r)=>s+r.amount,0);
+
+  const NEW_REGIME_ALLOWED_SECTIONS = ['80CCD(2)','80CCH','80JJAA'];
+  const ineligibleUnderNewRegime = d.f_regime==='old' ? 0 : d.deductions
+    .filter(r=>!NEW_REGIME_ALLOWED_SECTIONS.some(s=>String(r.section).toUpperCase().replace(/\s/g,'').includes(s.replace(/\s/g,''))))
+    .reduce((s,r)=>s+r.amount,0);
+
+  const totalTaxLiability = Math.max(0,(d.t_taxpayable - d.t_rebate) + d.t_surcharge + d.t_cess - d.t_relief + d.t_interest);
+  const totalTaxesPaid = d.t_tds + d.t_tcs + d.t_advance + d.t_sat;
+  const balance = totalTaxLiability - totalTaxesPaid;
+  const typeLabelMap = {'1':'ITR-1 (Sahaj)','2':'ITR-2','3':'ITR-3','4':'ITR-4 (Sugam)','5':'ITR-5','6':'ITR-6','7':'ITR-7'};
+
+  return {headNet, gti, totalDeductions, totalIncome, totalExempt, ineligibleUnderNewRegime, totalTaxLiability, totalTaxesPaid, balance, typeLabelMap};
+}
+
+function renderDoc(){
+  const d = collectData();
+  const {headNet, gti, totalDeductions, totalIncome, totalExempt, ineligibleUnderNewRegime, totalTaxLiability, totalTaxesPaid, balance, typeLabelMap} = computeTotals(d);
+  HEADS.forEach(h=>{
+    const netEl = document.getElementById('net_'+h.key);
+    if(netEl) netEl.textContent = fmtINR(headNet[h.key].net);
+  });
+
+  const incomeRowsHtml = HEADS.map(h=>{
+    const {income, exempt} = d.heads[h.key];
+    const {incTotal, net} = headNet[h.key];
+    if(income.length===0 && exempt.length===0 && net===0) return '';
+    let incBody = income.map(r=>`<tr class="subrow"><td class="sec">${escapeHtml(r.section)}</td><td>${escapeHtml(r.desc)||'&nbsp;'}</td><td class="amt">${fmtINR(r.amount)}</td></tr>`).join('');
+    let exBody = exempt.map(r=>`<tr class="subrow less"><td class="sec">${escapeHtml(r.section)}</td><td>Less: ${escapeHtml(r.desc)||'&nbsp;'}</td><td class="amt">(${fmtINR(r.amount)})</td></tr>`).join('');
+    return `<tr class="headrow"><td colspan="3">${h.label}</td></tr>
+      ${incBody}
+      ${exempt.length ? `<tr class="subtotal"><td colspan="2">Gross under this head</td><td class="amt">${fmtINR(incTotal)}</td></tr>${exBody}` : ''}
+      <tr class="total"><td colspan="2">Net Income — ${h.label.replace(/^[A-Z]\.\s*/,'')}</td><td class="amt">${fmtINR(net)}</td></tr>`;
+  }).join('');
+
+  const exemptRowsHtml = d.exempt.length ? d.exempt.map(r=>`<tr><td class="sec">${escapeHtml(r.section)}</td><td>${escapeHtml(r.desc)}</td><td class="amt">${fmtINR(r.amount)}</td></tr>`).join('')
+      + `<tr class="total"><td colspan="2">Total Exempt Income</td><td class="amt">${fmtINR(totalExempt)}</td></tr>` : '';
+
+  const dedRowsHtml = d.deductions.length ? d.deductions.map(r=>`<tr><td class="sec">${escapeHtml(r.section)}</td><td>${escapeHtml(r.desc)}</td><td class="amt">${fmtINR(r.amount)}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--muted)">No deductions claimed</td></tr>';
+
+  const html = `
+  <div class="sheet" id="printSheet">
+    <div class="doc-topband"></div>
+    <div class="doc-header">
+      <div class="brand">Computation of Income Statement</div>
+      <div class="brand">${typeLabelMap[d.itrType]} &nbsp;|&nbsp; AY ${d.f_ay||'—'}</div>
+    </div>
+    <div class="doc-title">
+      <h1>COMPUTATION OF TOTAL INCOME</h1>
+      <p>As per Income Tax Return filed for Assessment Year ${d.f_ay||'—'} (Financial Year ${d.f_fy||'—'})</p>
+    </div>
+
+    <div class="assessee-box">
+      <div class="assessee-grid">
+        <div class="kv"><span class="l">Name of Assessee</span><span>${escapeHtml(d.f_name)||'—'}</span></div>
+        <div class="kv"><span class="l">PAN</span><span>${escapeHtml(d.f_pan)||'—'}</span></div>
+        <div class="kv"><span class="l">Status</span><span>${escapeHtml(d.f_status)}</span></div>
+        <div class="kv"><span class="l">Residential Status</span><span>${escapeHtml(d.f_residential)}</span></div>
+        <div class="kv"><span class="l">Date of Birth / Incorp.</span><span>${d.f_dob||'—'}</span></div>
+        <div class="kv"><span class="l">Tax Regime Opted</span><span>${d.f_regime==='old'?'Old Regime (Opted Out) — Sec 115BAC(6)':'New Regime (Default) — Sec 115BAC'}</span></div>
+        <div class="kv"><span class="l">ITR Form / Filed u/s</span><span>${typeLabelMap[d.itrType]} / ${escapeHtml(d.f_filedus)||'—'}</span></div>
+        <div class="kv"><span class="l">Acknowledgement No.</span><span>${escapeHtml(d.f_ack)||'—'}</span></div>
+        <div class="kv"><span class="l">Date of Filing</span><span>${d.f_filingdate||'—'}</span></div>
+        <div class="kv" style="grid-column:1/-1;"><span class="l">Address</span><span>${escapeHtml(d.f_address)||'—'}</span></div>
+      </div>
+    </div>
+
+    <div class="doc-section-title">Statement of Total Income (Head-wise, showing all exemptions &amp; deductions claimed)</div>
+    <table class="doc-table">
+      <thead><tr><th style="width:16%">Section</th><th>Particulars</th><th class="amt">Amount</th></tr></thead>
+      <tbody>
+        ${incomeRowsHtml || '<tr><td colspan="3" style="color:var(--muted)">No income entries added</td></tr>'}
+        <tr class="grand"><td colspan="2">Gross Total Income</td><td class="amt">${fmtINR(gti)}</td></tr>
+        <tr><td colspan="3" style="background:#f3f5f9;font-weight:700;color:var(--navy);">Less: Deductions under Chapter VI-A</td></tr>
+        ${dedRowsHtml}
+        <tr class="total"><td colspan="2">Total Deductions (Chapter VI-A)</td><td class="amt">${fmtINR(totalDeductions)}</td></tr>
+        <tr class="grand"><td colspan="2">TOTAL INCOME (Rounded off)</td><td class="amt">${fmtINR(totalIncome)}</td></tr>
+      </tbody>
+    </table>
+
+    ${exemptRowsHtml ? `
+    <div class="doc-section-title">Exempt Income (Fully Exempt — For Reporting Purposes)</div>
+    <table class="doc-table"><thead><tr><th style="width:16%">Section</th><th>Particulars</th><th class="amt">Amount</th></tr></thead>
+    <tbody>${exemptRowsHtml}</tbody></table>` : ''}
+
+    <div class="doc-section-title">Tax &amp; Payment Summary (As Per Return Filed)</div>
+    <table class="doc-table">
+      <tbody>
+        <tr><td colspan="2">Tax Payable on Total Income</td><td class="amt">${fmtINR(d.t_taxpayable)}</td></tr>
+        <tr class="subrow less"><td colspan="2">Less: Rebate u/s 87A</td><td class="amt">(${fmtINR(d.t_rebate)})</td></tr>
+        <tr><td colspan="2">Add: Surcharge</td><td class="amt">${fmtINR(d.t_surcharge)}</td></tr>
+        <tr><td colspan="2">Add: Health &amp; Education Cess</td><td class="amt">${fmtINR(d.t_cess)}</td></tr>
+        <tr class="subrow less"><td colspan="2">Less: Relief u/s 89 / 90 / 91</td><td class="amt">(${fmtINR(d.t_relief)})</td></tr>
+        <tr><td colspan="2">Add: Interest u/s 234A/B/C &amp; Fee u/s 234F</td><td class="amt">${fmtINR(d.t_interest)}</td></tr>
+        <tr class="total"><td colspan="2">Total Tax Liability</td><td class="amt">${fmtINR(totalTaxLiability)}</td></tr>
+        <tr><td colspan="3" style="background:#f3f5f9;font-weight:700;color:var(--navy);">Taxes Paid</td></tr>
+        <tr><td colspan="2">TDS (Tax Deducted at Source)</td><td class="amt">${fmtINR(d.t_tds)}</td></tr>
+        <tr><td colspan="2">TCS (Tax Collected at Source)</td><td class="amt">${fmtINR(d.t_tcs)}</td></tr>
+        <tr><td colspan="2">Advance Tax</td><td class="amt">${fmtINR(d.t_advance)}</td></tr>
+        <tr><td colspan="2">Self-Assessment Tax</td><td class="amt">${fmtINR(d.t_sat)}</td></tr>
+        <tr class="total"><td colspan="2">Total Taxes Paid</td><td class="amt">${fmtINR(totalTaxesPaid)}</td></tr>
+        <tr class="grand ${balance>0?'negative':''}"><td colspan="2">${balance>0?'Net Tax Payable':'Net Refund Due'}</td><td class="amt">${fmtINR(Math.abs(balance))}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="declaration">
+      This Computation of Total Income has been prepared based on the Income Tax Return (${typeLabelMap[d.itrType]}) filed by the
+      above-named assessee for Assessment Year ${d.f_ay||'—'} bearing Acknowledgement No. ${escapeHtml(d.f_ack)||'—'}, filed on
+      ${d.f_filingdate||'—'}.
+    </div>
+
+    <div class="sign-block">
+      <div class="col">
+        <div class="sign-line">Place: ${escapeHtml(d.p_place)||'________________'}<br>Date: ${d.p_date||'________________'}</div>
+      </div>
+      <div class="col" style="text-align:right;">
+        <div class="sign-line">${escapeHtml(d.p_name)||'________________'}<br>${escapeHtml(d.p_membership)||''}</div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('docWrap').innerHTML = html || '<div class="empty-msg">Fill in the form to see a live preview.</div>';
+}
+
+function escapeHtml(s){
+  if(s===undefined||s===null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeAttr(s){
+  if(s===undefined||s===null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
+const PDF_COLOR = {
+  navy: [18,35,63], navyLight: [28,51,87], gold: [169,129,44], muted: [100,110,124],
+  line: [210,216,226], accent: [15,110,92], panel: [246,248,251],
+  less: [74,85,104], warn: [138,90,0], warnBg: [255,248,232], warnBorder: [240,217,154]
+};
+
+function fmtINRPdf(n){
+  n = Number(n)||0;
+  const neg = n<0; n = Math.abs(n);
+  let s = n.toFixed(0);
+  let lastThree = s.substring(s.length-3);
+  let other = s.substring(0,s.length-3);
+  if(other!=='') lastThree = ','+lastThree;
+  let formatted = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+  return (neg?'-':'') + 'Rs. ' + formatted;
+}
+
+function pdfRowStyler(rowMeta){
+  return function(data){
+    if(data.section !== 'body') return;
+    const meta = rowMeta[data.row.index];
+    if(!meta || meta === 'normal'){
+      if(data.row.index % 2 === 0) data.cell.styles.fillColor = [250,251,253];
+      return;
+    }
+    if(meta === 'headrow'){ data.cell.styles.fontStyle = 'bold'; data.cell.styles.textColor = PDF_COLOR.navy; data.cell.styles.fillColor = PDF_COLOR.panel; }
+    if(meta === 'subtotal'){ data.cell.styles.fontStyle = 'bold'; }
+    if(meta === 'less'){ data.cell.styles.fontStyle = 'italic'; data.cell.styles.textColor = PDF_COLOR.less; }
+    if(meta === 'total'){ data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = PDF_COLOR.panel; }
+    if(meta === 'grand'){ data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = [238,243,238]; data.cell.styles.textColor = PDF_COLOR.accent; }
+    if(meta === 'grandNegative'){ data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = PDF_COLOR.warnBg; data.cell.styles.textColor = PDF_COLOR.warn; }
+  };
+}
+
+async function downloadPdf(){
+  renderDoc();
+  const d = collectData();
+  const t = computeTotals(d);
+  const { headNet, gti, totalDeductions, totalIncome, totalExempt, ineligibleUnderNewRegime, totalTaxLiability, totalTaxesPaid, balance, typeLabelMap } = t;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 42;
+  const contentW = pageW - marginX*2;
+  const regimeLabel = d.f_regime==='old' ? 'Old Regime (Opted Out) - Sec 115BAC(6)' : 'New Regime (Default) - Sec 115BAC';
+
+  doc.setProperties({
+    title: `Computation of Income - ${d.f_name||'Assessee'} - AY ${d.f_ay||''}`,
+    subject: 'Computation of Total Income',
+    creator: 'Trac Consultant Tax Engine'
+  });
+
+  doc.setFillColor(...PDF_COLOR.navy);
+  doc.rect(0, 0, pageW, 6, 'F');
+  doc.setFillColor(...PDF_COLOR.gold);
+  doc.rect(pageW*0.72, 0, pageW*0.28, 6, 'F');
+
+  let y = 30;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...PDF_COLOR.muted);
+  doc.text('COMPUTATION OF INCOME STATEMENT', marginX, y);
+  doc.text(`${typeLabelMap[d.itrType]}   |   AY ${d.f_ay||'-'}`, pageW-marginX, y, {align:'right'});
+  y += 10;
+  doc.setDrawColor(...PDF_COLOR.navy); doc.setLineWidth(1.2);
+  doc.line(marginX, y, pageW-marginX, y);
+  y += 26;
+
+  doc.setFont('times','bold'); doc.setFontSize(18); doc.setTextColor(...PDF_COLOR.navy);
+  doc.text('COMPUTATION OF TOTAL INCOME', pageW/2, y, {align:'center'});
+  y += 16;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...PDF_COLOR.muted);
+  doc.text(`As per Income Tax Return filed for Assessment Year ${d.f_ay||'-'} (Financial Year ${d.f_fy||'-'})`, pageW/2, y, {align:'center'});
+  y += 22;
+
+  const infoRows = [
+    ['Name of Assessee', d.f_name||'-', 'PAN', d.f_pan||'-'],
+    ['Status', d.f_status||'-', 'Residential Status', d.f_residential||'-'],
+    ['Date of Birth / Incorp.', d.f_dob||'-', 'Tax Regime Opted', regimeLabel],
+    ['ITR Form / Filed u/s', `${typeLabelMap[d.itrType]} / ${d.f_filedus||'-'}`, 'Acknowledgement No.', d.f_ack||'-'],
+    ['Date of Filing', d.f_filingdate||'-', '', '']
+  ];
+  doc.autoTable({
+    startY: y, margin: {left: marginX, right: marginX}, tableWidth: contentW,
+    theme: 'plain', styles: {font:'helvetica', fontSize:9, cellPadding:{top:3,bottom:3,left:0,right:6}, textColor:[26,34,51]},
+    columnStyles: {0:{fontStyle:'bold', textColor:PDF_COLOR.muted, cellWidth:110}, 1:{cellWidth: contentW/2-110}, 2:{fontStyle:'bold', textColor:PDF_COLOR.muted, cellWidth:110}, 3:{cellWidth: contentW/2-110}},
+    body: infoRows
+  });
+  y = doc.lastAutoTable.finalY + 2;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...PDF_COLOR.muted);
+  doc.text('Address', marginX, y+9);
+  doc.setFont('helvetica','normal'); doc.setTextColor(26,34,51);
+  const addrLines = doc.splitTextToSize(d.f_address||'-', contentW-110);
+  doc.text(addrLines, marginX+110, y+9);
+  y += 9 + addrLines.length*11 + 14;
+  doc.setDrawColor(...PDF_COLOR.line); doc.setLineWidth(0.6);
+  doc.line(marginX, y, pageW-marginX, y);
+  y += 16;
+
+  function sectionBand(title, startY){
+    doc.setFillColor(...PDF_COLOR.navy);
+    doc.rect(marginX, startY, contentW, 18, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(255,255,255);
+    doc.text(title.toUpperCase(), marginX+8, startY+12);
+    return startY + 18;
+  }
+
+  function ensureSpace(needed){
+    if(y + needed > doc.internal.pageSize.getHeight() - 60){
+      doc.addPage();
+      y = 40;
+    }
+  }
+
+  ensureSpace(40);
+  y = sectionBand('Statement of Total Income (Head-wise, showing all exemptions & deductions claimed)', y);
+
+  const incomeBody = [];
+  const incomeMeta = [];
+  HEADS.forEach(h=>{
+    const {income, exempt} = d.heads[h.key];
+    const {incTotal, net} = headNet[h.key];
+    if(income.length===0 && exempt.length===0 && net===0) return;
+    incomeBody.push([h.label.replace(/&amp;/g,'&'), '', '']); incomeMeta.push('headrow');
+    income.forEach(r=>{ incomeBody.push([r.section||'', r.desc||'', fmtINRPdf(r.amount)]); incomeMeta.push('normal'); });
+    if(exempt.length){
+      incomeBody.push(['', 'Gross under this head', fmtINRPdf(incTotal)]); incomeMeta.push('subtotal');
+      exempt.forEach(r=>{ incomeBody.push([r.section||'', 'Less: '+(r.desc||''), '('+fmtINRPdf(r.amount)+')']); incomeMeta.push('less'); });
+    }
+    incomeBody.push(['', 'Net Income - '+h.label.replace(/^[A-Z]\.\s*/,'').replace(/&amp;/g,'&'), fmtINRPdf(net)]); incomeMeta.push('total');
+  });
+  incomeBody.push(['', 'Gross Total Income', fmtINRPdf(gti)]); incomeMeta.push('grand');
+  incomeBody.push(['', 'Less: Deductions under Chapter VI-A', '']); incomeMeta.push('headrow');
+  if(d.deductions.length){
+    d.deductions.forEach(r=>{ incomeBody.push([r.section||'', r.desc||'', fmtINRPdf(r.amount)]); incomeMeta.push('normal'); });
+  } else {
+    incomeBody.push(['', 'No deductions claimed', '']); incomeMeta.push('normal');
+  }
+  incomeBody.push(['', 'Total Deductions (Chapter VI-A)', fmtINRPdf(totalDeductions)]); incomeMeta.push('total');
+  incomeBody.push(['', 'TOTAL INCOME (Rounded off)', fmtINRPdf(totalIncome)]); incomeMeta.push('grand');
+
+  doc.autoTable({
+    startY: y, margin: {left: marginX, right: marginX, bottom: 50}, tableWidth: contentW,
+    theme: 'grid', styles: {font:'helvetica', fontSize:8.5, cellPadding:5, textColor:[26,34,51], lineColor:PDF_COLOR.line, lineWidth:0.5},
+    headStyles: {fillColor: PDF_COLOR.panel, textColor: PDF_COLOR.muted, fontStyle:'bold', fontSize:7.5},
+    columnStyles: {0:{cellWidth:70}, 1:{cellWidth: contentW-70-110}, 2:{cellWidth:110, halign:'right'}},
+    head: [['Section','Particulars','Amount']],
+    body: incomeBody,
+    didParseCell: pdfRowStyler(incomeMeta)
+  });
+  y = doc.lastAutoTable.finalY + 6;
+
+  ensureSpace(40);
+  y = sectionBand('Tax & Payment Summary (As Per Return Filed)', y);
+  const taxBody = [
+    ['Tax Payable on Total Income', fmtINRPdf(d.t_taxpayable)],
+    ['Less: Rebate u/s 87A', '('+fmtINRPdf(d.t_rebate)+')'],
+    ['Add: Surcharge', fmtINRPdf(d.t_surcharge)],
+    ['Add: Health & Education Cess', fmtINRPdf(d.t_cess)],
+    ['Less: Relief u/s 89 / 90 / 91', '('+fmtINRPdf(d.t_relief)+')'],
+    ['Add: Interest u/s 234A/B/C & Fee u/s 234F', fmtINRPdf(d.t_interest)],
+    ['Total Tax Liability', fmtINRPdf(totalTaxLiability)],
+    ['Taxes Paid', ''],
+    ['TDS (Tax Deducted at Source)', fmtINRPdf(d.t_tds)],
+    ['TCS (Tax Collected at Source)', fmtINRPdf(d.t_tcs)],
+    ['Advance Tax', fmtINRPdf(d.t_advance)],
+    ['Self-Assessment Tax', fmtINRPdf(d.t_sat)],
+    ['Total Taxes Paid', fmtINRPdf(totalTaxesPaid)],
+    [balance>0?'Net Tax Payable':'Net Refund Due', fmtINRPdf(Math.abs(balance))]
+  ];
+  const taxMeta = ['normal','less','normal','normal','less','normal','total','headrow','normal','normal','normal','normal','total', balance>0?'grandNegative':'grand'];
+  doc.autoTable({
+    startY: y, margin: {left: marginX, right: marginX, bottom: 50}, tableWidth: contentW,
+    theme: 'grid', styles: {font:'helvetica', fontSize:8.5, cellPadding:5, textColor:[26,34,51], lineColor:PDF_COLOR.line, lineWidth:0.5},
+    columnStyles: {0:{cellWidth: contentW-110}, 1:{cellWidth:110, halign:'right'}},
+    body: taxBody,
+    didParseCell: pdfRowStyler(taxMeta)
+  });
+  y = doc.lastAutoTable.finalY + 12;
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    const ph = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(...PDF_COLOR.line); doc.setLineWidth(0.5);
+    doc.line(marginX, ph-38, pageW-marginX, ph-38);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...PDF_COLOR.muted);
+    const footNote = 'Generated via Trac Consultant Tax Suite. For submission/verification purposes only.';
+    doc.text(doc.splitTextToSize(footNote, contentW-70), marginX, ph-28);
+    doc.text(`Page ${i} of ${pageCount}`, pageW-marginX, ph-16, {align:'right'});
+  }
+
+  const nameForFile = (d.f_name||'Computation_of_Income').replace(/\s+/g,'_');
+  doc.save(`${nameForFile}_COI_${d.f_ay||''}.pdf`);
+}
+
+function saveDraft(){
+  const d = collectData();
+  const blob = new Blob([JSON.stringify(d, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nameForFile = (d.f_name||'Computation_of_Income').replace(/\s+/g,'_');
+  a.href = url;
+  a.download = `${nameForFile}_COI_draft_${d.f_ay||''}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function loadDraft(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    let d;
+    try{ d = JSON.parse(e.target.result); }
+    catch(err){ alert('Invalid draft file.'); return; }
+    document.getElementById('itrType').value = d.itrType || '1';
+    onTypeChange();
+
+    ['f_name','f_pan','f_status','f_residential','f_regime','f_address','f_dob','f_mobile','f_email',
+     'f_fy','f_ay','f_filingdate','f_ack','f_filedus','f_bank','f_employer',
+     'p_name','p_membership','p_place','p_date','p_purpose'].forEach(id=>{
+      if(d[id]!==undefined) document.getElementById(id).value = d[id];
+    });
+    ['t_taxpayable','t_rebate','t_surcharge','t_cess','t_relief','t_interest','t_tds','t_tcs','t_advance','t_sat'].forEach(id=>{
+      if(d[id]!==undefined) document.getElementById(id).value = d[id];
+    });
+
+    HEADS.forEach(h=>{
+      clearTableBody('head_'+h.key+'_income');
+      clearTableBody('head_'+h.key+'_exempt');
+      (d.heads[h.key]?.income||[]).forEach(r=>addRow('head_'+h.key+'_income', r.section, r.desc, r.amount, h.incomeDatalist));
+      (d.heads[h.key]?.exempt||[]).forEach(r=>addRow('head_'+h.key+'_exempt', r.section, r.desc, r.amount, h.exemptDatalist));
+    });
+    clearTableBody('exemptTable');
+    (d.exempt||[]).forEach(r=>addRow('exemptTable', r.section, r.desc, r.amount, 'dl-exempt-income'));
+    clearTableBody('deductionTable');
+    (d.deductions||[]).forEach(r=>addRow('deductionTable', r.section, r.desc, r.amount, 'dl-chapter6a'));
+
+    renderDoc();
+    alert('Draft loaded.');
+  };
+  reader.readAsText(file);
+}
+
+function resetAll(){
+  if(!confirm('Clear the entire form?')) return;
+  document.querySelectorAll('input[type=text],input[type=date],input[type=number],textarea').forEach(el=>{
+    el.value = el.type==='number' ? 0 : '';
+  });
+  document.getElementById('f_status').value = 'Individual';
+  document.getElementById('f_residential').value = 'Resident';
+  document.getElementById('f_regime').value = 'new';
+  window.jsonReportedTotals = null;
+  document.getElementById('itrType').value = '1';
+  onTypeChange();
+}
+
+onTypeChange();
+</script>
+</body>
+</html>

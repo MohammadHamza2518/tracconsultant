@@ -166,8 +166,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasToolAccess = (toolId: string) => {
-    // Free calculators are accessible to everyone
-    if (['hra-calculator', 'advance-tax-calculator', 'tax-calculator'].includes(toolId)) {
+    // Free & Basic tools are accessible to everyone unconditionally
+    if ([
+      'hra-calculator', 
+      'advance-tax-calculator', 
+      'tax-calculator',
+      'pdf-redactor',
+      'tb-to-balancesheet',
+      'gstr2a-reconciliation',
+      'json-to-computation',
+      'gstr2a-cleaner'
+    ].includes(toolId)) {
       return true;
     }
     // Admins have access to everything

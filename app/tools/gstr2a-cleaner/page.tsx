@@ -52,10 +52,10 @@ export default function Gstr2aCleanerPage() {
   const { user, hasToolAccess, refreshUser } = useAuth();
   const { getToolPrice } = useConfig();
   const toolId = 'gstr2a-cleaner';
-  const toolName = 'Clean GSTR-2A & Supplier-Wise Summary Tool';
-  const price = getToolPrice(toolId, 199);
+  const toolName = 'Clean GSTR-2A & Supplier-Wise Summary Tool (Basic)';
+  const price = 0;
 
-  const isUnlocked = hasToolAccess(toolId);
+  const isUnlocked = true;
   const [paywallOpen, setPaywallOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -219,19 +219,9 @@ export default function Gstr2aCleanerPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {isUnlocked ? (
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
-                <Unlock className="w-3.5 h-3.5" /> Workspace Unlocked
-              </span>
-            ) : (
-              <button
-                onClick={() => setPaywallOpen(true)}
-                className="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Unlock Tool (₹{price})</span>
-              </button>
-            )}
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Basic Tool • 100% Free
+            </span>
             <Link
               href="/tools"
               className="text-slate-300 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
@@ -359,23 +349,13 @@ export default function Gstr2aCleanerPage() {
               />
             </div>
 
-            {isUnlocked ? (
-              <button
-                onClick={handleExportExcel}
-                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export Clean Excel (.xlsx)</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setPaywallOpen(true)}
-                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Unlock (₹{price})</span>
-              </button>
-            )}
+            <button
+              onClick={handleExportExcel}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Clean Excel (.xlsx)</span>
+            </button>
           </div>
         </div>
 

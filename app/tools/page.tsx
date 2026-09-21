@@ -21,7 +21,9 @@ import {
   FileSpreadsheet, 
   GitCompare, 
   FileCode2,
-  Search
+  Search,
+  FileArchive,
+  Receipt
 } from 'lucide-react';
 
 export default function ToolsHubPage() {
@@ -49,6 +51,8 @@ export default function ToolsHubPage() {
       case 'FileSpreadsheet': return <FileSpreadsheet className="w-6 h-6 text-indigo-600" />;
       case 'GitCompare': return <GitCompare className="w-6 h-6 text-indigo-600" />;
       case 'FileCode2': return <FileCode2 className="w-6 h-6 text-indigo-600" />;
+      case 'FileArchive': return <FileArchive className="w-6 h-6 text-indigo-600" />;
+      case 'Receipt': return <Receipt className="w-6 h-6 text-indigo-600" />;
       default: return <Sparkles className="w-6 h-6 text-indigo-600" />;
     }
   };
@@ -67,12 +71,12 @@ export default function ToolsHubPage() {
             Tax & Compliance Digital Suite
           </h1>
           <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            From free Union Budget tax calculators to enterprise-level GSTR-2A automated reconciliation and Schedule III balance sheet formatters.
+            From free Union Budget calculators and Basic audit tools to advance ITR 1-7 computation, PDF redaction studio, and GST billing.
           </p>
           <div className="pt-1 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-300">
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 3 Free Calculators</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 8 Free & Basic Tools</span>
             <span className="text-slate-600">•</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 5 Pro Audit SaaS Utilities</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 4 Advance & Pro Modules</span>
             <span className="text-slate-600">•</span>
             <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> DPDP Act & Rule 36(4) Compliant</span>
           </div>
@@ -83,22 +87,22 @@ export default function ToolsHubPage() {
               href="#tools-grid"
               className="px-5 py-2.5 bg-[#00a859] hover:bg-[#008f4c] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
             >
-              <span>Explore All 8 Tools</span>
+              <span>Explore All 12 Tools</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
             <button
               type="button"
               onClick={() => setPaywallTool({
                 id: 'all-access-pass',
-                name: 'All-Access Compliance Suite Pass (All 5 Paid Modules)',
+                name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
                 slug: 'all-access',
                 category: 'paid',
                 price: bundlePrice,
-                shortDesc: 'Unlock all 5 paid CA processing tools in one bundle.',
-                description: 'Unlimited file processing pass for all 5 professional tools.',
+                shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
+                description: 'Unlimited file processing pass for all professional tools.',
                 icon: 'Sparkles',
                 tags: ['Bundle', 'Full Suite'],
-                features: ['All 5 Paid Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
+                features: ['All 4 Advance/Pro Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']
               })}
               className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 hover:scale-105 cursor-pointer"
             >
@@ -254,20 +258,20 @@ export default function ToolsHubPage() {
             <div className="inline-flex items-center gap-1.5 text-indigo-400 text-xs font-bold uppercase tracking-wider">
               <Sparkles className="w-4 h-4" /> Comprehensive Tax & Compliance Suite
             </div>
-            <h2 className="text-2xl font-black text-white">Need all 5 Paid Compliance Modules for your firm or practice?</h2>
+            <h2 className="text-2xl font-black text-white">Need all 4 Advance &amp; Pro Compliance Modules for your firm or practice?</h2>
             <p className="text-slate-300 text-xs max-w-xl">
-              Get unlimited lifetime file processing across GSTR-2A reconciliation, PDF sensitive data masking, Schedule III Balance Sheets, and JSON tax computations for flat ₹{bundlePrice}.
+              Get unlimited lifetime file processing across PDF Redactor Studio (Advance), Computation of Income Generator (Advance), Smart File Compressor, and GST Invoice Generator for flat ₹{bundlePrice}.
             </p>
           </div>
           <button
             onClick={() => setPaywallTool({
               id: 'all-access-pass',
-              name: 'All-Access Compliance Suite Pass (All 5 Paid Modules)',
+              name: 'All-Access Compliance Suite Pass (All 4 Advance/Pro Modules)',
               slug: 'all-access',
               category: 'paid',
               price: bundlePrice,
-              shortDesc: 'Unlock all 5 paid CA processing tools in one bundle.',
-              description: 'Unlimited file processing pass for all 5 professional tools.',
+              shortDesc: 'Unlock all 4 advance & pro processing tools in one bundle.',
+              description: 'Unlimited file processing pass for all professional tools.',
               icon: 'Sparkles',
               tags: ['Bundle', 'Full Suite'],
               features: ['All 5 Paid Tools Unlocked Forever', 'Priority Server Processing', 'Direct WhatsApp CA Support']

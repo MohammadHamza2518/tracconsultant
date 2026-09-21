@@ -24,7 +24,8 @@ import {
   Building,
   UserCheck,
   Layers,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CheckCircle2
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
@@ -133,10 +134,10 @@ export default function JsonToComputationPage() {
   const { user, hasToolAccess, refreshUser } = useAuth();
   const { getToolPrice } = useConfig();
   const toolId = 'json-to-computation';
-  const toolName = 'Upload JSON & Get Tax Computation Sheet';
-  const price = getToolPrice(toolId, 199);
+  const toolName = 'Upload JSON & Get Tax Computation Sheet (Basic)';
+  const price = 0;
 
-  const isUnlocked = hasToolAccess(toolId);
+  const isUnlocked = true;
   const [paywallOpen, setPaywallOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -357,11 +358,6 @@ export default function JsonToComputationPage() {
 
   // Real Excel Export using xlsx
   const handleExportExcel = () => {
-    if (!isUnlocked) {
-      setPaywallOpen(true);
-      return;
-    }
-
     const wb = XLSX.utils.book_new();
     const sheetData = [
       ['STATEMENT OF COMPUTATION OF TOTAL INCOME', ''],
@@ -410,19 +406,9 @@ export default function JsonToComputationPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {isUnlocked ? (
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
-                <Unlock className="w-3.5 h-3.5" /> Workspace Unlocked
-              </span>
-            ) : (
-              <button
-                onClick={() => setPaywallOpen(true)}
-                className="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Unlock Tool (₹{price})</span>
-              </button>
-            )}
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Basic Tool • 100% Free
+            </span>
             <Link
               href="/tools"
               className="text-slate-300 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
@@ -538,39 +524,27 @@ export default function JsonToComputationPage() {
 
             {/* Export Actions */}
             <div className="space-y-2 pt-2">
-              {isUnlocked ? (
-                <>
-                  <button
-                    onClick={handleDownloadPdf}
-                    className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download Computation PDF (.pdf)</span>
-                  </button>
-                  <button
-                    onClick={handleExportExcel}
-                    className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Export Excel Statement (.xlsx)</span>
-                  </button>
-                  <button
-                    onClick={() => window.print()}
-                    className="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Print Computation Sheet</span>
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setPaywallOpen(true)}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <Lock className="w-4 h-4" />
-                  <span>Unlock Full Export Suite (₹{price})</span>
-                </button>
-              )}
+              <button
+                onClick={handleDownloadPdf}
+                className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Computation PDF (.pdf)</span>
+              </button>
+              <button
+                onClick={handleExportExcel}
+                className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Export Excel Statement (.xlsx)</span>
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Computation Sheet</span>
+              </button>
             </div>
           </div>
 

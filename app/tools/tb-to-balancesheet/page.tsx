@@ -77,10 +77,10 @@ export default function TbToBalanceSheetPage() {
   const { user, hasToolAccess, refreshUser } = useAuth();
   const { getToolPrice } = useConfig();
   const toolId = 'tb-to-balancesheet';
-  const toolName = 'Trial Balance to Balance Sheet & P&L Formatter';
-  const price = getToolPrice(toolId, 299);
+  const toolName = 'Trial Balance to Balance Sheet & P&L Formatter (Basic)';
+  const price = 0;
 
-  const isUnlocked = hasToolAccess(toolId);
+  const isUnlocked = true;
   const [paywallOpen, setPaywallOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -326,19 +326,9 @@ export default function TbToBalanceSheetPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {isUnlocked ? (
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
-                <Unlock className="w-3.5 h-3.5" /> Workspace Unlocked
-              </span>
-            ) : (
-              <button
-                onClick={() => setPaywallOpen(true)}
-                className="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Unlock Tool (₹{price})</span>
-              </button>
-            )}
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Basic Tool • 100% Free
+            </span>
             <Link
               href="/tools"
               className="text-slate-300 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
@@ -622,32 +612,20 @@ export default function TbToBalanceSheetPage() {
 
               {/* Export Buttons */}
               <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
-                {isUnlocked ? (
-                  <>
-                    <button
-                      onClick={handleExportExcel}
-                      className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download Schedule III Excel (.xlsx)</span>
-                    </button>
-                    <button
-                      onClick={handleDownloadTextSummary}
-                      className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Text Statement</span>
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setPaywallOpen(true)}
-                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Unlock Full Export (₹{price})</span>
-                  </button>
-                )}
+                <button
+                  onClick={handleExportExcel}
+                  className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Schedule III Excel (.xlsx)</span>
+                </button>
+                <button
+                  onClick={handleDownloadTextSummary}
+                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Text Statement</span>
+                </button>
               </div>
             </div>
           </div>

@@ -14,7 +14,12 @@
       "tb-to-balancesheet",
       "gstr2a-reconciliation",
       "json-to-computation",
-      "gstr2a-cleaner"
+      "gstr2a-cleaner",
+      "advanced-pdf-redactor",
+      "advanced-computation-generator",
+      "file-compressor",
+      "gst-invoice-generator",
+      "all-access-pass"
     ],
     "createdAt": "2025-01-15T09:00:00Z"
   }

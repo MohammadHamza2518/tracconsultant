@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart PDF & Image Compressor</title>
+
+<!-- CDN LIBRARIES -->
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0F1618;
+    --panel:#172024;
+    --panel-2:#1D2A2F;
+    --line:#2A3A40;
+    --text:#E7EFF0;
+    --muted:#7E9095;
+    --mint:#4FD1AE;
+    --mint-dim:#2E6E5C;
+    --amber:#F2A65A;
+    --red:#E8695F;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(79,209,174,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .title-block h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:28px;
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .title-block h1 span{color:var(--mint);}
+  .title-block p{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    max-width:50ch;
+    line-height:1.5;
+  }
+  .formats{
+    margin-top:10px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .formats span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.03em;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:3px 7px;
+    border-radius:5px;
+  }
+
+  /* signature gauge */
+  .gauge{
+    width:118px;height:118px;flex-shrink:0;
+    position:relative;
+  }
+  .gauge svg{width:100%;height:100%;}
+  .gauge .needle{
+    transform-origin:60px 60px;
+    transition:transform 0.6s cubic-bezier(.22,1,.36,1);
+  }
+  .gauge .readout{
+    position:absolute;
+    bottom:10px;left:0;right:0;
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    color:var(--mint);
+  }
+
+  /* ---------- controls panel ---------- */
+  .controls{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    align-items:flex-start;
+  }
+  .control-group{flex:1;min-width:240px;}
+  .control-group h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  .level-switch{
+    display:flex;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:3px;
+    gap:3px;
+  }
+  .level-switch button{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:8px 6px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  .level-switch button.active{
+    background:var(--mint);
+    color:#0B1210;
+    font-weight:600;
+  }
+  .level-desc{
+    margin:9px 2px 0;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.5;
+    min-height:34px;
+  }
+  .toggle-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .toggle-row input{
+    margin-top:3px;
+    accent-color:var(--mint);
+    width:15px;height:15px;
+    flex-shrink:0;
+  }
+  .toggle-row .label{
+    font-size:13px;
+    font-weight:500;
+  }
+  .toggle-row .sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:2px;
+    line-height:1.5;
+  }
+
+  /* ---------- dropzone ---------- */
+  .dropzone{
+    border:1.5px dashed var(--line);
+    border-radius:var(--radius);
+    background:var(--panel);
+    padding:40px 24px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    position:relative;
+  }
+  .dropzone.drag{
+    border-color:var(--mint);
+    background:var(--panel-2);
+  }
+  .dropzone .icon{
+    width:38px;height:38px;margin:0 auto 12px;
+    color:var(--mint);
+  }
+  .dropzone h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16px;
+    margin:0 0 6px;
+    font-weight:600;
+  }
+  .dropzone p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .dropzone input{display:none;}
+  .dropzone .browse{color:var(--mint);text-decoration:underline;cursor:pointer;}
+
+  /* ---------- status line + bulk actions ---------- */
+  .status-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:18px 2px 8px;
+    flex-wrap:wrap;
+  }
+  .status-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    color:var(--muted);
+    min-height:18px;
+  }
+  .status-line .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 0 0 rgba(79,209,174,.5);
+    animation:pulse 1.4s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(79,209,174,.45);}
+    70%{box-shadow:0 0 0 8px rgba(79,209,174,0);}
+    100%{box-shadow:0 0 0 0 rgba(79,209,174,0);}
+  }
+  .status-line.idle .dot{display:none;}
+  .bulk-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .ghost-btn{
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    padding:7px 12px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--mint-dim);color:var(--mint);}
+  .ghost-btn:disabled{opacity:.35;cursor:default;}
+  .ghost-btn.primary{
+    border-color:var(--mint-dim);
+    color:var(--mint);
+  }
+
+  /* ---------- table ---------- */
+  .table-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-top:8px;
+    overflow-x:auto;
+  }
+  table{width:100%;border-collapse:collapse;min-width:760px;}
+  thead th{
+    text-align:left;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px 16px;
+    font-size:13.5px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  .fname{
+    font-weight:500;
+    max-width:200px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .ftype{
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .fmt-note{
+    color:var(--amber);
+    font-size:10.5px;
+    margin-top:2px;
+  }
+  .num{font-family:'IBM Plex Mono', monospace; font-size:12.5px; white-space:nowrap;}
+  .saved-pill{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .saved-pos{background:rgba(79,209,174,.14);color:var(--mint);}
+  .saved-zero{background:rgba(126,144,149,.14);color:var(--muted);}
+  .row-progress{
+    height:4px;
+    background:var(--line);
+    border-radius:2px;
+    overflow:hidden;
+    width:90px;
+  }
+  .row-progress > div{
+    height:100%;
+    background:var(--mint);
+    width:0%;
+    transition:width .25s;
+  }
+  .state-text{font-size:12px;color:var(--muted);margin-top:4px;}
+  .state-text.err{color:var(--red);}
+  .row-level{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .row-level select{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12px;
+    padding:4px 6px;
+    border-radius:6px;
+  }
+  .dl-btn, .redo-btn{
+    border:1px solid var(--mint-dim);
+    background:transparent;
+    color:var(--mint);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:5px 9px;
+    border-radius:6px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .redo-btn{border-color:var(--line);color:var(--muted);}
+  .redo-btn:hover{border-color:var(--amber);color:var(--amber);}
+  .dl-btn:hover{background:rgba(79,209,174,.1);}
+  .dl-btn:disabled{opacity:.35;cursor:default;}
+  .action-cell{display:flex;flex-direction:column;gap:5px;align-items:flex-start;}
+
+  .empty-row td{
+    text-align:center;
+    color:var(--muted);
+    padding:26px;
+    font-size:13px;
+  }
+
+  footer{
+    margin-top:26px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.6;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  footer b{color:var(--text);}
+
+  @media (max-width:560px){
+    header{flex-direction:column;align-items:flex-start;}
+    .fname{max-width:120px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>Smart Compressor<span>.</span></h1>
+      <p>A local compression bench for images and PDFs. Everything runs in this tab — zero data is uploaded anywhere.</p>
+      <div class="formats">
+        <span>JPEG</span><span>PNG</span><span>WebP</span><span>BMP</span><span>GIF</span><span>PDF</span>
+      </div>
+    </div>
+    <div class="gauge">
+      <svg viewBox="0 0 120 120">
+        <path d="M 18 88 A 48 48 0 1 1 102 88" fill="none" stroke="#2A3A40" stroke-width="10" stroke-linecap="round"/>
+        <path id="gaugeArc" d="M 18 88 A 48 48 0 1 1 102 88" fill="none" stroke="#4FD1AE" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="219.9" stroke-dashoffset="219.9"/>
+        <line class="needle" id="needle" x1="60" y1="60" x2="60" y2="24" stroke="#F2A65A" stroke-width="3" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+        <circle cx="60" cy="60" r="4" fill="#F2A65A"/>
+      </svg>
+      <div class="readout" id="gaugeReadout">0%</div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="control-group">
+      <h3>Compression level</h3>
+      <div class="level-switch" id="levelSwitch">
+        <button data-level="standard">Standard</button>
+        <button data-level="medium" class="active">Medium</button>
+        <button data-level="hard">Hard</button>
+      </div>
+      <div class="level-desc" id="levelDesc"></div>
+    </div>
+    <div class="control-group">
+      <h3>PDF images</h3>
+      <label class="toggle-row">
+        <input type="checkbox" id="pdfImgToggle" checked>
+        <div>
+          <div class="label">Recompress embedded photos</div>
+          <div class="sub">Rewrites JPEGs inside the PDF at the level above for much bigger savings. Turn off to only strip metadata &amp; structure and leave every image byte untouched.</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>Drop images or PDFs here</h2>
+    <p>or <span class="browse">browse your device</span> — processed locally on your machine</p>
+    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,.pdf,image/jpeg,image/png,image/webp,image/bmp,image/gif,application/pdf" multiple>
+  </div>
+
+  <div class="status-row">
+    <div class="status-line idle" id="statusLine">
+      <div class="dot"></div>
+      <span id="statusText">Waiting for files.</span>
+    </div>
+    <div class="bulk-actions">
+      <button class="ghost-btn" id="recompressAllBtn" disabled>Recompress all at current level</button>
+      <button class="ghost-btn primary" id="downloadAllBtn" disabled>Download all (.zip)</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Original</th>
+          <th>Compressed</th>
+          <th>Saved</th>
+          <th>Level</th>
+          <th>Progress</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr class="empty-row" id="emptyRow"><td colspan="7">No files yet — your comparison table will build here.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <b>Security &amp; Privacy:</b> All files are processed client-side inside your browser via Web Workers and HTML5 Canvas. No document or image leaves your device.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const LEVELS = {
+    standard: {
+      label: 'Standard',
+      desc: 'Light touch: trims oversized images, re-encodes near-original quality. Good default for documents & photos.',
+      imgMaxDim: 2200, imgQuality: 0.85,
+      pdfImgMaxDim: 2000, pdfImgQuality: 0.82
+    },
+    medium: {
+      label: 'Medium',
+      desc: 'Balanced: noticeably smaller files with quality loss that\u2019s hard to spot at normal viewing size.',
+      imgMaxDim: 1600, imgQuality: 0.70,
+      pdfImgMaxDim: 1400, pdfImgQuality: 0.62
+    },
+    hard: {
+      label: 'Hard',
+      desc: 'Maximum savings: aggressive downscale and quality cut. Optimal for portal upload limits (e.g. GST/ITR under 200KB/500KB).',
+      imgMaxDim: 1000, imgQuality: 0.45,
+      pdfImgMaxDim: 900, pdfImgQuality: 0.40
+    }
+  };
+  let currentLevel = 'medium';
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const tbody = document.getElementById('tbody');
+  const emptyRow = document.getElementById('emptyRow');
+  const statusLine = document.getElementById('statusLine');
+  const statusText = document.getElementById('statusText');
+  const gaugeArc = document.getElementById('gaugeArc');
+  const needle = document.getElementById('needle');
+  const gaugeReadout = document.getElementById('gaugeReadout');
+  const levelSwitch = document.getElementById('levelSwitch');
+  const levelDesc = document.getElementById('levelDesc');
+  const pdfImgToggle = document.getElementById('pdfImgToggle');
+  const recompressAllBtn = document.getElementById('recompressAllBtn');
+  const downloadAllBtn = document.getElementById('downloadAllBtn');
+
+  const ARC_LENGTH = 219.9;
+
+  let queue = [];
+  let processing = false;
+  let rows = {};
+  let rowCounter = 0;
+  let totalOriginal = 0;
+  let totalCompressed = 0;
+
+  function refreshLevelDesc(){
+    levelDesc.textContent = LEVELS[currentLevel].desc;
+  }
+  refreshLevelDesc();
+
+  levelSwitch.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-level]');
+    if (!btn) return;
+    currentLevel = btn.dataset.level;
+    [...levelSwitch.children].forEach(b => b.classList.toggle('active', b === btn));
+    refreshLevelDesc();
+  });
+
+  const pdfWorkerSrc = `
+    self.onmessage = async function(e){
+      const { id, buffer, cfg } = e.data;
+      try {
+        importScripts('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js');
+        const { PDFDocument, PDFName, PDFRawStream, PDFNumber } = PDFLib;
+        const srcDoc = await PDFDocument.load(buffer, { ignoreEncryption: true, updateMetadata: false });
+        const newDoc = await PDFDocument.create();
+        const pageCount = srcDoc.getPageCount();
+        const batchSize = 15;
+        for (let i = 0; i < pageCount; i += batchSize) {
+          const end = Math.min(i + batchSize, pageCount);
+          const indices = [];
+          for (let p = i; p < end; p++) indices.push(p);
+          const copied = await newDoc.copyPages(srcDoc, indices);
+          copied.forEach(p => newDoc.addPage(p));
+          const pct = Math.round((end / pageCount) * (cfg.recompressImages ? 55 : 85));
+          self.postMessage({ id, type: 'progress', progress: pct });
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        let imagesTotal = 0, imagesRecompressed = 0, imageBytesSaved = 0;
+
+        if (cfg.recompressImages && typeof OffscreenCanvas !== 'undefined') {
+          const context = newDoc.context;
+          const entries = context.enumerateIndirectObjects();
+          const SubtypeKey = PDFName.of('Subtype');
+          const FilterKey = PDFName.of('Filter');
+          const ImageName = PDFName.of('Image');
+          const DCTName = PDFName.of('DCTDecode');
+          let processed = 0;
+          const imageEntries = entries.filter(([ref, obj]) =>
+            obj instanceof PDFRawStream &&
+            obj.dict.get(SubtypeKey) === ImageName &&
+            obj.dict.get(FilterKey) === DCTName
+          );
+          imagesTotal = imageEntries.length;
+
+          for (const [ref, obj] of imageEntries) {
+            processed++;
+            try {
+              const raw = obj.getContents();
+              if (raw.length < 12000) continue;
+              const blob = new Blob([raw], { type: 'image/jpeg' });
+              const bitmap = await createImageBitmap(blob);
+              const scale = Math.min(1, cfg.pdfImgMaxDim / Math.max(bitmap.width, bitmap.height));
+              const w = Math.max(1, Math.round(bitmap.width * scale));
+              const h = Math.max(1, Math.round(bitmap.height * scale));
+              const canvas = new OffscreenCanvas(w, h);
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(bitmap, 0, 0, w, h);
+              const newBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: cfg.pdfImgQuality });
+              const newBytes = new Uint8Array(await newBlob.arrayBuffer());
+              if (newBytes.length < raw.length) {
+                const dict = obj.dict;
+                dict.set(PDFName.of('Width'), PDFNumber.of(w));
+                dict.set(PDFName.of('Height'), PDFNumber.of(h));
+                dict.set(PDFName.of('Length'), PDFNumber.of(newBytes.length));
+                const newStream = PDFRawStream.of(dict, newBytes);
+                context.assign(ref, newStream);
+                imagesRecompressed++;
+                imageBytesSaved += (raw.length - newBytes.length);
+              }
+            } catch (imgErr) {}
+            if (imagesTotal > 0) {
+              const pct = 55 + Math.round((processed / imagesTotal) * 35);
+              self.postMessage({ id, type: 'progress', progress: pct });
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+
+        newDoc.setTitle('');
+        newDoc.setAuthor('');
+        newDoc.setSubject('');
+        newDoc.setKeywords([]);
+        newDoc.setCreator('');
+        newDoc.setProducer('Trac Consultant Compressor (local, offline)');
+        const bytes = await newDoc.save({ useObjectStreams: true });
+        self.postMessage({ id, type: 'progress', progress: 97 });
+        self.postMessage({ id, type: 'done', bytes, stats: { imagesTotal, imagesRecompressed, imageBytesSaved } }, [bytes.buffer]);
+      } catch (err) {
+        self.postMessage({ id, type: 'error', error: (err && err.message) || 'PDF processing failed' });
+      }
+    };
+  `;
+  let pdfWorker = null;
+  let pdfWorkerCallbacks = {};
+  function getPdfWorker(){
+    if (pdfWorker) return pdfWorker;
+    const blob = new Blob([pdfWorkerSrc], { type: 'application/javascript' });
+    pdfWorker = new Worker(URL.createObjectURL(blob));
+    pdfWorker.onmessage = (e) => {
+      const { id, type } = e.data;
+      const cb = pdfWorkerCallbacks[id];
+      if (!cb) return;
+      if (type === 'progress') cb.onProgress(e.data.progress);
+      else if (type === 'done') { cb.resolve({ bytes: e.data.bytes, stats: e.data.stats }); delete pdfWorkerCallbacks[id]; }
+      else if (type === 'error') { cb.reject(new Error(e.data.error)); delete pdfWorkerCallbacks[id]; }
+    };
+    return pdfWorker;
+  }
+  function compressPdfInWorker(id, arrayBuffer, cfg, onProgress){
+    return new Promise((resolve, reject) => {
+      pdfWorkerCallbacks[id] = { resolve, reject, onProgress };
+      getPdfWorker().postMessage({ id, buffer: arrayBuffer, cfg }, [arrayBuffer]);
+    });
+  }
+
+  function fmtBytes(n){
+    if (n < 1024) return n + ' B';
+    if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+    return (n/(1024*1024)).toFixed(2) + ' MB';
+  }
+
+  function setStatus(msg, active){
+    statusText.textContent = msg;
+    statusLine.classList.toggle('idle', !active);
+  }
+
+  function updateGauge(){
+    if (totalOriginal === 0){
+      gaugeArc.style.strokeDashoffset = ARC_LENGTH;
+      needle.setAttribute('transform', 'rotate(-90 60 60)');
+      gaugeReadout.textContent = '0%';
+      return;
+    }
+    const pct = Math.max(0, (1 - totalCompressed/totalOriginal) * 100);
+    const clamped = Math.min(pct, 100);
+    gaugeArc.style.strokeDashoffset = ARC_LENGTH - (ARC_LENGTH * clamped/100);
+    const deg = -90 + (clamped/100)*180;
+    needle.setAttribute('transform', `rotate(${deg} 60 60)`);
+    gaugeReadout.textContent = pct.toFixed(1) + '%';
+  }
+
+  function labelForType(file){
+    if (file.type === 'application/pdf') return 'PDF';
+    if (file.type === 'image/jpeg') return 'JPEG';
+    if (file.type === 'image/png') return 'PNG';
+    if (file.type === 'image/webp') return 'WEBP';
+    if (file.type === 'image/bmp') return 'BMP';
+    if (file.type === 'image/gif') return 'GIF';
+    return (file.name.split('.').pop() || 'FILE').toUpperCase();
+  }
+
+  function addRow(file){
+    const id = 'f' + (rowCounter++);
+    emptyRow.style.display = 'none';
+    const tr = document.createElement('tr');
+    tr.id = id;
+    const type = labelForType(file);
+    tr.innerHTML = `
+      <td>
+        <div class="fname" title="${file.name}">${file.name}</div>
+        <div class="ftype">${type}</div>
+        <div class="fmt-note" data-role="fmtnote"></div>
+      </td>
+      <td class="num">${fmtBytes(file.size)}</td>
+      <td class="num" data-role="compressed">—</td>
+      <td data-role="saved">—</td>
+      <td>
+        <div class="row-level">
+          <select data-role="levelsel">
+            <option value="standard">Standard</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </td>
+      <td>
+        <div class="row-progress"><div data-role="bar"></div></div>
+        <div class="state-text" data-role="state">Queued</div>
+      </td>
+      <td>
+        <div class="action-cell">
+          <button class="dl-btn" data-role="dl" disabled>Download</button>
+          <button class="redo-btn" data-role="redo" disabled>Recompress</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+    tr.querySelector('[data-role=levelsel]').value = currentLevel;
+    rows[id] = { el: tr, file, original: file.size, compressed: null, url: null, level: currentLevel, kind: file.type === 'application/pdf' ? 'pdf' : 'image' };
+
+    tr.querySelector('[data-role=redo]').addEventListener('click', () => {
+      const lvl = tr.querySelector('[data-role=levelsel]').value;
+      rows[id].level = lvl;
+      enqueue(id);
+    });
+
+    return id;
+  }
+
+  function setRow(id, patch){
+    const row = rows[id];
+    if (!row) return;
+    const el = row.el;
+    if (patch.progress != null) el.querySelector('[data-role=bar]').style.width = patch.progress + '%';
+    if (patch.state != null) {
+      const st = el.querySelector('[data-role=state]');
+      st.textContent = patch.state;
+      st.classList.toggle('err', !!patch.error);
+    }
+    if (patch.fmtNote != null) {
+      el.querySelector('[data-role=fmtnote]').textContent = patch.fmtNote;
+    }
+    if (patch.compressedSize != null) {
+      el.querySelector('[data-role=compressed]').textContent = fmtBytes(patch.compressedSize);
+      const saved = row.original - patch.compressedSize;
+      const pct = row.original > 0 ? (saved/row.original*100) : 0;
+      const savedEl = el.querySelector('[data-role=saved]');
+      if (saved > 0){
+        savedEl.innerHTML = `<span class="saved-pill saved-pos">-${pct.toFixed(0)}%</span>`;
+      } else {
+        savedEl.innerHTML = `<span class="saved-pill saved-zero">already optimized</span>`;
+      }
+    }
+    if (patch.enableDownload){
+      const btn = el.querySelector('[data-role=dl]');
+      btn.disabled = false;
+      btn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = patch.url;
+        a.download = patch.downloadName;
+        a.click();
+      };
+      el.querySelector('[data-role=redo]').disabled = false;
+    }
+  }
+
+  async function detectAlpha(file){
+    try {
+      const bitmap = await createImageBitmap(file);
+      const size = 32;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, size, size);
+      const data = ctx.getImageData(0, 0, size, size).data;
+      for (let i = 3; i < data.length; i += 4){
+        if (data[i] < 255) return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function decideOutputType(file){
+    if (file.type === 'image/jpeg') return { type: 'image/jpeg', note: '' };
+    const hasAlpha = await detectAlpha(file);
+    if (hasAlpha) return { type: 'image/webp', note: labelForType(file) + ' \u2192 WebP (keeps transparency)' };
+    return { type: 'image/jpeg', note: labelForType(file) + ' \u2192 JPEG (smaller, opaque)' };
+  }
+
+  async function compressImageFile(id){
+    const row = rows[id];
+    const file = row.file;
+    const cfg = LEVELS[row.level];
+    setRow(id, { state: 'Checking format\u2026', progress: 8 });
+    const { type: outputType, note } = await decideOutputType(file);
+    if (note) setRow(id, { fmtNote: note });
+    if (file.type === 'image/gif') setRow(id, { fmtNote: (note ? note + ' \u00b7 ' : '') + 'animation not preserved' });
+
+    setRow(id, { state: 'Downscaling & re-encoding\u2026', progress: 20 });
+    const options = {
+      maxSizeMB: 50,
+      maxWidthOrHeight: cfg.imgMaxDim,
+      useWebWorker: true,
+      initialQuality: cfg.imgQuality,
+      fileType: outputType,
+      onProgress: (p) => setRow(id, { progress: Math.min(92, 20 + p * 0.72) })
+    };
+    let compressed;
+    try {
+      compressed = await imageCompression(file, options);
+    } catch (err) {
+      setRow(id, { state: 'Failed: ' + err.message, error: true, progress: 0 });
+      return;
+    }
+    finalizeResult(id, compressed);
+  }
+
+  async function compressPdfFile(id){
+    const row = rows[id];
+    const file = row.file;
+    const cfg = LEVELS[row.level];
+    setRow(id, { state: 'Rebuilding pages in worker\u2026', progress: 5 });
+    const buffer = await file.arrayBuffer();
+    const workerCfg = {
+      recompressImages: pdfImgToggle.checked,
+      pdfImgMaxDim: cfg.pdfImgMaxDim,
+      pdfImgQuality: cfg.pdfImgQuality
+    };
+    try {
+      const { bytes, stats } = await compressPdfInWorker(id, buffer, workerCfg, (p) => setRow(id, { progress: p }));
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      if (stats && workerCfg.recompressImages) {
+        if (stats.imagesTotal > 0) {
+          setRow(id, { fmtNote: `recompressed ${stats.imagesRecompressed}/${stats.imagesTotal} embedded photo(s)` });
+        } else {
+          setRow(id, { fmtNote: 'no recompressible photos found' });
+        }
+      }
+      finalizeResult(id, blob);
+    } catch (err) {
+      setRow(id, { state: 'Failed: ' + err.message, error: true, progress: 0 });
+    }
+  }
+
+  function finalizeResult(id, resultBlobOrFile){
+    const row = rows[id];
+    let finalBlob = resultBlobOrFile;
+    let usedOriginal = false;
+
+    if (finalBlob.size >= row.original){
+      finalBlob = row.file;
+      usedOriginal = true;
+    }
+
+    if (row.compressed != null) {
+      totalCompressed -= row.compressed;
+      totalOriginal -= row.original;
+      if (row.url) URL.revokeObjectURL(row.url);
+    }
+
+    const url = URL.createObjectURL(finalBlob);
+    row.compressed = finalBlob.size;
+    row.url = url;
+
+    let ext = '';
+    if (!usedOriginal && finalBlob.type === 'image/webp') ext = '.webp';
+    else if (!usedOriginal && finalBlob.type === 'image/jpeg' && !/\.jpe?g$/i.test(row.file.name)) ext = '.jpg';
+
+    const baseName = row.file.name.replace(/\.[^.]+$/, (m) => ext ? '' : m);
+    const downloadName = usedOriginal ? row.file.name : ('compressed-' + baseName + (ext || row.file.name.match(/\.[^.]+$/)?.[0] || ''));
+
+    setRow(id, {
+      progress: 100,
+      state: usedOriginal ? 'Already optimized \u2014 kept original' : `Done \u00b7 ${LEVELS[row.level].label}`,
+      compressedSize: finalBlob.size,
+      enableDownload: true,
+      url,
+      downloadName
+    });
+
+    totalOriginal += row.original;
+    totalCompressed += finalBlob.size;
+    updateGauge();
+    refreshBulkButtons();
+  }
+
+  function enqueue(id){
+    if (!queue.includes(id)) queue.push(id);
+    processQueue();
+  }
+
+  async function processQueue(){
+    if (processing) return;
+    processing = true;
+    let idx = 0;
+    while (queue.length){
+      idx++;
+      const id = queue.shift();
+      const row = rows[id];
+      if (!row) continue;
+      setStatus(`Processing file ${idx} of ${idx + queue.length} \u2014 ${row.file.name}`, true);
+      if (row.kind === 'pdf'){
+        await compressPdfFile(id);
+      } else {
+        await compressImageFile(id);
+      }
+      await new Promise(r => setTimeout(r, 0));
+    }
+    processing = false;
+    setStatus('All files processed.', false);
+  }
+
+  function acceptFiles(fileList){
+    const IMG_TYPES = ['image/jpeg','image/png','image/webp','image/bmp','image/gif'];
+    const files = Array.from(fileList).filter(f =>
+      f.type === 'application/pdf' ||
+      IMG_TYPES.includes(f.type) ||
+      /\.(jpe?g|png|webp|bmp|gif|pdf)$/i.test(f.name)
+    );
+    if (!files.length){
+      setStatus('Only JPEG, PNG, WebP, BMP, GIF, and PDF files are supported.', false);
+      return;
+    }
+    files.forEach(file => {
+      const id = addRow(file);
+      enqueue(id);
+    });
+    refreshBulkButtons();
+  }
+
+  function refreshBulkButtons(){
+    const hasFiles = Object.keys(rows).length > 0;
+    const hasDone = Object.values(rows).some(r => r.compressed != null);
+    recompressAllBtn.disabled = !hasFiles;
+    downloadAllBtn.disabled = !hasDone;
+  }
+
+  recompressAllBtn.addEventListener('click', () => {
+    Object.keys(rows).forEach(id => {
+      rows[id].level = currentLevel;
+      rows[id].el.querySelector('[data-role=levelsel]').value = currentLevel;
+      enqueue(id);
+    });
+  });
+
+  downloadAllBtn.addEventListener('click', async () => {
+    const done = Object.values(rows).filter(r => r.url && r.compressed != null);
+    if (!done.length) return;
+    downloadAllBtn.disabled = true;
+    const prevLabel = downloadAllBtn.textContent;
+    downloadAllBtn.textContent = 'Zipping\u2026';
+    try {
+      const zip = new JSZip();
+      for (const r of done){
+        const resp = await fetch(r.url);
+        const blob = await resp.blob();
+        zip.file(r.file.name.replace(/\.[^.]+$/, '') + '-compressed' + (r.file.name.match(/\.[^.]+$/)?.[0] || ''), blob);
+      }
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'trac-compressed-files.zip';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } finally {
+      downloadAllBtn.textContent = prevLabel;
+      refreshBulkButtons();
+    }
+  });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => { acceptFiles(e.target.files); fileInput.value = ''; });
+
+  ['dragenter','dragover'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('drag'); })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('drag'); })
+  );
+  dropzone.addEventListener('drop', (e) => {
+    if (e.dataTransfer && e.dataTransfer.files) acceptFiles(e.dataTransfer.files);
+  });
+
+  updateGauge();
+  refreshBulkButtons();
+})();
+</script>
+</body>
+</html>

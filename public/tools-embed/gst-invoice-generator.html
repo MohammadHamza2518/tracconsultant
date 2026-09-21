@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GST Invoice Generator — Professional & Compliant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --ink:#0E0E10;
+  --amber:#F5B301;
+  --amber-dark:#D89A00;
+  --cream:#F4EDE2;
+  --card:#FFFFFF;
+  --rust:#E2582B;
+  --line:#E4DCC8;
+  --muted:#6B6558;
+  --good:#1E8E3E;
+  --bad:#D93025;
+  --radius:12px;
+  --shadow:0 2px 10px rgba(14,14,16,0.06), 0 1px 2px rgba(14,14,16,0.08);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+}
+h1,h2,h3,h4,.brand{font-family:'Poppins',sans-serif;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;font-size:13.5px;}
+::selection{background:var(--amber);color:var(--ink);}
+
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:var(--ink);color:#fff;
+  padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.topbar .brand{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.topbar .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--amber);}
+.privacy-badge{
+  font-size:12px;background:rgba(245,179,1,0.15);color:var(--amber);
+  border:1px solid rgba(245,179,1,0.35);padding:6px 12px;border-radius:999px;
+  display:flex;align-items:center;gap:6px;
+}
+.topbar-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+.btn{
+  border:none;border-radius:9px;padding:9px 16px;font-weight:600;font-size:13px;
+  display:inline-flex;align-items:center;gap:6px;transition:transform .08s ease, box-shadow .08s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px);}
+.btn-amber{background:var(--amber);color:var(--ink);}
+.btn-amber:hover{background:var(--amber-dark);}
+.btn-ghost{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.18);}
+.btn-ghost:hover{background:rgba(255,255,255,0.16);}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
+.btn-outline:hover{background:var(--ink);color:#fff;}
+.btn-rust{background:var(--rust);color:#fff;}
+.btn-rust:hover{background:#c94a20;}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:7px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;max-width:1600px;margin:0 auto;align-items:start;
+}
+@media (max-width:1100px){ .layout{grid-template-columns:1fr;} }
+
+.col{min-width:0;}
+.sticky-preview{position:sticky;top:74px;}
+
+.card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  margin-bottom:16px;overflow:hidden;
+}
+.section-head{
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+  border-bottom:1px solid var(--line);
+}
+.section-head h2{margin:0;font-size:15px;display:flex;align-items:center;gap:8px;}
+.section-head .letter{
+  width:22px;height:22px;border-radius:6px;background:var(--ink);color:var(--amber);
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+}
+.chev{transition:transform .15s ease;color:var(--muted);}
+.section-body{padding:16px 18px;display:grid;gap:12px;}
+.card.collapsed .section-body{display:none;}
+.card.collapsed .chev{transform:rotate(-90deg);}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media (max-width:640px){ .grid2,.grid3,.grid4{grid-template-columns:1fr;} }
+
+label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+.field{display:flex;flex-direction:column;}
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=date],select,textarea{
+  padding:9px 10px;border:1.5px solid var(--line);border-radius:8px;background:#fdfcfa;color:var(--ink);
+  width:100%;outline:none;transition:border-color .1s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--amber);}
+textarea{resize:vertical;min-height:56px;}
+.hint{font-size:11px;color:var(--muted);margin-top:2px;}
+.err-msg{font-size:11.5px;color:var(--bad);margin-top:2px;display:none;}
+.field.invalid input,.field.invalid select{border-color:var(--bad);}
+.field.invalid .err-msg{display:block;}
+
+.gstin-status{font-size:11.5px;margin-top:3px;font-weight:600;}
+.gstin-status.ok{color:var(--good);}
+.gstin-status.bad{color:var(--bad);}
+
+.checkline{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--ink);}
+.checkline input{width:16px;height:16px;}
+
+.items-wrap{overflow-x:auto;}
+table.items{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1050px;}
+table.items th{
+  background:var(--ink);color:#fff;padding:8px 6px;text-align:left;font-weight:600;font-size:11.5px;
+  white-space:nowrap;
+}
+table.items td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.items input,table.items select{padding:6px 7px;font-size:12.5px;}
+table.items .num{text-align:right;}
+.taxable-cell{font-weight:700;text-align:right;padding-top:12px;display:block;}
+.discount-toggle{display:flex;gap:4px;}
+.discount-toggle button{
+  border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:6px 8px;font-size:11px;font-weight:700;
+}
+.discount-toggle button.active{background:var(--ink);color:var(--amber);border-color:var(--ink);}
+.row-del{background:none;border:none;color:var(--rust);font-size:16px;padding:6px;}
+
+.item-lib-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+.item-lib-row .field{flex:1;min-width:140px;}
+.saved-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chip{
+  background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.chip:hover{border-color:var(--amber);}
+.chip .x{color:var(--rust);font-weight:700;}
+
+.totals-live{
+  background:var(--ink);color:#fff;border-radius:10px;padding:14px 16px;font-size:13px;
+}
+.totals-live .row{display:flex;justify-content:space-between;padding:3px 0;color:#d8d4c8;}
+.totals-live .row.grand{color:var(--amber);font-size:17px;font-weight:700;border-top:1px solid rgba(255,255,255,0.2);margin-top:6px;padding-top:8px;}
+
+.actions-bar{
+  position:sticky;bottom:0;background:var(--cream);padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;
+  border-top:1px solid var(--line);z-index:40;
+}
+
+.preview-shell{background:#5c584c;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.preview-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#fff;font-size:12.5px;}
+.preview-scale{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.25);}
+#invoicePreviewFrame{width:100%;border:none;display:block;background:#fff;}
+
+.history-list{display:grid;gap:8px;max-height:320px;overflow:auto;}
+.history-item{
+  border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;justify-content:space-between;
+  align-items:center;gap:10px;font-size:12.5px;
+}
+.history-item .meta b{display:block;font-size:13px;}
+.history-actions{display:flex;gap:6px;}
+
+#toastHost{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  background:var(--ink);color:#fff;padding:11px 16px;border-radius:9px;font-size:13px;box-shadow:var(--shadow);
+  border-left:4px solid var(--amber);min-width:220px;animation:slideIn .18s ease;
+}
+.toast.error{border-left-color:var(--bad);}
+.toast.success{border-left-color:var(--good);}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(14,14,16,0.65);z-index:150;display:none;
+  align-items:flex-start;justify-content:center;padding:30px 16px;overflow:auto;
+}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:10px;max-width:900px;width:100%;overflow:hidden;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);}
+.modal-head h3{margin:0;font-size:15px;}
+.modal-close{background:none;border:none;font-size:20px;color:var(--muted);}
+.modal-body{padding:0;}
+
+.print-area-hidden{position:fixed;left:-9999px;top:0;}
+@media print{
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  #printArea.print-area-hidden{position:absolute !important;left:0 !important;top:0;}
+  @page{size:A4;margin:0;}
+}
+</style>
+<style id="pdfStyles">
+.inv-page{
+  width:210mm;min-height:297mm;background:#fff;color:#000;
+  font-family:'Inter','Helvetica Neue',Arial,sans-serif;font-size:9.6px;
+  padding:6mm;position:relative;
+}
+.inv-header-strip{text-align:center;margin-bottom:3mm;}
+.inv-header-strip .title{font-size:16px;font-weight:800;letter-spacing:1px;}
+.inv-header-strip .sub{font-size:9px;margin-top:1mm;}
+.inv-copytype{position:absolute;right:6mm;top:6mm;font-size:8.5px;font-weight:700;border:1px solid #000;padding:2px 6px;}
+
+.box{border:1px solid #000;}
+.flex-2{display:flex;}
+.flex-2 > div{flex:1;padding:2.2mm 3mm;}
+.flex-2 > div + div{border-left:1px solid #000;}
+
+.inv-seller-logo{max-height:14mm;max-width:34mm;object-fit:contain;margin-bottom:1.5mm;}
+.inv-biz-name{font-size:12px;font-weight:800;margin-bottom:0.8mm;}
+.inv-small-line{font-size:9px;margin:0.4mm 0;}
+.inv-label{font-weight:700;}
+
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;}
+.meta-cell{border-bottom:1px solid #000;border-right:1px solid #000;padding:1.6mm 2.4mm;}
+.meta-grid .meta-cell:nth-child(2n){border-right:none;}
+.meta-cell .k{font-size:7.6px;text-transform:uppercase;color:#333;letter-spacing:.3px;}
+.meta-cell .v{font-size:9.6px;font-weight:700;}
+
+.party-box{display:flex;border-top:none;}
+.party-box>div{flex:1;padding:2.2mm 3mm;}
+.party-box>div:first-child{border-right:1px solid #000;}
+.party-title{font-size:8.6px;font-weight:800;text-transform:uppercase;border-bottom:1px solid #000;margin:-2.2mm -3mm 1.6mm;padding:1.4mm 3mm;background:#f0f0f0;}
+
+table.inv-items{width:100%;border-collapse:collapse;margin-top:0;}
+table.inv-items th,table.inv-items td{border:1px solid #000;padding:1.3mm 1.6mm;font-size:8.6px;}
+table.inv-items th{background:#e9e9e9;font-weight:800;text-align:center;}
+table.inv-items td.num{text-align:right;}
+table.inv-items td.center{text-align:center;}
+table.inv-items tr.pad-row td{height:5.2mm;}
+
+.totals-block{display:flex;justify-content:flex-end;}
+.totals-table{border-collapse:collapse;min-width:70mm;}
+.totals-table td{border:1px solid #000;padding:1.3mm 2.4mm;font-size:9px;}
+.totals-table td:first-child{font-weight:700;}
+.totals-table td.num{text-align:right;}
+.totals-table tr.grand td{font-weight:800;font-size:10.4px;background:#f0f0f0;}
+
+.words-strip{border:1px solid #000;border-top:none;padding:1.8mm 3mm;font-size:9px;font-weight:700;}
+
+table.hsn-summary{width:100%;border-collapse:collapse;margin-top:2mm;}
+table.hsn-summary th,table.hsn-summary td{border:1px solid #000;padding:1.2mm 1.6mm;font-size:8.4px;}
+table.hsn-summary th{background:#e9e9e9;}
+table.hsn-summary td.num{text-align:right;}
+
+.bottom-flex{display:flex;margin-top:2mm;border:1px solid #000;}
+.bottom-flex>div{flex:1;padding:2.2mm 3mm;}
+.bottom-flex>div:first-child{border-right:1px solid #000;}
+.sig-space{height:12mm;}
+.footer-note{text-align:center;font-size:7.8px;margin-top:2mm;color:#333;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>GST Invoice Generator</div>
+  <div class="privacy-badge">🔒 Fully local — your client & billing data stays on your machine.</div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost btn-sm" id="btnHistory">History</button>
+    <button class="btn btn-ghost btn-sm" id="btnExportCsv">Export CSV</button>
+    <button class="btn btn-ghost btn-sm" id="btnNewInvoice">New Invoice</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: FORM -->
+  <div class="col" id="formCol">
+
+    <!-- SECTION A: SELLER -->
+    <div class="card" id="cardA">
+      <div class="section-head" data-toggle="cardA">
+        <h2><span class="letter">A</span> Seller Details (Your Business)</h2>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <div class="grid2">
+          <div class="field"><label>Business / Trade Name *</label><input type="text" id="s_name"></div>
+          <div class="field"><label>Logo (optional, printed top-left)</label><input type="file" id="s_logo" accept="image/*"></div>
+        </div>
+        <div class="field"><label>Full Address *</label><textarea id="s_address" placeholder="Building, Street, Area"></textarea></div>
+        <div class="grid3">
+          <div class="field"><label>City *</label><input type="text" id="s_city"></div>
+          <div class="field"><label>State *</label><select id="s_state"></select></div>
+          <div class="field"><label>PIN Code *</label><input type="text" id="s_pin" maxlength="6"></div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>GSTIN *</label>
+            <input type="text" id="s_gstin" maxlength="15" placeholder="22AAAAA0000A1Z5" style="text-transform:uppercase">
+            <div class="gstin-status" id="s_gstin_status"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+              <button type="button" class="btn btn-outline btn-sm portal-verify-btn" data-portal="s_gstin">🔎 Verify GSTIN on GST Portal</button>
+            </div>
+          </div>
+          <div class="field"><label>PAN</label><input type="text" id="s_pan" maxlength="10" style="text-transform:uppercase"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Email</label><input type="email" id="s_email"></div>
+          <div class="field"><label>Phone</label><input type="tel" id="s_phone"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Bank Name</label><input type="text" id="s_bank"></div>
+          <div class="field"><label>Account Number</label><input type="text" id="s_acc"></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>IFSC</label><input type="text" id="s_ifsc" style="text-transform:uppercase"></div>
+          <div class="field"><label>Branch</label><input type="text" id="s_branch"></div>
+          <div class="field"><label>UPI ID</label><input type="text" id="s_upi" placeholder="business@upi"></div>
+        </div>
+        <div><button class="btn btn-amber" id="btnSaveSeller">💾 Save Business Profile</button></div>
+      </div>
+    </div>
+
+    <!-- SECTION B: INVOICE DETAILS -->
+    <div class="card" id="cardB">
+      <div class="section-head" data-toggle="cardB">
+        <h2><span class="letter">B</span> Invoice Details</h2>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <div class="grid3">
+          <div class="field"><label>Invoice Number *</label><input type="text" id="i_number"></div>
+          <div class="field"><label>Invoice Date *</label><input type="date" id="i_date"></div>
+          <div class="field"><label>Due Date</label><input type="date" id="i_due"></div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>Reverse Charge Applicable</label>
+            <select id="i_reverse"><option value="No">No</option><option value="Yes">Yes</option></select>
+          </div>
+          <div class="field">
+            <label>Copy Type (printed in header)</label>
+            <select id="i_copytype">
+              <option>Original for Recipient</option>
+              <option>Duplicate for Transporter</option>
+              <option>Triplicate for Supplier</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid4">
+          <div class="field"><label>Vehicle No.</label><input type="text" id="i_vehicle"></div>
+          <div class="field"><label>E-Way Bill No.</label><input type="text" id="i_eway"></div>
+          <div class="field"><label>Challan No.</label><input type="text" id="i_challan"></div>
+          <div class="field"><label>P.O. No.</label><input type="text" id="i_po"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION C: BUYER -->
+    <div class="card" id="cardC">
+      <div class="section-head" data-toggle="cardC">
+        <h2><span class="letter">C</span> Buyer Details (Bill To)</h2>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Load Saved Client</label>
+          <select id="c_loadClient"><option value="">— Select a saved client —</option></select>
+        </div>
+        <div class="field"><label>Name *</label><input type="text" id="b_name"></div>
+        <div class="field"><label>Full Address *</label><textarea id="b_address"></textarea></div>
+        <div class="grid3">
+          <div class="field"><label>City *</label><input type="text" id="b_city"></div>
+          <div class="field"><label>State *</label><select id="b_state"></select></div>
+          <div class="field"><label>PIN</label><input type="text" id="b_pin" maxlength="6"></div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>GSTIN (blank = unregistered / B2C)</label>
+            <input type="text" id="b_gstin" maxlength="15" style="text-transform:uppercase">
+            <div class="gstin-status" id="b_gstin_status"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+              <button type="button" class="btn btn-outline btn-sm portal-verify-btn" data-portal="b_gstin">🔎 Verify GSTIN on GST Portal</button>
+            </div>
+          </div>
+          <div class="field"><label>Phone / Email</label><input type="text" id="b_contact" placeholder="phone or email"></div>
+        </div>
+        <label class="checkline"><input type="checkbox" id="c_shipToggle"> Ship-to address is different from Bill-to</label>
+        <div id="shipToBlock" style="display:none;">
+          <div class="field"><label>Consignee Name</label><input type="text" id="sh_name"></div>
+          <div class="field"><label>Consignee Address</label><textarea id="sh_address"></textarea></div>
+          <div class="grid3">
+            <div class="field"><label>City</label><input type="text" id="sh_city"></div>
+            <div class="field"><label>State</label><select id="sh_state"></select></div>
+            <div class="field"><label>GSTIN</label><input type="text" id="sh_gstin" style="text-transform:uppercase"></div>
+          </div>
+        </div>
+        <div><button class="btn btn-outline btn-sm" id="btnSaveClient">💾 Save This Client</button></div>
+      </div>
+    </div>
+
+    <!-- SECTION D: LINE ITEMS -->
+    <div class="card" id="cardD">
+      <div class="section-head" data-toggle="cardD">
+        <h2><span class="letter">D</span> Line Items</h2>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <div class="item-lib-row">
+          <div class="field">
+            <label>Quick-add from Product Library</label>
+            <select id="d_libSelect"><option value="">— Select saved item —</option></select>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnAddFromLib">+ Add to Table</button>
+        </div>
+        <div class="items-wrap">
+          <table class="items" id="itemsTable">
+            <thead>
+              <tr>
+                <th>#</th><th style="min-width:150px;">Description</th><th>HSN/SAC</th><th>Qty</th><th>Unit</th>
+                <th>Rate ₹</th><th>Discount</th><th>Taxable ₹</th><th>GST %</th><th>Cess %</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-amber btn-sm" id="btnAddRow">+ Add Row</button>
+          <button class="btn btn-outline btn-sm" id="btnSaveItemToLib">💾 Save Current Row's Item to Library</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION E: EXTRAS -->
+    <div class="card" id="cardE">
+      <div class="section-head" data-toggle="cardE">
+        <h2><span class="letter">E</span> Extras & Summary</h2>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <label style="font-size:13px;font-weight:700;">Additional Charges</label>
+        <div class="grid4">
+          <div class="field"><label>Freight ₹</label><input type="number" id="x_freight" value="0"></div>
+          <div class="field"><label>Freight GST %</label><input type="number" id="x_freightGst" value="18"></div>
+          <div class="field"><label>Packing ₹</label><input type="number" id="x_packing" value="0"></div>
+          <div class="field"><label>Packing GST %</label><input type="number" id="x_packingGst" value="18"></div>
+        </div>
+        <div class="grid4">
+          <div class="field"><label>Insurance ₹</label><input type="number" id="x_insurance" value="0"></div>
+          <div class="field"><label>Insurance GST %</label><input type="number" id="x_insuranceGst" value="18"></div>
+          <div class="field"><label>Other ₹</label><input type="number" id="x_other" value="0"></div>
+          <div class="field"><label>Other GST %</label><input type="number" id="x_otherGst" value="18"></div>
+        </div>
+        <label class="checkline"><input type="checkbox" id="x_roundOff" checked> Round off grand total to nearest ₹</label>
+        <div class="field"><label>Terms & Conditions</label><textarea id="x_terms" rows="3"></textarea></div>
+        <div class="field"><label>Declaration</label><textarea id="x_declaration" rows="2"></textarea></div>
+        <div class="field"><label>Notes</label><textarea id="x_notes" rows="2"></textarea></div>
+        <div class="grid2">
+          <div class="field"><label>Authorised Signatory Name</label><input type="text" id="x_signatory"></div>
+          <div class="field"><label>Signature Image (optional)</label><input type="file" id="x_sigImage" accept="image/*"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-body">
+        <div class="totals-live" id="liveTotals"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div class="col sticky-preview">
+    <div class="preview-shell">
+      <div class="preview-toolbar">
+        <span>Live Invoice Facsimile</span>
+        <span id="pdfPageInfo">A4 · 210×297mm</span>
+      </div>
+      <div class="preview-scale">
+        <iframe id="invoicePreviewFrame" height="500"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <button class="btn btn-amber" id="btnGeneratePdf">⬇ Generate PDF</button>
+  <button class="btn btn-outline" id="btnPreviewModal">👁 Full Preview</button>
+  <button class="btn btn-outline" id="btnPrint">🖨 Print</button>
+  <button class="btn btn-outline" id="btnSaveInvoice">💾 Save Invoice (Ctrl+S)</button>
+</div>
+
+<div id="toastHost"></div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Invoice Preview</h3><button class="modal-close" id="closePreviewModal">✕</button></div>
+    <div class="modal-body"><iframe id="modalPreviewFrame" style="width:100%;height:80vh;border:none;"></iframe></div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Saved Invoices</h3><button class="modal-close" id="closeHistoryModal">✕</button></div>
+    <div class="modal-body" style="padding:16px;">
+      <input type="text" id="historySearch" placeholder="Search by invoice number or buyer..." style="margin-bottom:12px;">
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden container for PDF rendering -->
+<div id="printArea" class="print-area-hidden"></div>
+
+<script>
+const STATES = [
+ {code:"01",name:"Jammu and Kashmir"},{code:"02",name:"Himachal Pradesh"},{code:"03",name:"Punjab"},
+ {code:"04",name:"Chandigarh"},{code:"05",name:"Uttarakhand"},{code:"06",name:"Haryana"},
+ {code:"07",name:"Delhi"},{code:"08",name:"Rajasthan"},{code:"09",name:"Uttar Pradesh"},
+ {code:"10",name:"Bihar"},{code:"11",name:"Sikkim"},{code:"12",name:"Arunachal Pradesh"},
+ {code:"13",name:"Nagaland"},{code:"14",name:"Manipur"},{code:"15",name:"Mizoram"},
+ {code:"16",name:"Tripura"},{code:"17",name:"Meghalaya"},{code:"18",name:"Assam"},
+ {code:"19",name:"West Bengal"},{code:"20",name:"Jharkhand"},{code:"21",name:"Odisha"},
+ {code:"22",name:"Chhattisgarh"},{code:"23",name:"Madhya Pradesh"},{code:"24",name:"Gujarat"},
+ {code:"26",name:"Dadra and Nagar Haveli and Daman and Diu"},{code:"27",name:"Maharashtra"},
+ {code:"29",name:"Karnataka"},{code:"30",name:"Goa"},{code:"31",name:"Lakshadweep"},
+ {code:"32",name:"Kerala"},{code:"33",name:"Tamil Nadu"},{code:"34",name:"Puducherry"},
+ {code:"35",name:"Andaman and Nicobar Islands"},{code:"36",name:"Telangana"},
+ {code:"37",name:"Andhra Pradesh"},{code:"38",name:"Ladakh"},{code:"97",name:"Other Territory"}
+];
+const UQC = ["NOS","PCS","KGS","GMS","LTR","MTR","SQF","SQM","BOX","BAG","BTL","SET","PAIR","DOZ","HRS","DAY","MON","OTH"];
+const GST_RATES = [0,0.25,3,5,12,18,28];
+const GSTIN_RE = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+const LS = {
+  seller:"gst_seller_profile", clients:"gst_clients", products:"gst_products",
+  invoices:"gst_invoices", counter:"gst_invoice_counter", draft:"gst_draft_form"
+};
+
+let items = [];
+let itemSeq = 0;
+let sellerLogoBase64 = "";
+let signatureBase64 = "";
+
+function uid(){ return 'r'+(++itemSeq)+'_'+Math.random().toString(36).slice(2,7); }
+
+function numberToWordsIndian(num){
+  num = Math.round(num * 100) / 100;
+  const rupees = Math.floor(num);
+  const paise = Math.round((num - rupees) * 100);
+
+  const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
+    "Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+  const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+
+  function twoDigits(n){
+    if(n===0) return "";
+    if(n<20) return ones[n]+" ";
+    return tens[Math.floor(n/10)]+" "+(n%10 ? ones[n%10]+" " : "");
+  }
+  function threeDigits(n){
+    let str = "";
+    if(n>=100){ str += ones[Math.floor(n/100)]+" Hundred "; n = n%100; }
+    str += twoDigits(n);
+    return str;
+  }
+  function convert(n){
+    if(n===0) return "Zero";
+    let crore = Math.floor(n / 10000000); n = n % 10000000;
+    let lakh  = Math.floor(n / 100000);   n = n % 100000;
+    let thousand = Math.floor(n / 1000);  n = n % 1000;
+    let hundred = n;
+    let out = "";
+    if(crore) out += threeDigits(crore) + "Crore ";
+    if(lakh) out += threeDigits(lakh) + "Lakh ";
+    if(thousand) out += threeDigits(thousand) + "Thousand ";
+    if(hundred) out += threeDigits(hundred);
+    return out.trim();
+  }
+  let words = "Rupees " + convert(rupees);
+  if(paise > 0){
+    words += " and " + convert(paise) + " Paise";
+  }
+  words += " Only";
+  return words.replace(/\s+/g," ").trim();
+}
+
+function fmtMoney(n){
+  n = isFinite(n) ? n : 0;
+  return n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function num(v){ const n = parseFloat(v); return isFinite(n) ? n : 0; }
+function esc(s){ return (s===undefined||s===null) ? "" : String(s).replace(/[<>&]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c])); }
+function stateNameByCode(code){ const s = STATES.find(x=>x.code===code); return s ? s.name : ""; }
+function stateCodeByName(name){ const s = STATES.find(x=>x.name===name); return s ? s.code : ""; }
+
+function populateStateSelect(sel){
+  sel.innerHTML = '<option value="">Select State</option>' +
+    STATES.map(s=>`<option value="${s.name}">${s.name} (${s.code})</option>`).join('');
+}
+['s_state','b_state','sh_state'].forEach(id=>populateStateSelect(document.getElementById(id)));
+
+function toast(msg, type){
+  const host = document.getElementById('toastHost');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' '+type : '');
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .25s'; setTimeout(()=>el.remove(),260); }, 2600);
+}
+
+document.querySelectorAll('.section-head').forEach(h=>{
+  h.addEventListener('click', ()=>{
+    document.getElementById(h.dataset.toggle).classList.toggle('collapsed');
+  });
+});
+
+document.getElementById('c_shipToggle').addEventListener('change', function(){
+  document.getElementById('shipToBlock').style.display = this.checked ? 'grid' : 'none';
+  scheduleRender();
+});
+
+function wireGstinValidation(inputId, statusId, stateSelectId){
+  const input = document.getElementById(inputId);
+  const status = document.getElementById(statusId);
+  input.addEventListener('input', function(){
+    this.value = this.value.toUpperCase();
+    validateGstin();
+  });
+  function validateGstin(){
+    const v = input.value.trim();
+    if(!v){ status.textContent=''; status.className='gstin-status'; input.closest('.field').classList.remove('invalid'); return true; }
+    const ok = GSTIN_RE.test(v);
+    if(!ok){
+      status.textContent = '✕ Invalid GSTIN format';
+      status.className = 'gstin-status bad';
+      return false;
+    }
+    let msg = '✓ Valid GSTIN format';
+    const codeInGstin = v.substring(0,2);
+    const stateSel = stateSelectId ? document.getElementById(stateSelectId) : null;
+    if(stateSel && stateSel.value){
+      const expected = stateCodeByName(stateSel.value);
+      if(expected && expected !== codeInGstin){
+        msg += ` — ⚠ GSTIN state code (${codeInGstin}) doesn't match ${stateSel.value}`;
+        status.className = 'gstin-status bad';
+        status.textContent = msg;
+        return true;
+      }
+    }
+    status.textContent = msg;
+    status.className = 'gstin-status ok';
+    return true;
+  }
+  return validateGstin;
+}
+const validateSellerGstin = wireGstinValidation('s_gstin','s_gstin_status','s_state');
+const validateBuyerGstin = wireGstinValidation('b_gstin','b_gstin_status','b_state');
+document.getElementById('s_state').addEventListener('change', ()=>{ validateSellerGstin(); scheduleRender(); });
+document.getElementById('b_state').addEventListener('change', ()=>{ validateBuyerGstin(); scheduleRender(); });
+
+function newItem(overrides){
+  return Object.assign({
+    id: uid(), desc:"", hsn:"", qty:1, unit:"NOS", rate:0,
+    discType:"pct", discVal:0, gstRate:18, cess:0
+  }, overrides||{});
+}
+function addItemRow(overrides){
+  items.push(newItem(overrides));
+  renderItemsTable();
+  scheduleRender();
+}
+function removeItemRow(id){
+  items = items.filter(it=>it.id!==id);
+  renderItemsTable();
+  scheduleRender();
+}
+function itemTaxable(it){
+  const gross = num(it.qty) * num(it.rate);
+  const disc = it.discType==='pct' ? gross * num(it.discVal)/100 : num(it.discVal);
+  return Math.max(0, gross - disc);
+}
+function renderItemsTable(){
+  const body = document.getElementById('itemsBody');
+  body.innerHTML = items.map((it,idx)=>{
+    return `<tr data-id="${it.id}">
+      <td>${idx+1}</td>
+      <td><input type="text" data-f="desc" value="${esc(it.desc)}" placeholder="Item / service description" style="min-width:150px;"></td>
+      <td><input type="text" data-f="hsn" value="${esc(it.hsn)}" style="width:70px;"></td>
+      <td><input type="number" data-f="qty" value="${it.qty}" min="0" step="any" style="width:60px;"></td>
+      <td><select data-f="unit" style="width:70px;">${UQC.map(u=>`<option ${u===it.unit?'selected':''}>${u}</option>`).join('')}</select></td>
+      <td><input type="number" data-f="rate" value="${it.rate}" min="0" step="any" style="width:80px;"></td>
+      <td>
+        <div class="discount-toggle">
+          <input type="number" data-f="discVal" value="${it.discVal}" min="0" step="any" style="width:56px;">
+          <button type="button" data-f="discType" data-v="pct" class="${it.discType==='pct'?'active':''}">%</button>
+          <button type="button" data-f="discType" data-v="amt" class="${it.discType==='amt'?'active':''}">₹</button>
+        </div>
+      </td>
+      <td><span class="taxable-cell">₹${fmtMoney(itemTaxable(it))}</span></td>
+      <td><select data-f="gstRate" style="width:64px;">${GST_RATES.map(r=>`<option value="${r}" ${r===it.gstRate?'selected':''}>${r}%</option>`).join('')}</select></td>
+      <td><input type="number" data-f="cess" value="${it.cess}" min="0" step="any" style="width:56px;"></td>
+      <td><button class="row-del" data-del="${it.id}" title="Delete row">✕</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:16px;">No items yet — click "+ Add Row".</td></tr>`;
+
+  body.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('input', onItemFieldChange);
+    el.addEventListener('change', onItemFieldChange);
+  });
+  body.querySelectorAll('button[data-f="discType"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.closest('tr').dataset.id;
+      const it = items.find(i=>i.id===id);
+      it.discType = btn.dataset.v;
+      renderItemsTable(); scheduleRender();
+    });
+  });
+  body.querySelectorAll('button[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>removeItemRow(btn.dataset.del));
+  });
+}
+function onItemFieldChange(e){
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const it = items.find(i=>i.id===id);
+  const f = e.target.dataset.f;
+  if(!f || f==='discType') return;
+  if(['qty','rate','discVal','gstRate','cess'].includes(f)){
+    it[f] = num(e.target.value);
+  } else {
+    it[f] = e.target.value;
+  }
+  const taxCell = tr.querySelector('.taxable-cell');
+  if(taxCell) taxCell.textContent = '₹'+fmtMoney(itemTaxable(it));
+  scheduleRender();
+}
+document.getElementById('btnAddRow').addEventListener('click', ()=>addItemRow());
+
+function getProducts(){ return JSON.parse(localStorage.getItem(LS.products)||'[]'); }
+function saveProducts(p){ localStorage.setItem(LS.products, JSON.stringify(p)); }
+function refreshLibSelect(){
+  const sel = document.getElementById('d_libSelect');
+  const prods = getProducts();
+  sel.innerHTML = '<option value="">— Select saved item —</option>' +
+    prods.map((p,idx)=>`<option value="${idx}">${esc(p.desc)} (${esc(p.hsn)})</option>`).join('');
+}
+refreshLibSelect();
+document.getElementById('btnAddFromLib').addEventListener('click', ()=>{
+  const idx = document.getElementById('d_libSelect').value;
+  if(idx==='') { toast('Pick an item from the library first.', 'error'); return; }
+  const p = getProducts()[idx];
+  addItemRow(Object.assign({}, p));
+  toast('Item added from library.', 'success');
+});
+document.getElementById('btnSaveItemToLib').addEventListener('click', ()=>{
+  if(items.length===0){ toast('Add a row first.', 'error'); return; }
+  const it = items[items.length-1];
+  if(!it.desc){ toast('Fill in a description before saving to library.', 'error'); return; }
+  const prods = getProducts();
+  prods.push({desc:it.desc,hsn:it.hsn,unit:it.unit,rate:it.rate,gstRate:it.gstRate,cess:it.cess,discType:it.discType,discVal:it.discVal});
+  saveProducts(prods);
+  refreshLibSelect();
+  toast('Saved last row to product library.', 'success');
+});
+
+function computeInvoice(){
+  const sellerState = document.getElementById('s_state').value;
+  const buyerState = document.getElementById('b_state').value;
+  const isInterState = !!(sellerState && buyerState && sellerState !== buyerState);
+
+  let totalTaxable = 0, totalCgst = 0, totalSgst = 0, totalIgst = 0, totalCess = 0;
+  const computedItems = items.map(it=>{
+    const taxable = itemTaxable(it);
+    const gstAmt = taxable * num(it.gstRate) / 100;
+    const cessAmt = taxable * num(it.cess) / 100;
+    let cgst=0, sgst=0, igst=0;
+    if(isInterState){ igst = gstAmt; } else { cgst = gstAmt/2; sgst = gstAmt/2; }
+    totalTaxable += taxable; totalCgst += cgst; totalSgst += sgst; totalIgst += igst; totalCess += cessAmt;
+    return {...it, taxable, cgst, sgst, igst, cessAmt, gstAmt};
+  });
+
+  const charges = [
+    {label:'Freight', amt:num(document.getElementById('x_freight').value), rate:num(document.getElementById('x_freightGst').value)},
+    {label:'Packing', amt:num(document.getElementById('x_packing').value), rate:num(document.getElementById('x_packingGst').value)},
+    {label:'Insurance', amt:num(document.getElementById('x_insurance').value), rate:num(document.getElementById('x_insuranceGst').value)},
+    {label:'Other', amt:num(document.getElementById('x_other').value), rate:num(document.getElementById('x_otherGst').value)},
+  ].filter(c=>c.amt>0);
+
+  let chargesTaxable=0, chargesCgst=0, chargesSgst=0, chargesIgst=0;
+  charges.forEach(c=>{
+    chargesTaxable += c.amt;
+    const gstAmt = c.amt * c.rate/100;
+    if(isInterState){ chargesIgst += gstAmt; } else { chargesCgst += gstAmt/2; chargesSgst += gstAmt/2; }
+  });
+
+  const grandTaxable = totalTaxable + chargesTaxable;
+  const grandCgst = totalCgst + chargesCgst;
+  const grandSgst = totalSgst + chargesSgst;
+  const grandIgst = totalIgst + chargesIgst;
+  const grandCess = totalCess;
+
+  const preRound = grandTaxable + grandCgst + grandSgst + grandIgst + grandCess;
+  const roundOffEnabled = document.getElementById('x_roundOff').checked;
+  const roundedTotal = roundOffEnabled ? Math.round(preRound) : preRound;
+  const roundOffDiff = roundedTotal - preRound;
+
+  const hsnMap = {};
+  computedItems.forEach(it=>{
+    const key = it.hsn || '—';
+    if(!hsnMap[key]) hsnMap[key] = {hsn:key, taxable:0, cgstRate:num(it.gstRate)/ (isInterState?1:2), sgstRate:num(it.gstRate)/(isInterState?1:2), cgst:0, sgst:0, igst:0, gstRate:num(it.gstRate)};
+    hsnMap[key].taxable += it.taxable;
+    hsnMap[key].cgst += it.cgst;
+    hsnMap[key].sgst += it.sgst;
+    hsnMap[key].igst += it.igst;
+  });
+
+  return {
+    isInterState, sellerState, buyerState, computedItems, charges,
+    totalTaxable, totalCgst, totalSgst, totalIgst, totalCess,
+    chargesTaxable, chargesCgst, chargesSgst, chargesIgst,
+    grandTaxable, grandCgst, grandSgst, grandIgst, grandCess,
+    preRound, roundedTotal, roundOffDiff, roundOffEnabled,
+    hsnSummary: Object.values(hsnMap)
+  };
+}
+
+function renderLiveTotals(calc){
+  const el = document.getElementById('liveTotals');
+  let rows = `<div class="row"><span>Taxable Value</span><span>₹${fmtMoney(calc.grandTaxable)}</span></div>`;
+  if(calc.isInterState){
+    rows += `<div class="row"><span>IGST</span><span>₹${fmtMoney(calc.grandIgst)}</span></div>`;
+  } else {
+    rows += `<div class="row"><span>CGST</span><span>₹${fmtMoney(calc.grandCgst)}</span></div>`;
+    rows += `<div class="row"><span>SGST</span><span>₹${fmtMoney(calc.grandSgst)}</span></div>`;
+  }
+  if(calc.grandCess>0) rows += `<div class="row"><span>Cess</span><span>₹${fmtMoney(calc.grandCess)}</span></div>`;
+  if(calc.roundOffEnabled) rows += `<div class="row"><span>Round Off</span><span>${calc.roundOffDiff>=0?'+':''}₹${fmtMoney(calc.roundOffDiff)}</span></div>`;
+  rows += `<div class="row grand"><span>Grand Total</span><span>₹${fmtMoney(calc.roundedTotal)}</span></div>`;
+  el.innerHTML = rows;
+}
+
+function buildMetaCells(){
+  const number = document.getElementById('i_number').value || '—';
+  const date = document.getElementById('i_date').value || '—';
+  const due = document.getElementById('i_due').value || '—';
+  const reverse = document.getElementById('i_reverse').value;
+  const challan = document.getElementById('i_challan').value || '—';
+  const po = document.getElementById('i_po').value || '—';
+  const eway = document.getElementById('i_eway').value || '—';
+  const vehicle = document.getElementById('i_vehicle').value || '—';
+  const cells = [
+    ['Invoice No.', number], ['Invoice Date', date],
+    ['Due Date', due], ['Reverse Charge', reverse],
+    ['Challan No.', challan], ['P.O. No.', po],
+    ['E-Way Bill No.', eway], ['Vehicle No.', vehicle],
+  ];
+  return cells.map(([k,v])=>`<div class="meta-cell"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join('');
+}
+
+function buildInvoiceHTML(){
+  const calc = computeInvoice();
+  const copyType = document.getElementById('i_copytype').value;
+
+  const sellerName = document.getElementById('s_name').value || 'Your Business Name';
+  const sellerAddr = document.getElementById('s_address').value || '';
+  const sellerCity = document.getElementById('s_city').value || '';
+  const sellerState = document.getElementById('s_state').value || '';
+  const sellerPin = document.getElementById('s_pin').value || '';
+  const sellerGstin = document.getElementById('s_gstin').value || '';
+  const sellerPan = document.getElementById('s_pan').value || '';
+  const sellerEmail = document.getElementById('s_email').value || '';
+  const sellerPhone = document.getElementById('s_phone').value || '';
+  const sellerStateCode = stateCodeByName(sellerState);
+
+  const buyerName = document.getElementById('b_name').value || '';
+  const buyerAddr = document.getElementById('b_address').value || '';
+  const buyerCity = document.getElementById('b_city').value || '';
+  const buyerState = document.getElementById('b_state').value || '';
+  const buyerPin = document.getElementById('b_pin').value || '';
+  const buyerGstin = document.getElementById('b_gstin').value || 'Unregistered';
+  const buyerStateCode = stateCodeByName(buyerState);
+
+  const shipToggle = document.getElementById('c_shipToggle').checked;
+  const shipName = shipToggle ? (document.getElementById('sh_name').value || buyerName) : buyerName;
+  const shipAddr = shipToggle ? (document.getElementById('sh_address').value || buyerAddr) : buyerAddr;
+  const shipCity = shipToggle ? (document.getElementById('sh_city').value || buyerCity) : buyerCity;
+  const shipState = shipToggle ? (document.getElementById('sh_state').value || buyerState) : buyerState;
+  const shipGstin = shipToggle ? (document.getElementById('sh_gstin').value || buyerGstin) : buyerGstin;
+  const shipStateCode = stateCodeByName(shipState) || buyerStateCode;
+
+  let itemRows = calc.computedItems.map((it,idx)=>{
+    if(calc.isInterState){
+      return `<tr>
+        <td class="center">${idx+1}</td>
+        <td>${esc(it.desc)}</td>
+        <td class="center">${esc(it.hsn)}</td>
+        <td class="num">${it.qty}</td>
+        <td class="center">${esc(it.unit)}</td>
+        <td class="num">${fmtMoney(it.rate)}</td>
+        <td class="num">${it.discType==='pct'? it.discVal+'%': fmtMoney(it.discVal)}</td>
+        <td class="num">${fmtMoney(it.taxable)}</td>
+        <td class="center">${it.gstRate}%</td>
+        <td class="num">${fmtMoney(it.igst)}</td>
+        <td class="num">${fmtMoney(it.taxable+it.igst+it.cessAmt)}</td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td class="center">${idx+1}</td>
+        <td>${esc(it.desc)}</td>
+        <td class="center">${esc(it.hsn)}</td>
+        <td class="num">${it.qty}</td>
+        <td class="center">${esc(it.unit)}</td>
+        <td class="num">${fmtMoney(it.rate)}</td>
+        <td class="num">${it.discType==='pct'? it.discVal+'%': fmtMoney(it.discVal)}</td>
+        <td class="num">${fmtMoney(it.taxable)}</td>
+        <td class="center">${(it.gstRate/2)}%</td>
+        <td class="num">${fmtMoney(it.cgst)}</td>
+        <td class="center">${(it.gstRate/2)}%</td>
+        <td class="num">${fmtMoney(it.sgst)}</td>
+        <td class="num">${fmtMoney(it.taxable+it.cgst+it.sgst+it.cessAmt)}</td>
+      </tr>`;
+    }
+  }).join('');
+
+  const minRows = 10;
+  const padCount = Math.max(0, minRows - calc.computedItems.length);
+  const colCount = calc.isInterState ? 11 : 13;
+  for(let i=0;i<padCount;i++){
+    itemRows += `<tr class="pad-row">${'<td></td>'.repeat(colCount)}</tr>`;
+  }
+
+  const headCols = calc.isInterState
+    ? `<th>Sl.</th><th>Description of Goods / Services</th><th>HSN/SAC</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Disc</th><th>Taxable Value</th><th>IGST Rate</th><th>IGST Amt</th><th>Total</th>`
+    : `<th>Sl.</th><th>Description of Goods / Services</th><th>HSN/SAC</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Disc</th><th>Taxable Value</th><th>CGST Rate</th><th>CGST Amt</th><th>SGST Rate</th><th>SGST Amt</th><th>Total</th>`;
+
+  let totalsRows = `<tr><td>Total Taxable Value</td><td class="num">₹${fmtMoney(calc.grandTaxable)}</td></tr>`;
+  if(calc.isInterState){
+    totalsRows += `<tr><td>IGST</td><td class="num">₹${fmtMoney(calc.grandIgst)}</td></tr>`;
+  } else {
+    totalsRows += `<tr><td>CGST</td><td class="num">₹${fmtMoney(calc.grandCgst)}</td></tr>`;
+    totalsRows += `<tr><td>SGST</td><td class="num">₹${fmtMoney(calc.grandSgst)}</td></tr>`;
+  }
+  if(calc.grandCess>0) totalsRows += `<tr><td>Cess</td><td class="num">₹${fmtMoney(calc.grandCess)}</td></tr>`;
+  if(calc.chargesTaxable>0) totalsRows += `<tr><td>Freight / Packing / Insurance / Other</td><td class="num">₹${fmtMoney(calc.chargesTaxable)}</td></tr>`;
+  if(calc.roundOffEnabled) totalsRows += `<tr><td>Round Off</td><td class="num">${calc.roundOffDiff>=0?'+':''}₹${fmtMoney(calc.roundOffDiff)}</td></tr>`;
+  totalsRows += `<tr class="grand"><td>Grand Total</td><td class="num">₹${fmtMoney(calc.roundedTotal)}</td></tr>`;
+
+  let hsnRows = calc.hsnSummary.map(h=>{
+    if(calc.isInterState){
+      return `<tr><td>${esc(h.hsn)}</td><td class="num">${fmtMoney(h.taxable)}</td><td class="center">${h.gstRate}%</td><td class="num">${fmtMoney(h.igst)}</td><td class="num">${fmtMoney(h.taxable+h.igst)}</td></tr>`;
+    }
+    return `<tr><td>${esc(h.hsn)}</td><td class="num">${fmtMoney(h.taxable)}</td><td class="center">${(h.gstRate/2)}%</td><td class="num">${fmtMoney(h.cgst)}</td><td class="center">${(h.gstRate/2)}%</td><td class="num">${fmtMoney(h.sgst)}</td><td class="num">${fmtMoney(h.taxable+h.cgst+h.sgst)}</td></tr>`;
+  }).join('');
+  const hsnFootTaxable = calc.hsnSummary.reduce((s,h)=>s+h.taxable,0);
+  const hsnFootTax = calc.isInterState
+    ? calc.hsnSummary.reduce((s,h)=>s+h.igst,0)
+    : calc.hsnSummary.reduce((s,h)=>s+h.cgst+h.sgst,0);
+  const hsnHead = calc.isInterState
+    ? `<th>HSN/SAC</th><th>Taxable Value</th><th>IGST Rate</th><th>IGST Amount</th><th>Total Tax</th>`
+    : `<th>HSN/SAC</th><th>Taxable Value</th><th>CGST Rate</th><th>CGST Amount</th><th>SGST Rate</th><th>SGST Amount</th><th>Total Tax</th>`;
+  const hsnFootCols = calc.isInterState ? 5 : 7;
+  hsnRows += `<tr><td><b>Total</b></td><td class="num"><b>${fmtMoney(hsnFootTaxable)}</b></td>${'<td></td>'.repeat(hsnFootCols-4)}<td class="num"><b>${fmtMoney(hsnFootTax)}</b></td></tr>`;
+
+  const words = numberToWordsIndian(calc.roundedTotal);
+  const terms = document.getElementById('x_terms').value;
+  const declaration = document.getElementById('x_declaration').value;
+  const notes = document.getElementById('x_notes').value;
+  const signatory = document.getElementById('x_signatory').value;
+
+  const bank = {
+    name: document.getElementById('s_bank').value,
+    acc: document.getElementById('s_acc').value,
+    ifsc: document.getElementById('s_ifsc').value,
+    branch: document.getElementById('s_branch').value,
+    upi: document.getElementById('s_upi').value,
+  };
+
+  return `
+  <div class="inv-page">
+    <div class="inv-copytype">${esc(copyType)}</div>
+    <div class="inv-header-strip">
+      <div class="title">TAX INVOICE</div>
+      <div class="sub">(${esc(copyType.toUpperCase())})</div>
+    </div>
+    <div class="box flex-2" style="margin-bottom:0;">
+      <div>
+        ${sellerLogoBase64 ? `<img class="inv-seller-logo" src="${sellerLogoBase64}">` : ``}
+        <div class="inv-biz-name">${esc(sellerName)}</div>
+        <div class="inv-small-line">${esc(sellerAddr)}</div>
+        <div class="inv-small-line">${esc(sellerCity)}${sellerCity?', ':''}${esc(sellerState)} ${esc(sellerPin)}</div>
+        <div class="inv-small-line"><span class="inv-label">GSTIN:</span> ${esc(sellerGstin)} &nbsp; <span class="inv-label">State:</span> ${esc(sellerState)} (${esc(sellerStateCode)})</div>
+        <div class="inv-small-line"><span class="inv-label">PAN:</span> ${esc(sellerPan)}</div>
+        <div class="inv-small-line">${esc(sellerEmail)} ${sellerEmail&&sellerPhone?'|':''} ${esc(sellerPhone)}</div>
+      </div>
+      <div style="padding:0;">
+        <div class="meta-grid">${buildMetaCells()}</div>
+      </div>
+    </div>
+    <div class="box party-box" style="border-top:none;">
+      <div>
+        <div class="party-title">Bill To</div>
+        <div class="inv-small-line"><b>${esc(buyerName)}</b></div>
+        <div class="inv-small-line">${esc(buyerAddr)}</div>
+        <div class="inv-small-line">${esc(buyerCity)}${buyerCity?', ':''}${esc(buyerState)} ${esc(buyerPin)}</div>
+        <div class="inv-small-line"><span class="inv-label">GSTIN:</span> ${esc(buyerGstin)} &nbsp; <span class="inv-label">State:</span> ${esc(buyerState)} (${esc(buyerStateCode)})</div>
+      </div>
+      <div>
+        <div class="party-title">Ship To</div>
+        <div class="inv-small-line"><b>${esc(shipName)}</b></div>
+        <div class="inv-small-line">${esc(shipAddr)}</div>
+        <div class="inv-small-line">${esc(shipCity)}${shipCity?', ':''}${esc(shipState)}</div>
+        <div class="inv-small-line"><span class="inv-label">GSTIN:</span> ${esc(shipGstin)} &nbsp; <span class="inv-label">State:</span> ${esc(shipState)} (${esc(shipStateCode)})</div>
+      </div>
+    </div>
+    <table class="inv-items">
+      <thead><tr>${headCols}</tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <div class="totals-block">
+      <table class="totals-table">${totalsRows}</table>
+    </div>
+    <div class="words-strip">Amount in Words: ${esc(words)}</div>
+
+    <table class="hsn-summary">
+      <thead><tr>${hsnHead}</tr></thead>
+      <tbody>${hsnRows}</tbody>
+    </table>
+
+    <div class="bottom-flex">
+      <div>
+        <div class="party-title" style="background:none;border:none;margin:0 0 1mm;padding:0;">Bank Details</div>
+        <div class="inv-small-line"><span class="inv-label">Bank:</span> ${esc(bank.name)}</div>
+        <div class="inv-small-line"><span class="inv-label">A/C No.:</span> ${esc(bank.acc)}</div>
+        <div class="inv-small-line"><span class="inv-label">IFSC:</span> ${esc(bank.ifsc)} &nbsp; <span class="inv-label">Branch:</span> ${esc(bank.branch)}</div>
+        <div class="inv-small-line"><span class="inv-label">UPI:</span> ${esc(bank.upi)}</div>
+        ${terms ? `<div class="party-title" style="background:none;border:none;margin:2mm 0 1mm;padding:0;">Terms &amp; Conditions</div><div class="inv-small-line">${esc(terms).replace(/\n/g,'<br>')}</div>` : ''}
+        ${notes ? `<div class="inv-small-line" style="margin-top:1mm;"><span class="inv-label">Notes:</span> ${esc(notes)}</div>` : ''}
+        <div class="inv-small-line" style="margin-top:1.5mm;"><span class="inv-label">Declaration:</span> ${esc(declaration)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="inv-small-line"><b>For ${esc(sellerName)}</b></div>
+        <div class="sig-space">${signatureBase64?`<img src="${signatureBase64}" style="max-height:12mm;max-width:40mm;">`:''}</div>
+        <div class="inv-small-line" style="border-top:1px solid #000;padding-top:1mm;display:inline-block;">${esc(signatory)||'Authorised Signatory'}</div>
+      </div>
+    </div>
+    <div class="footer-note">Generated via Trac Consultant Billing Engine. This is a computer-generated document.</div>
+  </div>`;
+}
+
+let renderTimer = null;
+function scheduleRender(){
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(doRender, 120);
+}
+function doRender(){
+  const calc = computeInvoice();
+  renderLiveTotals(calc);
+  const html = buildInvoiceHTML();
+  const iframe = document.getElementById('invoicePreviewFrame');
+  writeIframe(iframe, html);
+  fitIframe(iframe);
+}
+function writeIframe(iframe, innerHtml){
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${getInvoiceStylesOnly()}
+    html,body{margin:0;background:#ddd;} .inv-page{margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.15);}
+  </style></head><body>${innerHtml}</body></html>`);
+  doc.close();
+}
+function fitIframe(iframe){
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  const page = doc.querySelector('.inv-page');
+  if(!page) return;
+  const pageWidthPx = 210 * 3.7795;
+  const containerWidth = iframe.clientWidth;
+  const scale = Math.min(1, (containerWidth-20) / pageWidthPx);
+  page.style.transformOrigin = 'top center';
+  page.style.transform = `scale(${scale})`;
+  const pageHeightPx = 297 * 3.7795;
+  iframe.style.height = (pageHeightPx*scale + 24) + 'px';
+}
+function getInvoiceStylesOnly(){
+  return document.getElementById('pdfStyles').textContent;
+}
+window.addEventListener('resize', ()=>fitIframe(document.getElementById('invoicePreviewFrame')));
+
+function clearFieldErrors(){
+  document.querySelectorAll('.field.invalid').forEach(f=>f.classList.remove('invalid'));
+}
+function markInvalid(id){
+  const field = document.getElementById(id)?.closest('.field');
+  if(field) field.classList.add('invalid');
+  return field;
+}
+function validateForm(){
+  clearFieldErrors();
+  const errors = [];
+  const required = [
+    ['s_name','Business / Trade Name is required'],
+    ['s_address','Seller address is required'],
+    ['s_city','Seller city is required'],
+    ['s_state','Seller state is required'],
+    ['s_pin','Seller PIN code is required'],
+    ['s_gstin','Seller GSTIN is required'],
+    ['i_number','Invoice number is required'],
+    ['i_date','Invoice date is required'],
+    ['b_name','Buyer name is required'],
+    ['b_address','Buyer address is required'],
+    ['b_city','Buyer city is required'],
+    ['b_state','Buyer state is required'],
+  ];
+  let firstErrorField = null;
+  required.forEach(([id,msg])=>{
+    const el = document.getElementById(id);
+    if(!el.value || !el.value.trim()){
+      const f = markInvalid(id);
+      errors.push(msg);
+      if(!firstErrorField) firstErrorField = f;
+    }
+  });
+  const sGstin = document.getElementById('s_gstin').value.trim();
+  if(sGstin && !GSTIN_RE.test(sGstin)){
+    const f = markInvalid('s_gstin');
+    errors.push('Seller GSTIN format is invalid');
+    if(!firstErrorField) firstErrorField = f;
+  }
+  const bGstin = document.getElementById('b_gstin').value.trim();
+  if(bGstin && !GSTIN_RE.test(bGstin)){
+    const f = markInvalid('b_gstin');
+    errors.push('Buyer GSTIN format is invalid');
+    if(!firstErrorField) firstErrorField = f;
+  }
+  if(items.length===0){
+    errors.push('Add at least one line item');
+  } else {
+    const emptyDesc = items.some(it=>!it.desc || !it.desc.trim());
+    if(emptyDesc) errors.push('Every line item needs a description');
+  }
+  if(errors.length){
+    toast(errors[0], 'error');
+    if(firstErrorField){
+      firstErrorField.scrollIntoView({behavior:'smooth', block:'center'});
+      document.getElementById(firstErrorField.querySelector('input,select,textarea')?.id)?.focus();
+    } else {
+      document.getElementById('cardD').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    return false;
+  }
+  return true;
+}
+
+function readFileAsBase64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = ()=>res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+document.getElementById('s_logo').addEventListener('change', async function(){
+  if(this.files[0]){ sellerLogoBase64 = await readFileAsBase64(this.files[0]); scheduleRender(); }
+});
+document.getElementById('x_sigImage').addEventListener('change', async function(){
+  if(this.files[0]){ signatureBase64 = await readFileAsBase64(this.files[0]); scheduleRender(); }
+});
+
+function collectSellerProfile(){
+  return {
+    name: document.getElementById('s_name').value,
+    address: document.getElementById('s_address').value,
+    city: document.getElementById('s_city').value,
+    state: document.getElementById('s_state').value,
+    pin: document.getElementById('s_pin').value,
+    gstin: document.getElementById('s_gstin').value,
+    pan: document.getElementById('s_pan').value,
+    email: document.getElementById('s_email').value,
+    phone: document.getElementById('s_phone').value,
+    bank: document.getElementById('s_bank').value,
+    acc: document.getElementById('s_acc').value,
+    ifsc: document.getElementById('s_ifsc').value,
+    branch: document.getElementById('s_branch').value,
+    upi: document.getElementById('s_upi').value,
+    logo: sellerLogoBase64,
+    terms: document.getElementById('x_terms').value,
+    declaration: document.getElementById('x_declaration').value,
+    signatory: document.getElementById('x_signatory').value,
+  };
+}
+function applySellerProfile(p){
+  if(!p) return;
+  document.getElementById('s_name').value = p.name||'';
+  document.getElementById('s_address').value = p.address||'';
+  document.getElementById('s_city').value = p.city||'';
+  document.getElementById('s_state').value = p.state||'';
+  document.getElementById('s_pin').value = p.pin||'';
+  document.getElementById('s_gstin').value = p.gstin||'';
+  document.getElementById('s_pan').value = p.pan||'';
+  document.getElementById('s_email').value = p.email||'';
+  document.getElementById('s_phone').value = p.phone||'';
+  document.getElementById('s_bank').value = p.bank||'';
+  document.getElementById('s_acc').value = p.acc||'';
+  document.getElementById('s_ifsc').value = p.ifsc||'';
+  document.getElementById('s_branch').value = p.branch||'';
+  document.getElementById('s_upi').value = p.upi||'';
+  sellerLogoBase64 = p.logo||'';
+  if(p.terms) document.getElementById('x_terms').value = p.terms;
+  if(p.declaration) document.getElementById('x_declaration').value = p.declaration;
+  if(p.signatory) document.getElementById('x_signatory').value = p.signatory;
+}
+document.getElementById('btnSaveSeller').addEventListener('click', ()=>{
+  localStorage.setItem(LS.seller, JSON.stringify(collectSellerProfile()));
+  toast('Business profile saved.', 'success');
+  validateSellerGstin();
+  scheduleRender();
+});
+
+function getClients(){ return JSON.parse(localStorage.getItem(LS.clients)||'[]'); }
+function saveClients(c){ localStorage.setItem(LS.clients, JSON.stringify(c)); }
+function refreshClientSelect(){
+  const sel = document.getElementById('c_loadClient');
+  const clients = getClients();
+  sel.innerHTML = '<option value="">— Select a saved client —</option>' +
+    clients.map((c,idx)=>`<option value="${idx}">${esc(c.name)} — ${esc(c.city)}</option>`).join('');
+}
+refreshClientSelect();
+document.getElementById('c_loadClient').addEventListener('change', function(){
+  if(this.value==='') return;
+  const c = getClients()[this.value];
+  document.getElementById('b_name').value = c.name||'';
+  document.getElementById('b_address').value = c.address||'';
+  document.getElementById('b_city').value = c.city||'';
+  document.getElementById('b_state').value = c.state||'';
+  document.getElementById('b_pin').value = c.pin||'';
+  document.getElementById('b_gstin').value = c.gstin||'';
+  document.getElementById('b_contact').value = c.contact||'';
+  validateBuyerGstin();
+  scheduleRender();
+  toast('Client details loaded.', 'success');
+});
+document.getElementById('btnSaveClient').addEventListener('click', ()=>{
+  const name = document.getElementById('b_name').value.trim();
+  if(!name){ toast('Enter a buyer name before saving.', 'error'); return; }
+  const clients = getClients();
+  const client = {
+    name, address: document.getElementById('b_address').value,
+    city: document.getElementById('b_city').value, state: document.getElementById('b_state').value,
+    pin: document.getElementById('b_pin').value, gstin: document.getElementById('b_gstin').value,
+    contact: document.getElementById('b_contact').value,
+  };
+  const existingIdx = clients.findIndex(c=>c.name===name);
+  if(existingIdx>=0) clients[existingIdx] = client; else clients.push(client);
+  saveClients(clients);
+  refreshClientSelect();
+  toast('Client saved.', 'success');
+});
+
+const GST_PORTAL_SEARCH_URL = 'https://services.gst.gov.in/services/searchtp';
+document.querySelectorAll('.portal-verify-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const gstin = document.getElementById(btn.dataset.portal).value.trim();
+    if(!gstin){ toast('Enter a GSTIN first.', 'error'); return; }
+    try{
+      await navigator.clipboard.writeText(gstin);
+      toast('GSTIN copied — paste into portal search.', 'success');
+    } catch(err){}
+    window.open(GST_PORTAL_SEARCH_URL, '_blank', 'noopener');
+  });
+});
+
+function financialYearLabel(d){
+  const y = d.getFullYear(), m = d.getMonth()+1;
+  const startY = m>=4 ? y : y-1;
+  const endY = (startY+1).toString().slice(-2);
+  return `${startY}-${endY}`;
+}
+function nextInvoiceNumber(){
+  let counter = parseInt(localStorage.getItem(LS.counter)||'0',10) + 1;
+  const fy = financialYearLabel(new Date());
+  return { number: `INV/${fy}/${String(counter).padStart(3,'0')}`, counter };
+}
+function bumpCounter(counter){
+  localStorage.setItem(LS.counter, String(counter));
+}
+
+function initForm(freshInvoiceNumber){
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('i_date').value = today;
+  if(freshInvoiceNumber){
+    const {number} = nextInvoiceNumber();
+    document.getElementById('i_number').value = number;
+  }
+  document.getElementById('x_terms').value = localStorage.getItem('gst_default_terms') ||
+    "1. Payment due within 30 days of invoice date.\n2. Interest @18% p.a. will be charged on overdue payments.\n3. Goods once sold will not be taken back.\n4. Subject to local jurisdiction only.";
+  document.getElementById('x_declaration').value = "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.";
+  const seller = JSON.parse(localStorage.getItem(LS.seller)||'null');
+  if(seller) applySellerProfile(seller);
+}
+function newInvoice(){
+  items = [];
+  itemSeq = 0;
+  document.getElementById('b_name').value='';
+  document.getElementById('b_address').value='';
+  document.getElementById('b_city').value='';
+  document.getElementById('b_state').value='';
+  document.getElementById('b_pin').value='';
+  document.getElementById('b_gstin').value='';
+  document.getElementById('b_contact').value='';
+  document.getElementById('c_shipToggle').checked=false;
+  document.getElementById('shipToBlock').style.display='none';
+  document.getElementById('i_vehicle').value='';
+  document.getElementById('i_eway').value='';
+  document.getElementById('i_challan').value='';
+  document.getElementById('i_po').value='';
+  document.getElementById('i_reverse').value='No';
+  document.getElementById('x_notes').value='';
+  document.getElementById('x_freight').value=0;
+  document.getElementById('x_packing').value=0;
+  document.getElementById('x_insurance').value=0;
+  document.getElementById('x_other').value=0;
+  signatureBase64='';
+  const {number, counter} = nextInvoiceNumber();
+  document.getElementById('i_number').value = number;
+  document.getElementById('i_date').value = new Date().toISOString().slice(0,10);
+  bumpCounter(counter);
+  renderItemsTable();
+  scheduleRender();
+  toast('New invoice started.', 'success');
+}
+document.getElementById('btnNewInvoice').addEventListener('click', newInvoice);
+
+document.querySelectorAll('#formCol input, #formCol select, #formCol textarea').forEach(el=>{
+  el.addEventListener('input', scheduleRender);
+  el.addEventListener('change', scheduleRender);
+});
+
+document.getElementById('btnGeneratePdf').addEventListener('click', ()=>{
+  if(!validateForm()) return;
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = buildInvoiceHTML();
+  const number = (document.getElementById('i_number').value||'invoice').replace(/[\/\\?%*:|"<>]/g,'-');
+  const buyer = (document.getElementById('b_name').value||'buyer').replace(/[\/\\?%*:|"<>]/g,'-');
+  const filename = `Invoice-${number}-${buyer}.pdf`;
+  toast('Generating PDF…');
+  const opt = {
+    margin: 0,
+    filename,
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:3, useCORS:true},
+    jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
+  };
+  html2pdf().set(opt).from(printArea.querySelector('.inv-page')).save().then(()=>{
+    toast('PDF downloaded.', 'success');
+  }).catch(err=>{
+    console.error(err);
+    toast('PDF generation failed.', 'error');
+  });
+});
+
+document.getElementById('btnPreviewModal').addEventListener('click', ()=>{
+  if(!validateForm()) return;
+  const html = buildInvoiceHTML();
+  writeIframe(document.getElementById('modalPreviewFrame'), html);
+  document.getElementById('previewModal').classList.add('open');
+});
+document.getElementById('closePreviewModal').addEventListener('click', ()=>{
+  document.getElementById('previewModal').classList.remove('open');
+});
+
+document.getElementById('btnPrint').addEventListener('click', ()=>{
+  if(!validateForm()) return;
+  const printArea = document.getElementById('printArea');
+  printArea.id = 'printArea';
+  printArea.innerHTML = `<style>${getInvoiceStylesOnly()}</style>` + buildInvoiceHTML();
+  window.print();
+});
+
+function getInvoices(){ return JSON.parse(localStorage.getItem(LS.invoices)||'[]'); }
+function saveInvoices(arr){ localStorage.setItem(LS.invoices, JSON.stringify(arr)); }
+
+function snapshotInvoice(){
+  const calc = computeInvoice();
+  return {
+    savedAt: new Date().toISOString(),
+    number: document.getElementById('i_number').value,
+    date: document.getElementById('i_date').value,
+    buyer: document.getElementById('b_name').value,
+    grandTotal: calc.roundedTotal,
+    formState: collectFullFormState()
+  };
+}
+function collectFullFormState(){
+  const ids = ['i_number','i_date','i_due','i_reverse','i_copytype','i_vehicle','i_eway','i_challan','i_po',
+    'b_name','b_address','b_city','b_state','b_pin','b_gstin','b_contact','c_shipToggle',
+    'sh_name','sh_address','sh_city','sh_state','sh_gstin',
+    'x_freight','x_freightGst','x_packing','x_packingGst','x_insurance','x_insuranceGst','x_other','x_otherGst',
+    'x_roundOff','x_terms','x_declaration','x_notes','x_signatory'];
+  const state = {};
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    state[id] = el.type==='checkbox' ? el.checked : el.value;
+  });
+  state.items = JSON.parse(JSON.stringify(items));
+  state.signatureBase64 = signatureBase64;
+  return state;
+}
+function applyFullFormState(state){
+  Object.keys(state).forEach(id=>{
+    if(id==='items' || id==='signatureBase64') return;
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type==='checkbox') el.checked = state[id]; else el.value = state[id];
+  });
+  document.getElementById('shipToBlock').style.display = state.c_shipToggle ? 'grid' : 'none';
+  items = state.items || [];
+  signatureBase64 = state.signatureBase64 || '';
+  renderItemsTable();
+  scheduleRender();
+}
+
+document.getElementById('btnSaveInvoice').addEventListener('click', ()=>{
+  if(!validateForm()) return;
+  const invoices = getInvoices();
+  const snap = snapshotInvoice();
+  const existingIdx = invoices.findIndex(i=>i.number===snap.number);
+  if(existingIdx>=0) invoices[existingIdx]=snap; else invoices.push(snap);
+  saveInvoices(invoices);
+  toast('Invoice saved to history.', 'success');
+});
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+    e.preventDefault();
+    document.getElementById('btnSaveInvoice').click();
+  }
+});
+
+function renderHistoryList(filter){
+  const list = document.getElementById('historyList');
+  let invoices = getInvoices().slice().reverse();
+  if(filter){
+    const f = filter.toLowerCase();
+    invoices = invoices.filter(i=> (i.number||'').toLowerCase().includes(f) || (i.buyer||'').toLowerCase().includes(f));
+  }
+  if(invoices.length===0){
+    list.innerHTML = `<div style="color:var(--muted);text-align:center;padding:20px;">No saved invoices yet.</div>`;
+    return;
+  }
+  list.innerHTML = invoices.map(inv=>`
+    <div class="history-item">
+      <div class="meta"><b>${esc(inv.number)}</b>${esc(inv.buyer)} · ${esc(inv.date)} · ₹${fmtMoney(inv.grandTotal)}</div>
+      <div class="history-actions">
+        <button class="btn btn-outline btn-sm" data-act="load" data-num="${esc(inv.number)}">Load</button>
+        <button class="btn btn-outline btn-sm" data-act="dup" data-num="${esc(inv.number)}">Duplicate</button>
+        <button class="btn btn-rust btn-sm" data-act="del" data-num="${esc(inv.number)}">Delete</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('button[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const invoices2 = getInvoices();
+      const target = invoices2.find(i=>i.number===btn.dataset.num);
+      if(!target) return;
+      if(btn.dataset.act==='load'){
+        applyFullFormState(target.formState);
+        document.getElementById('historyModal').classList.remove('open');
+        toast('Invoice loaded.', 'success');
+      } else if(btn.dataset.act==='dup'){
+        applyFullFormState(target.formState);
+        const {number, counter} = nextInvoiceNumber();
+        document.getElementById('i_number').value = number;
+        document.getElementById('i_date').value = new Date().toISOString().slice(0,10);
+        bumpCounter(counter);
+        scheduleRender();
+        document.getElementById('historyModal').classList.remove('open');
+        toast('Duplicated as a new invoice.', 'success');
+      } else if(btn.dataset.act==='del'){
+        saveInvoices(invoices2.filter(i=>i.number!==btn.dataset.num));
+        renderHistoryList(document.getElementById('historySearch').value);
+        toast('Invoice deleted.', 'success');
+      }
+    });
+  });
+}
+document.getElementById('btnHistory').addEventListener('click', ()=>{
+  renderHistoryList('');
+  document.getElementById('historyModal').classList.add('open');
+});
+document.getElementById('closeHistoryModal').addEventListener('click', ()=>{
+  document.getElementById('historyModal').classList.remove('open');
+});
+document.getElementById('historySearch').addEventListener('input', function(){
+  renderHistoryList(this.value);
+});
+
+document.getElementById('btnExportCsv').addEventListener('click', ()=>{
+  const invoices = getInvoices();
+  if(invoices.length===0){ toast('No saved invoices to export.', 'error'); return; }
+  const headers = ['Invoice Number','Date','Buyer','Grand Total','Saved At'];
+  const rows = invoices.map(i=>[i.number,i.date,i.buyer,i.grandTotal.toFixed(2),i.savedAt]);
+  const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'gst-invoices-export.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('CSV exported.', 'success');
+});
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+initForm(true);
+renderItemsTable();
+addItemRow();
+scheduleRender();
+</script>
+</body>
+</html>
