@@ -604,7 +604,7 @@ export default function Navbar() {
                                     </div>
                                     <div className="min-w-0">
                                       <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 truncate">
-                                        <span className="text-emerald-600 font-mono mr-1">#{item.num}</span> {item.title}
+                                        {item.title}
                                       </div>
                                       <div className="text-xs text-slate-500 truncate">{item.sub}</div>
                                     </div>
@@ -652,7 +652,6 @@ export default function Navbar() {
                                       </div>
                                       <div className="min-w-0">
                                         <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 truncate leading-tight">
-                                          <span className="text-slate-400 font-mono text-xs mr-1">#{item.num}</span>
                                           {item.title}
                                         </div>
                                         <div className="text-xs text-slate-400 truncate leading-none mt-0.5">
@@ -1181,7 +1180,7 @@ export default function Navbar() {
                             </div>
                             <div className="min-w-0">
                               <div className="text-xs font-bold text-slate-900 truncate group-hover:text-emerald-700">
-                                <span className="text-emerald-600 font-mono mr-1">#{svc.num}</span> {svc.title}
+                                {svc.title}
                               </div>
                               <div className="text-xs text-slate-500 truncate">{svc.sub}</div>
                             </div>

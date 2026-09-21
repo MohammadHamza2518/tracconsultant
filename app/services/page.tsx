@@ -275,10 +275,7 @@ export default function ServicesDirectoryPage() {
                   {/* Header Row: Category Badge, Service Number & Pricing Badge */}
                   <div className="flex items-start justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
-                      <span className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 font-black text-xs flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                        #{service.number.toString().padStart(2, '0')}
-                      </span>
-                      <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/60">
                         {service.categoryLabel}
                       </span>
                     </div>
@@ -360,7 +357,7 @@ export default function ServicesDirectoryPage() {
                     </button>
                     <a
                       href={`https://wa.me/917275922162?text=${encodeURIComponent(
-                        `Hello Tracconsultant, I want to inquire about Service #${service.number}: ${service.title}.`
+                        `Hello Tracconsultant, I want to inquire about ${service.title}.`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -459,7 +456,7 @@ export default function ServicesDirectoryPage() {
                 <>
                   <div className="mb-5">
                     <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      Service #{consultModalService.number} • {getService(consultModalService.id)?.startingPrice || consultModalService.startingPrice}
+                      {consultModalService.categoryLabel} • {getService(consultModalService.id)?.startingPrice || consultModalService.startingPrice}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mt-1">{consultModalService.title}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">{consultModalService.shortDesc}</p>

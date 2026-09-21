@@ -110,7 +110,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
-            <ShieldCheck className="w-3.5 h-3.5" /> Service #{service.number} • {service.categoryLabel}
+            <ShieldCheck className="w-3.5 h-3.5" /> Verified CA Service • {service.categoryLabel}
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
