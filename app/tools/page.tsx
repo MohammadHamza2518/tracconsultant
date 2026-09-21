@@ -167,6 +167,31 @@ export default function ToolsHubPage() {
         {/* Semantic Section Heading for Accessibility */}
         <h2 id="tools-grid" className="sr-only">Directory of Financial and Compliance Tools</h2>
 
+        {/* Featured 19 Calculators Hub Callout */}
+        <div className="mb-6 p-4 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Calculator className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
+                <span>Looking for Financial, Tax &amp; Investment Calculators?</span>
+                <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">19 FREE</span>
+              </div>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Instant calculations for SIP, EPF, HRA, Income Tax, Gratuity, PPF, Take-Home Salary, Loan EMI &amp; more.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/calculators"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shrink-0 transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <span>Open 19 Calculators Hub</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
         {/* Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTools.map((tool) => {

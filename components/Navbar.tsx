@@ -916,6 +916,22 @@ export default function Navbar() {
               )}
             </div>
 
+            {/* 19 Popular Financial Calculators */}
+            <Link
+              href="/calculators"
+              className={`px-2.5 xl:px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold whitespace-nowrap shrink-0 transition-colors flex items-center gap-1.5 ${
+                pathname === '/calculators'
+                  ? 'bg-emerald-50 text-emerald-700 font-bold'
+                  : 'text-slate-700 hover:text-emerald-600 hover:bg-slate-50'
+              }`}
+            >
+              <Calculator className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Calculators</span>
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full shrink-0">
+                19
+              </span>
+            </Link>
+
             {/* Live Filing Tracker */}
             <Link
               href="/track"
@@ -1295,6 +1311,27 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Featured 19 Calculators Mobile Button */}
+            <Link
+              href="/calculators"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border border-emerald-200 rounded-2xl flex items-center justify-between transition-colors shadow-2xs"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <Calculator className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>19 Financial &amp; Tax Calculators</span>
+                    <span className="bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full">FREE</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500">SIP, PF, HRA, Income Tax, Gratuity &amp; More</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-emerald-600" />
+            </Link>
 
             {/* 3. Quick Links: Track & Pay (+ Dashboard if logged in) */}
             <div className={`grid ${user ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>

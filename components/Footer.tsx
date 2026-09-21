@@ -135,7 +135,8 @@ export default function Footer() {
               Tax & Compliance Suite
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li><Link href="/tools" className="text-emerald-400 font-bold hover:underline">Complete Suite Hub (8 Tools)</Link></li>
+              <li><Link href="/calculators" className="text-emerald-400 font-bold hover:underline">19 Free Calculators Hub &rarr;</Link></li>
+              <li><Link href="/tools" className="hover:text-white transition-colors">Compliance Suite Hub (12 Tools)</Link></li>
               <li><Link href="/tools/hra-calculator" className="hover:text-white transition-colors">HRA Exemption Calc (Free)</Link></li>
               <li><Link href="/tools/advance-tax-calculator" className="hover:text-white transition-colors">Advance Tax Calc (Free)</Link></li>
               <li><Link href="/tools/tax-calculator" className="hover:text-white transition-colors">Income Tax Calc (Free)</Link></li>
