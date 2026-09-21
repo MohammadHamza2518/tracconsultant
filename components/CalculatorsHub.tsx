@@ -40,6 +40,7 @@ export interface CalcDef {
 }
 
 export const ALL_CALCULATORS: CalcDef[] = [
+  { id: 'capital-gains', name: 'Capital Gains Calculator', category: 'tax_salary', icon: TrendingUp, shortDesc: 'Shares & Equity MFs LTCG @ 12.5% & STCG @ 20% with Budget 2024 grandfathering', badge: 'Budget 2024' },
   { id: 'interest', name: 'Interest Calculator', category: 'banking', icon: Percent, shortDesc: 'Simple interest computation on loans, deposits & promissory notes' },
   { id: 'income-tax', name: 'Income Tax Calculator', category: 'tax_salary', icon: Calculator, shortDesc: 'Union Budget FY 24-25 & 25-26 Old vs New Regime comparison with 87A rebate', badge: 'Union Budget' },
   { id: 'gratuity', name: 'Gratuity Calculator', category: 'tax_salary', icon: Award, shortDesc: '15/26 formula calculation under Payment of Gratuity Act 1972' },
@@ -62,8 +63,8 @@ export const ALL_CALCULATORS: CalcDef[] = [
 ];
 
 export const CATEGORIES = [
-  { id: 'all', name: 'All Calculators (19)' },
-  { id: 'tax_salary', name: 'Tax & Salary (4)' },
+  { id: 'all', name: 'All Calculators (20)' },
+  { id: 'tax_salary', name: 'Tax & Salary (5)' },
   { id: 'investments', name: 'Investments & Wealth (8)' },
   { id: 'banking', name: 'Banking & Deposits (5)' },
   { id: 'loans_math', name: 'Loans & Math (2)' }
@@ -234,6 +235,7 @@ export default function CalculatorsHub() {
 
           {/* ACTIVE CALCULATOR BODY */}
           <div className="pt-2">
+            {activeCalcId === 'capital-gains' && <CapitalGainsCalculatorView />}
             {activeCalcId === 'interest' && <InterestCalculatorView />}
             {activeCalcId === 'income-tax' && <IncomeTaxCalculatorView />}
             {activeCalcId === 'gratuity' && <GratuityCalculatorView />}
@@ -1874,6 +1876,262 @@ function ResultBox({
           <span>{caNote}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+// ============================================================================
+// CAPITAL GAINS CALCULATOR (Budget 2024 - ClearTax Pattern with Grandfathering)
+// ============================================================================
+function CapitalGainsCalculatorView() {
+  const [holdingPeriod, setHoldingPeriod] = useState<string>('more_than_1_year');
+  const [saleValue, setSaleValue] = useState<number>(500000);
+  const [purchaseDate, setPurchaseDate] = useState<string>('on_or_after_jan_2018');
+  const [purchaseValue, setPurchaseValue] = useState<number>(300000);
+  const [transferExpenses, setTransferExpenses] = useState<number>(0);
+  const [fmvJan2018, setFmvJan2018] = useState<number>(0);
+
+  const isLongTerm = holdingPeriod === 'more_than_1_year';
+
+  // Grandfathering u/s 55(2)(ac)
+  let effectiveCost = purchaseValue;
+  if (purchaseDate === 'before_jan_2018' && fmvJan2018 > 0) {
+    const step1 = Math.min(fmvJan2018, saleValue);
+    effectiveCost = Math.max(purchaseValue, step1);
+  }
+
+  const netSaleConsideration = Math.max(0, saleValue - transferExpenses);
+  const grossCapitalGain = Math.max(0, netSaleConsideration - effectiveCost);
+
+  // Union Budget 2024:
+  // LTCG: 12.5% (raised from 10%), Exemption: ₹1,25,000 (raised from ₹1,00,000)
+  // STCG: 20% (raised from 15%)
+  const exemptionLimit = isLongTerm ? 125000 : 0;
+  const taxableGain = isLongTerm ? Math.max(0, grossCapitalGain - exemptionLimit) : grossCapitalGain;
+  const taxRate = isLongTerm ? 12.5 : 20.0;
+  const taxPayable = Math.round(taxableGain * (taxRate / 100));
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb matching client reference */}
+      <div className="text-xs text-slate-400 font-medium">
+        Home &gt;&gt; Calculators &gt;&gt; Capital Gains Calculator
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Form: Inputs matching ClearTax screenshot exactly */}
+        <div className="lg:col-span-7 space-y-4 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+          
+          {/* 1. Holding Period */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 block">
+              Holding Period (No of Years Between date of Purchase and sale)
+            </label>
+            <select
+              value={holdingPeriod}
+              onChange={(e) => setHoldingPeriod(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 text-slate-900 font-medium transition-colors"
+            >
+              <option value="less_equal_1_year">Less Than or Equal to 1 Year</option>
+              <option value="more_than_1_year">More than 1 Year</option>
+            </select>
+          </div>
+
+          {/* 2. Sale Value */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 block">
+              Sale Value
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                value={saleValue || ''}
+                onChange={(e) => setSaleValue(Number(e.target.value))}
+                placeholder="500000"
+                className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 text-slate-900 font-semibold transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* 3. Purchase Date */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 block">
+              Purchase Date
+            </label>
+            <select
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 text-slate-900 font-medium transition-colors"
+            >
+              <option value="before_jan_2018">Before 31 Jan 2018</option>
+              <option value="on_or_after_jan_2018">On or After 31 Jan 2018</option>
+            </select>
+          </div>
+
+          {/* 4. Purchase Value */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 block">
+              Purchase Value
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                value={purchaseValue || ''}
+                onChange={(e) => setPurchaseValue(Number(e.target.value))}
+                placeholder="300000"
+                className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 text-slate-900 font-semibold transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* 5. Transfer Expenses */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 block">
+              Transfer Expenses (Brokerage etc.)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                value={transferExpenses || ''}
+                onChange={(e) => setTransferExpenses(Number(e.target.value))}
+                placeholder="0"
+                className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 text-slate-900 font-semibold transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* 6. Fair Market Value as on 31st Jan 2018 (Grandfathering) */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-700 block">
+                Fair Market Value (FMV) (Highest Price of Shares or units) as on 31st Jan 2018
+              </label>
+              {purchaseDate === 'before_jan_2018' && (
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                  Sec 55(2)(ac)
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                value={fmvJan2018 || ''}
+                onChange={(e) => setFmvJan2018(Number(e.target.value))}
+                placeholder="0"
+                disabled={purchaseDate !== 'before_jan_2018'}
+                className={`w-full pl-9 pr-3.5 py-2.5 text-sm border rounded-xl font-semibold transition-colors ${
+                  purchaseDate === 'before_jan_2018'
+                    ? 'bg-white border-blue-400 focus:outline-none focus:border-blue-600 text-slate-900'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
+              />
+            </div>
+            {purchaseDate !== 'before_jan_2018' && (
+              <p className="text-[11px] text-slate-400">
+                (Applicable only for assets acquired before 31 Jan 2018 for grandfathering protection)
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Right Output: Matching ClearTax screenshot banner and result text */}
+        <div className="lg:col-span-5 space-y-4">
+          
+          {/* File ITR Now CTA Button */}
+          <Link
+            href="/consult-ca"
+            className="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-center block text-sm sm:text-base shadow-md hover:shadow-lg transition-all"
+          >
+            File ITR Now, Save more Taxes
+          </Link>
+
+          {/* EXACT RESULT TEXT matching Client's screenshot */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+            <p className="text-sm sm:text-base text-slate-900 font-medium leading-relaxed">
+              <span className="font-bold text-slate-900">
+                {isLongTerm ? 'Long Term' : 'Short Term'} Capital Gain
+              </span>{' '}
+              of <span className="font-bold text-slate-900">₹{grossCapitalGain.toLocaleString('en-IN')}</span> is chargeable to tax @{' '}
+              <span className="font-bold text-blue-700">{taxRate}%</span> i.e{' '}
+              <span className="font-black text-slate-900 text-lg">₹{taxPayable.toLocaleString('en-IN')}</span>
+            </p>
+
+            {isLongTerm && (
+              <div className="text-xs text-slate-600 bg-blue-50/80 p-2.5 rounded-xl border border-blue-100 leading-relaxed">
+                💡 <strong>Budget 2024 Relief:</strong> First ₹1,25,000 of Long-Term Capital Gains is completely tax-exempt under Section 112A. Tax @ 12.5% applies only on the net gain exceeding ₹1.25 Lakh.
+              </div>
+            )}
+          </div>
+
+          {/* Detailed Statement Breakdown */}
+          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2.5">
+            <div className="font-bold text-slate-800 pb-2 border-b border-slate-200 flex items-center justify-between">
+              <span>Capital Gain Breakdown (Budget 2024)</span>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Verified</span>
+            </div>
+            
+            <div className="flex justify-between text-slate-600">
+              <span>Sale Consideration:</span>
+              <span className="font-mono font-semibold text-slate-900">₹{saleValue.toLocaleString('en-IN')}</span>
+            </div>
+
+            {transferExpenses > 0 && (
+              <div className="flex justify-between text-slate-600">
+                <span>Less: Transfer Expenses:</span>
+                <span className="font-mono text-red-600">-₹{transferExpenses.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-slate-600">
+              <span>Cost of Acquisition:</span>
+              <span className="font-mono font-semibold text-slate-900">₹{effectiveCost.toLocaleString('en-IN')}</span>
+            </div>
+
+            <div className="flex justify-between text-slate-900 font-bold pt-1 border-t border-slate-200">
+              <span>Gross Capital Gain:</span>
+              <span className="font-mono text-emerald-700 font-black">₹{grossCapitalGain.toLocaleString('en-IN')}</span>
+            </div>
+
+            {isLongTerm && (
+              <div className="flex justify-between text-slate-600">
+                <span>Less: Sec 112A Exemption:</span>
+                <span className="font-mono text-emerald-700">-₹{Math.min(grossCapitalGain, exemptionLimit).toLocaleString('en-IN')}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-slate-900 font-bold pt-1 border-t border-slate-200">
+              <span>Net Taxable Capital Gain:</span>
+              <span className="font-mono font-black text-slate-900">₹{taxableGain.toLocaleString('en-IN')}</span>
+            </div>
+
+            <div className="flex justify-between text-blue-900 font-bold text-sm pt-2 border-t-2 border-blue-200">
+              <span>Tax Payable ({taxRate}%):</span>
+              <span className="font-mono font-black text-blue-700 text-base">₹{taxPayable.toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+
+          {/* Deep link to Full Advanced Multi-Asset Tool with PDF */}
+          <Link
+            href="/tools/capital-gain-calculator"
+            className="group flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-emerald-900 via-slate-900 to-[#0B2545] text-white border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all"
+          >
+            <div>
+              <span className="text-xs font-bold text-emerald-400 block group-hover:text-emerald-300">
+                Advanced Multi-Asset Suite Tool
+              </span>
+              <span className="text-[11px] text-slate-300">
+                Real Estate Dual Indexation (CII), Gold, Section 54/54EC &amp; PDF Export
+              </span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+          </Link>
+
+        </div>
+      </div>
     </div>
   );
 }

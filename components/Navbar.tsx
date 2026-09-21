@@ -977,7 +977,7 @@ export default function Navbar() {
               <Calculator className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-emerald-600 shrink-0" />
               <span className="whitespace-nowrap">Calculators</span>
               <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full shrink-0">
-                19
+                20
               </span>
             </Link>
 

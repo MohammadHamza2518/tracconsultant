@@ -1,11 +1,11 @@
 import React from 'react';
 import CalculatorsHub from '@/components/CalculatorsHub';
 import Link from 'next/link';
-import { Calculator, ArrowRight, ShieldCheck, Sparkles, CheckCircle2, PhoneCall } from 'lucide-react';
+import { Calculator, ArrowRight, ShieldCheck, Sparkles, CheckCircle2, PhoneCall, TrendingUp } from 'lucide-react';
 
 export const metadata = {
-  title: '19 Free Financial, Investment & Tax Calculators | Tracconsultant',
-  description: 'Compute Income Tax, SIP, PF, Gratuity, HRA, PPF, EMI, RD, FD, Mutual Funds, Salary In-Hand and Retirement goals online with official Chartered Accountant precision.'
+  title: '20 Free Financial, Investment & Tax Calculators | Tracconsultant',
+  description: 'Compute Capital Gains, Income Tax, SIP, PF, Gratuity, HRA, PPF, EMI, RD, FD, Mutual Funds, Salary In-Hand and Retirement goals online with official Chartered Accountant precision.'
 };
 
 export default function CalculatorsPage() {
@@ -14,10 +14,10 @@ export default function CalculatorsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Page Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-8">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold border border-emerald-200">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>19 Comprehensive Financial &amp; Tax Workstations • 100% Free</span>
+            <span>20 Comprehensive Financial &amp; Tax Workstations • 100% Free</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-[#0B2545] tracking-tight">
             Popular Financial &amp; Tax Calculators
@@ -25,6 +25,37 @@ export default function CalculatorsPage() {
           <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Instant statutory calculations for Income Tax, HRA, Salary Take-Home, Gratuity, SIP, PPF, EPF, Loans and Wealth Planning engineered by expert Chartered Accountants.
           </p>
+        </div>
+
+        {/* Featured Banner: Capital Gain Tax Calculator (Budget 2024) */}
+        <div className="max-w-4xl mx-auto mb-10">
+          <Link
+            href="/tools/capital-gain-calculator"
+            className="group flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0B2545] via-slate-900 to-emerald-950 border border-emerald-500/40 hover:border-emerald-400 shadow-md hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-bold shadow-sm group-hover:scale-105 transition-transform">
+                <TrendingUp className="w-6 h-6 text-slate-950" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm sm:text-base font-black text-white group-hover:text-emerald-300 transition-colors">
+                    Capital Gain Tax Calculator (Budget 2024 LTCG &amp; STCG)
+                  </span>
+                  <span className="text-[10px] font-black bg-emerald-400 text-slate-950 px-2 py-0.5 rounded uppercase">
+                    NEW • 100% FREE
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Compute LTCG @ 12.5% &amp; STCG @ 20% on Shares, Equity MFs, Gold &amp; Property with Budget 2024 Dual Indexation Comparison.
+                </p>
+              </div>
+            </div>
+            <span className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 group-hover:bg-emerald-500 text-white shrink-0 transition-all flex items-center gap-1.5 shadow-sm">
+              <span>Open Tool</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </Link>
         </div>
 
         {/* Main 19-in-1 Calculators Workstation Hub */}
