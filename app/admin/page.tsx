@@ -2180,6 +2180,57 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Free & Open Compliance Tools Master (11 Tools Status & Test Links) */}
+              <div className="pt-5 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h5 className="text-sm font-bold text-slate-900">
+                      Free &amp; Open Compliance Tools Master ({TOOLS_LIST.filter(t => t.category === 'free').length} Tools)
+                    </h5>
+                    <p className="text-[11px] text-slate-500">
+                      E-Commerce, GST Verification, HSN directory &amp; Calculators available 100% free with zero paywalls
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
+                    100% Active &amp; Free
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {TOOLS_LIST.filter(t => t.category === 'free').map(tool => (
+                    <div
+                      key={tool.id}
+                      className="p-3.5 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl border border-slate-200 hover:border-emerald-300 flex items-center justify-between gap-3 transition-all"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-slate-900 truncate">
+                            {tool.name}
+                          </span>
+                          {tool.badge && (
+                            <span className="text-[9px] font-black bg-emerald-600 text-white px-1.5 py-0.2 rounded shrink-0 uppercase">
+                              {tool.badge}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono block truncate mt-0.5">
+                          /tools/{tool.slug}
+                        </span>
+                      </div>
+                      <a
+                        href={`/tools/${tool.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 p-2 bg-white hover:bg-[#0B2545] hover:text-white text-slate-600 rounded-xl border border-slate-200 shadow-2xs transition-all"
+                        title={`Open ${tool.name}`}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* SECTION 3: 20 CORE CA SERVICES PRICING TABLE */}

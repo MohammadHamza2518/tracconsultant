@@ -56,7 +56,9 @@ import {
   History,
   FileCheck,
   Camera,
-  MessageCircle
+  MessageCircle,
+  ShoppingCart,
+  Hash
 } from 'lucide-react';
 import { CAQueryItem } from '@/lib/types';
 import { compressAvatarImage } from '@/lib/imageUtils';
@@ -187,7 +189,7 @@ export default function ClientDashboard() {
             completedFilings: (data.filings || []).filter((f: any) => f.status === 'completed').length,
             activeQueries: (data.queries || []).filter((q: any) => q.status !== 'resolved').length,
             resolvedQueries: (data.queries || []).filter((q: any) => q.status === 'resolved').length,
-            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner'].includes(t)).length,
+            unlockedPaidTools: (user.unlockedTools || []).filter((t: string) => !['hra-calculator', 'advance-tax-calculator', 'tax-calculator', 'pdf-redactor', 'tb-to-balancesheet', 'gstr2a-reconciliation', 'json-to-computation', 'gstr2a-cleaner', 'ecommerce-gst-converter', 'gstin-search', 'hsn-search'].includes(t)).length,
             verifiedPayments: (data.payments || []).length
           }
         });
@@ -1462,6 +1464,103 @@ export default function ClientDashboard() {
               </div>
             )}
 
+            {/* FEATURED: New E-Commerce & GST Compliance Launchpad */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 mb-1">
+                    <Sparkles className="w-3 h-3 text-emerald-600" />
+                    <span>NEW SUITE TOOLS • 100% FREE ACCESS</span>
+                  </div>
+                  <h2 className="text-lg font-black text-slate-900">E-Commerce &amp; GST Compliance Launchpad</h2>
+                  <p className="text-xs text-slate-500">Official GST portal utilities for marketplace sellers, CAs, and business verifications.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 1. E-Commerce Converter */}
+                <Link
+                  href="/tools/ecommerce-gst-converter"
+                  className="p-5 bg-gradient-to-br from-[#0B2545] to-slate-900 text-white rounded-3xl border border-slate-700 hover:border-emerald-400 shadow-md hover:shadow-xl transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shadow-sm group-hover:scale-110 transition-transform">
+                        <ShoppingCart className="w-5 h-5 text-slate-950" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase bg-emerald-400 text-slate-950 px-2 py-0.5 rounded-full">
+                        NEW • FREE
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-black group-hover:text-emerald-300 transition-colors">
+                      E-Commerce GSTR-1 &amp; TCS Converter
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                      Convert Amazon MTR, Flipkart &amp; Meesho sales into Table 7 B2CS JSON with 1% Sec 52 TCS credit.
+                    </p>
+                  </div>
+                  <div className="pt-4 mt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-emerald-400 group-hover:text-emerald-300">
+                    <span>Launch Converter</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* 2. GSTIN Search & Verification */}
+                <Link
+                  href="/tools/gstin-search"
+                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                        1-CLICK PDF
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-black group-hover:text-emerald-700 transition-colors">
+                      GSTIN Search &amp; Verification
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                      Verify any 15-digit GSTIN, check active legal profile, 6-month returns, and download verified A4 PDF report.
+                    </p>
+                  </div>
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
+                    <span>Verify &amp; Download PDF</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* 3. HSN & SAC Code Finder */}
+                <Link
+                  href="/tools/hsn-search"
+                  className="p-5 bg-white text-slate-900 rounded-3xl border border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform">
+                        <Hash className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                        150+ CODES
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-black group-hover:text-blue-700 transition-colors">
+                      HSN &amp; SAC Code Search Tool
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                      Instant product keyword &amp; code search with applicable 0%, 5%, 12%, 18%, 28% GST tax rates &amp; 1-click copy.
+                    </p>
+                  </div>
+                  <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                    <span>Search HSN Codes</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              </div>
+            </div>
+
             {/* 4 Advance / Pro Tools */}
             <div id="advance-pro-tools-section" className="space-y-4">
               <div className="flex items-center justify-between">
@@ -1574,8 +1673,8 @@ export default function ClientDashboard() {
             <div className="bg-slate-100/80 rounded-3xl p-6 sm:p-8 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-black text-slate-900">8 Free &amp; Basic Compliance Utilities</h3>
-                  <p className="text-xs text-slate-500">100% free calculators and basic converters permanently included in your account.</p>
+                  <h3 className="text-base font-black text-slate-900">{basicFreeTools.length} Free &amp; Basic Compliance Utilities</h3>
+                  <p className="text-xs text-slate-500">100% free calculators, GST engines, and converters permanently included in your account.</p>
                 </div>
                 <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-xl">
                   Included Free
