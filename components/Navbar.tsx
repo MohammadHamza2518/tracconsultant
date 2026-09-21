@@ -1050,8 +1050,8 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Direct WhatsApp / Consultation Callout - Professional Emerald with Phone Icon */}
-            {(!user || pathname !== '/dashboard') && (
+            {/* Direct WhatsApp / Consultation Callout - High-converting CTA for prospective visitors */}
+            {!user && (
               <a
                 href="https://wa.me/917275922162?text=Hello%20Tracconsultant,%20I%20need%20CA%20advice%20for%20my%20tax%20and%20business."
                 target="_blank"
